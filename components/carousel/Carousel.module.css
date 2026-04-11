@@ -71,25 +71,22 @@
   border-radius: var(--shape-sm);
   cursor: pointer;
   display: flex; align-items: center; justify-content: center;
-  transition: background 0.15s, color 0.15s, opacity 0.2s;
-  opacity: 0;
-  pointer-events: none;
+  transition: background 0.15s, color 0.15s;
 }
 .caseToggleBtn:hover {
   background: var(--color-surface-variant);
   color: var(--color-on-surface);
 }
 
-/* Show toggle when a card is active — managed via JS class on wrap */
-:global(.is-active) ~ .caseToggleBtn,
-.stage:has(:global(.is-active)) .caseToggleBtn {
-  opacity: 1;
-  pointer-events: auto;
-}
-
 /* ── Split state ── */
 .caseOpen .stage      { right: 75vw; }
 .caseOpen .casePanel  { left: 25vw; }
+
+/* Mobile: case panel is fullscreen, carousel stays put */
+@media (max-width: 767px) {
+  .caseOpen .stage     { right: 0; }
+  .caseOpen .casePanel { left: 0; }
+}
 
 /* Ctrl panel pushes stage */
 .ctrlOpen .stage { right: 260px; }

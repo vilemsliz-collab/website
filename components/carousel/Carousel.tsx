@@ -155,6 +155,10 @@ export default function Carousel() {
     runSplitTransition('split', () => { loadPreset('split') })
   }, [runSplitTransition, loadPreset])
 
+  // Stable ref so onTouchEnd (stale closure) can always call the latest openCasePanel
+  const openCasePanelRef = useRef(openCasePanel)
+  useEffect(() => { openCasePanelRef.current = openCasePanel }, [openCasePanel])
+
   const closeCasePanel = useCallback(() => {
     caseOpen.current = false
     setCaseOpenState(false)
@@ -292,7 +296,11 @@ export default function Carousel() {
             kick()
           }
         } else {
+          // Tap — snap carousel and open case panel for the active card
           kick()
+          if (activeIdx.current >= 0 && !caseOpen.current) {
+            openCasePanelRef.current(activeIdx.current)
+          }
         }
       } else {
         kick()

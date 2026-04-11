@@ -221,15 +221,18 @@ function Physics({
       cam.updateProjectionMatrix()
     }
 
+    // On mobile the case panel is fullscreen — no camera shift or spread compression
+    const mobileCase = caseOpen.current && size.width < 768
+
     // Camera X spring — positive X shifts view left (carousel visible in left 25vw)
-    const targetCamX = caseOpen.current ? size.width * 0.375 : 0
+    const targetCamX = mobileCase ? 0 : (caseOpen.current ? size.width * 0.375 : 0)
     camXVelRef.current += (targetCamX - camXRef.current) * 0.06
     camXVelRef.current *= 0.85
     camXRef.current += camXVelRef.current
     cam.position.x = camXRef.current
 
     // Effective width spring — compress card spread for narrow stage
-    const targetW = caseOpen.current ? size.width * 0.25 : size.width
+    const targetW = mobileCase ? size.width : (caseOpen.current ? size.width * 0.25 : size.width)
     wVelRef.current += (targetW - wRef.current) * 0.06
     wVelRef.current *= 0.85
     wRef.current += wVelRef.current
