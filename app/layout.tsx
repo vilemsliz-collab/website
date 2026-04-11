@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
 import { IBM_Plex_Mono } from 'next/font/google'
 import '@/styles/globals.css'
+import LenisProvider from '@/components/LenisProvider'
+import { Agentation } from 'agentation'
 
 const ibmPlexMono = IBM_Plex_Mono({
   subsets: ['latin'],
@@ -30,7 +32,10 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body>{children}</body>
+      <body>
+        <LenisProvider>{children}</LenisProvider>
+        {process.env.NODE_ENV === 'development' && <Agentation />}
+      </body>
     </html>
   )
 }

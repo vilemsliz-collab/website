@@ -1,8 +1,14 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
+import gsap from 'gsap'
+import { SplitText } from 'gsap/SplitText'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import type { CaseStudy } from '@/data/cases'
 import styles from './CaseStudy.module.css'
+
+gsap.registerPlugin(SplitText, ScrollTrigger)
 
 function RotatingClaims({ claims }: { claims: CaseStudy['claims'] }) {
   const [cur, setCur] = useState(0)
@@ -21,11 +27,18 @@ function RotatingClaims({ claims }: { claims: CaseStudy['claims'] }) {
 
   return (
     <div className={styles.csClaims}>
-      {claims.map((claim, i) => (
-        <p key={i} className={`${styles.csClaim} ${i === cur ? styles.csClaimActive : ''}`}>
-          {renderClaim(claim)}
-        </p>
-      ))}
+      <AnimatePresence mode="wait">
+        <motion.p
+          key={cur}
+          className={styles.csClaim}
+          initial={{ opacity: 0, y: 14 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -10 }}
+          transition={{ duration: 0.52, ease: [0.25, 0.46, 0.45, 0.94] }}
+        >
+          {renderClaim(claims[cur])}
+        </motion.p>
+      </AnimatePresence>
     </div>
   )
 }
@@ -56,6 +69,39 @@ function RevealSection({ children, delay = 0 }: { children: React.ReactNode; del
   )
 }
 
+function HeadlineReveal({ dark, muted }: { dark: string; muted: string }) {
+  const headlineRef = useRef<HTMLHeadingElement>(null)
+
+  useEffect(() => {
+    const el = headlineRef.current
+    if (!el) return
+    const ctx = gsap.context(() => {
+      const split = SplitText.create(el, { type: 'chars', charsClass: styles.splitChar })
+      gsap.from(split.chars, {
+        opacity: 0,
+        yPercent: 60,
+        filter: 'blur(6px)',
+        duration: 0.7,
+        stagger: 0.018,
+        ease: 'power3.out',
+        scrollTrigger: {
+          trigger: el,
+          start: 'top 85%',
+          toggleActions: 'play none none none',
+        },
+      })
+    }, el)
+    return () => ctx.revert()
+  }, [])
+
+  return (
+    <h1 ref={headlineRef} className={styles.csHeadline}>
+      <span className={styles.csHeadlineDark}>{dark}</span>
+      <span className={styles.csHeadlineMuted}>{muted}</span>
+    </h1>
+  )
+}
+
 interface Props {
   cs: CaseStudy
 }
@@ -72,14 +118,9 @@ export default function CaseStudyPage({ cs }: Props) {
       <div className={styles.csPage}>
 
         {/* ── 1. Hero ── */}
-        <RevealSection delay={0}>
-          <section className={`${styles.csHero} ${styles.csTextInset}`}>
-            <h1 className={styles.csHeadline}>
-              <span className={styles.csHeadlineDark}>{cs.headlineDark}</span>
-              <span className={styles.csHeadlineMuted}>{cs.headlineMuted}</span>
-            </h1>
-          </section>
-        </RevealSection>
+        <section className={`${styles.csHero} ${styles.csTextInset}`}>
+          <HeadlineReveal dark={cs.headlineDark} muted={cs.headlineMuted} />
+        </section>
 
         {/* ── 2. Stat + Role ── */}
         <RevealSection delay={60}>
