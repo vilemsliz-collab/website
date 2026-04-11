@@ -10,7 +10,7 @@ import {
   clamp, buildRollBase,
 } from '@/lib/carouselPhysics'
 import styles from './Carousel.module.css'
-import DevPanel from './DevPanel'
+import DevPanel, { type GlassConfig } from './DevPanel'
 
 const CarouselCanvas = dynamic(() => import('./CarouselCanvas'), { ssr: false })
 
@@ -76,6 +76,16 @@ export default function Carousel() {
   const inputRef  = useRef({ ...INPUT })
   const tiltCfg   = useRef({ ...TILT })
   const ghostCfg  = useRef({ ...GHOST })
+  const glassCfg  = useRef<GlassConfig>({ blur: 10, opacity: 0.15, color: 255 })
+
+  const applyGlass = useCallback(() => {
+    const el = casePanelRef.current
+    if (!el) return
+    const { blur, opacity, color } = glassCfg.current
+    el.style.backdropFilter = `blur(${blur}px)`
+    el.style.webkitBackdropFilter = `blur(${blur}px)`
+    el.style.background = `rgba(${color},${color},${color},${opacity})`
+  }, [])
 
   // ── React state (only for things that need re-render) ──
   const [caseOpenState, setCaseOpenState] = useState(false)
@@ -427,8 +437,10 @@ export default function Carousel() {
         inputRef={inputRef}
         tiltCfg={tiltCfg}
         ghostCfg={ghostCfg}
+        glassCfg={glassCfg}
         onCfgChange={() => {}}
         onGhostRebuild={() => {}}
+        onGlassChange={applyGlass}
       />
     </div>
   )

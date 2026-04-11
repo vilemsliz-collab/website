@@ -41,6 +41,8 @@ function DevRow({ label, min, max, step, value, fmt, onChange }: DevRowProps) {
   )
 }
 
+export interface GlassConfig { blur: number; opacity: number; color: number }
+
 interface DevPanelProps {
   open: boolean
   onToggle: () => void
@@ -49,12 +51,14 @@ interface DevPanelProps {
   inputRef: MutableRefObject<InputConfig>
   tiltCfg: MutableRefObject<TiltConfig>
   ghostCfg: MutableRefObject<GhostConfig>
+  glassCfg: MutableRefObject<GlassConfig>
   onCfgChange: () => void
   onGhostRebuild: () => void
+  onGlassChange: () => void
 }
 
 export default function DevPanel({
-  open, onToggle, cfg, revealRef, inputRef, tiltCfg, ghostCfg, onCfgChange, onGhostRebuild,
+  open, onToggle, cfg, revealRef, inputRef, tiltCfg, ghostCfg, glassCfg, onCfgChange, onGhostRebuild, onGlassChange,
 }: DevPanelProps) {
   function copyToClipboard(text: string, btn: HTMLButtonElement) {
     navigator.clipboard.writeText(text).then(() => {
@@ -132,6 +136,15 @@ export default function DevPanel({
             <DevRow label="stiffness" min={0.01} max={0.5}  step={0.01} value={tiltCfg.current.stiffness} fmt={v => v.toFixed(2)} onChange={v => { tiltCfg.current.stiffness = v }} />
             <DevRow label="damping"   min={0.5}  max={0.99} step={0.01} value={tiltCfg.current.damping}   fmt={v => v.toFixed(2)} onChange={v => { tiltCfg.current.damping = v }} />
             <button className={styles.devCopy} onClick={e => copyToClipboard(`max: ${tiltCfg.current.max}, stiffness: ${tiltCfg.current.stiffness.toFixed(2)}, damping: ${tiltCfg.current.damping.toFixed(2)}`, e.currentTarget)}>copy</button>
+          </div>
+
+          {/* ── Glass ── */}
+          <div className={styles.devSection}>
+            <div className={styles.devSectionTitle}>Glass</div>
+            <DevRow label="blur"    min={0}   max={40}  step={0.5}  value={glassCfg.current.blur}    fmt={v => v.toFixed(1)+'px'} onChange={v => { glassCfg.current.blur = v; onGlassChange() }} />
+            <DevRow label="opacity" min={0}   max={1}   step={0.01} value={glassCfg.current.opacity} fmt={v => v.toFixed(2)}      onChange={v => { glassCfg.current.opacity = v; onGlassChange() }} />
+            <DevRow label="tint"    min={0}   max={255} step={1}    value={glassCfg.current.color}   fmt={v => Math.round(v).toString()} onChange={v => { glassCfg.current.color = Math.round(v); onGlassChange() }} />
+            <button className={styles.devCopy} onClick={e => copyToClipboard(`backdrop-filter: blur(${glassCfg.current.blur.toFixed(1)}px); background: rgba(${glassCfg.current.color}, ${glassCfg.current.color}, ${glassCfg.current.color}, ${glassCfg.current.opacity.toFixed(2)});`, e.currentTarget)}>copy</button>
           </div>
 
           {/* ── Reveal ── */}
