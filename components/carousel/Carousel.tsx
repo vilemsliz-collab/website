@@ -82,8 +82,8 @@ export default function Carousel() {
     const el = casePanelRef.current
     if (!el) return
     const { blur, opacity, color } = glassCfg.current
-    el.style.backdropFilter = `blur(${blur}px)`
-    el.style.webkitBackdropFilter = `blur(${blur}px)`
+    el.style.backdropFilter = `blur(${blur}px)`;
+    (el.style as unknown as Record<string, string>).webkitBackdropFilter = `blur(${blur}px)`
     el.style.background = `rgba(${color},${color},${color},${opacity})`
   }, [])
 
