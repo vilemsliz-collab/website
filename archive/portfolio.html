@@ -1,0 +1,1134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>Portfolio — Lab</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:wght@100..900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./design-system.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      width: 100%; height: 100%;
+      background: var(--color-background);
+      overflow: hidden;
+      touch-action: none;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .site-nav {
+      position: fixed;
+      top: 20px; left: 24px;
+      display: flex; gap: 20px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;
+      z-index: 100;
+    }
+    .site-nav a {
+      color: var(--color-outline); text-decoration: none;
+      transition: color 0.2s;
+    }
+    .site-nav a:hover { color: var(--color-on-surface); }
+    .site-nav a.active { color: var(--color-on-surface); }
+
+    #stage {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      transition: right 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      perspective-origin: 50% 50%;
+      overflow: hidden;
+    }
+
+    /* ── Case study panel ── */
+    #case-panel {
+      position: fixed;
+      top: 0; bottom: 0;
+      left: 100%;
+      right: 0;
+      background: rgba(243, 244, 249, 0.82);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border-left: 1px solid var(--color-outline-variant);
+      border-radius: 16px 0 0 16px;
+      z-index: 50;
+      transition: left 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+      overflow: hidden;
+    }
+    .case-frame {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      border: none;
+      display: block;
+      transition: transform 0.55s cubic-bezier(0.4, 0, 0.2, 1),
+                  opacity 0.15s ease;
+    }
+
+    /* ── Toggle button (bottom-right of carousel, opens/closes case) ── */
+    #case-toggle-btn {
+      position: absolute;
+      bottom: 20px; right: 20px;
+      z-index: 100;
+      width: 40px; height: 40px;
+      background: var(--color-surface);
+      border: 1px solid var(--color-outline-variant);
+      color: var(--color-on-surface-variant);
+      font-size: 18px;
+      border-radius: var(--shape-sm);
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.15s, color 0.15s, opacity 0.2s;
+      opacity: 0;
+      pointer-events: none;
+    }
+    #case-toggle-btn:hover {
+      background: var(--color-surface-variant);
+      color: var(--color-on-surface);
+    }
+    body:has(.card-wrap.is-active) #case-toggle-btn {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* ── Split state ── */
+    body.case-open #stage      { right: 75vw; }
+    body.case-open #case-panel { left: 25vw; }
+
+    /* ── Card wrap: receives carousel 3D transform ── */
+    .card-wrap {
+      position: absolute;
+      width: min(92vw, var(--card-width));
+      aspect-ratio: var(--card-aspect-w) / var(--card-aspect-h);
+      perspective: var(--card-perspective);
+      will-change: transform, opacity;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+    }
+
+    /* ── Card: receives tilt transform ── */
+    .card {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: var(--card-padding) var(--card-padding) var(--space-10);
+      position: relative;
+      z-index: 2;
+      background: var(--card-bg);
+      border-radius: var(--shape-card);
+      clip-path: inset(0 round var(--shape-card));
+      will-change: transform;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+    }
+
+    .card-wrap            { cursor: pointer; }
+    .card-wrap.is-active  { cursor: default; }
+
+    .card-bg {
+      position: absolute; inset: 0; z-index: 0;
+      width: 100%; height: 100%; object-fit: cover; display: block;
+      border-radius: inherit;
+    }
+    .card-overlay {
+      position: absolute; inset: 0; z-index: 2;
+      background: linear-gradient(to bottom, rgba(0,0,0,0) 55%, rgba(0,0,0,0.55));
+    }
+    .card-content {
+      position: relative; z-index: 4;
+      display: flex; flex-direction: column; gap: var(--stack-sm);
+      color: #fff;
+      text-transform: none;
+    }
+    .card-line { line-height: 1.17; }
+    .card-line:first-child { margin-bottom: var(--stack-sm); }
+
+
+    /* ── Ghost clone ── */
+    .ghost-clone {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0;
+      will-change: transform, opacity;
+    }
+    .ghost-clone .card-content { visibility: hidden; }
+
+    /* ── Word reveal ── */
+    .word {
+      display: inline-block;
+    }
+
+
+
+    /* ── Ctrl toggle ── */
+    #ctrl-toggle {
+      position: fixed;
+      bottom: 62px; right: 16px;
+      min-width: 56px; height: 36px;
+      padding: 0 12px;
+      background: #0a0a0c;
+      border: 1px solid #2a2a30;
+      border-radius: 20px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase;
+      cursor: pointer; color: #888;
+      z-index: 300;
+      display: flex; align-items: center; justify-content: center;
+      transition: color 0.15s, border-color 0.15s;
+      touch-action: auto;
+    }
+    #ctrl-toggle:hover      { color: #ddd; border-color: #555; }
+    .ctrl-open #ctrl-toggle { color: #ddd; border-color: #555; }
+
+    /* ── Ctrl panel (right-side drawer) ── */
+    #ctrl-panel {
+      position: fixed;
+      top: 0; right: 0; bottom: 0; width: 260px;
+      background: rgba(10,10,12,0.95);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      z-index: 200;
+      transform: translateX(100%);
+      transition: transform 0.28s ease;
+      display: flex; flex-direction: column;
+      touch-action: auto;
+      user-select: text; -webkit-user-select: text;
+      overflow: hidden;
+    }
+    .ctrl-open #ctrl-panel  { transform: translateX(0); }
+    .ctrl-open #stage       { right: 260px; }
+
+    #ctrl-panel-inner {
+      flex: 1; overflow-y: auto;
+      padding: 52px 16px 16px;
+      scrollbar-width: thin; scrollbar-color: #333 transparent;
+    }
+
+    .dev-section { margin-bottom: 18px; }
+    .dev-section-title {
+      font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase;
+      color: #555; margin-bottom: 8px; padding-bottom: 5px;
+      border-bottom: 1px solid #1e1e22;
+      font-family: 'IBM Plex Mono', monospace;
+    }
+    .dev-row {
+      display: grid;
+      grid-template-columns: 72px 1fr 44px;
+      align-items: center;
+      gap: 6px; margin-bottom: 8px;
+    }
+    .dev-label {
+      font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase;
+      color: #666; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      font-family: 'IBM Plex Mono', monospace;
+    }
+    .dev-row input[type="range"] {
+      width: 100%; height: 3px; accent-color: #c8ff00; cursor: pointer;
+    }
+    .dev-val {
+      font-size: 10px; text-align: right; color: #c8ff00;
+      font-family: 'IBM Plex Mono', monospace;
+    }
+    .dev-btn-row { display: flex; gap: 6px; margin-bottom: 8px; }
+    .dev-btn {
+      flex: 1; padding: 7px 0;
+      border: 1px solid #2a2a30; border-radius: 6px;
+      background: #111115; color: #666;
+      font-family: 'IBM Plex Mono', monospace; font-size: 10px;
+      cursor: pointer; transition: all 0.15s; touch-action: auto;
+    }
+    .dev-btn:hover  { border-color: #555; color: #ddd; }
+    .dev-btn.active { background: #c8ff00; color: #0a0a0c; border-color: #c8ff00; }
+    .dev-replay {
+      width: 100%; padding: 9px;
+      background: #c8ff00; border: none; border-radius: 5px;
+      font-family: 'IBM Plex Mono', monospace; font-size: 10px;
+      font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase;
+      color: #0a0a0c; cursor: pointer; transition: background 0.15s;
+      margin-top: 4px; touch-action: auto;
+    }
+    .dev-replay:hover { background: #d4ff33; }
+    .dev-copy {
+      width: 100%; padding: 7px 0;
+      border: 1px solid #2a2a30; border-radius: 6px;
+      background: transparent; color: #555;
+      font-family: 'IBM Plex Mono', monospace; font-size: 9px;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      cursor: pointer; transition: all 0.15s;
+      margin-top: 6px; touch-action: auto;
+    }
+    .dev-copy:hover  { border-color: #555; color: #ddd; }
+    .dev-copy.copied { border-color: #c8ff00; color: #c8ff00; }
+    .dev-val-input {
+      width: 44px; text-align: right;
+      background: transparent; border: none; border-bottom: 1px solid #2a2a30;
+      color: #c8ff00; font-family: 'IBM Plex Mono', monospace; font-size: 10px;
+      padding: 0; outline: none;
+      -moz-appearance: textfield;
+    }
+    .dev-val-input::-webkit-inner-spin-button { display: none; }
+    .dev-val-input:focus { border-bottom-color: #c8ff00; }
+
+  </style>
+</head>
+<body>
+
+  <nav class="site-nav">
+    <a href="./portfolio.html" class="active">Portfolio</a>
+    <a href="./card.html">Card</a>
+    <a href="./design-system.html">Design System</a>
+  </nav>
+
+<div id="stage">
+  <button id="case-toggle-btn" aria-label="Toggle case study">&#x2922;</button>
+</div>
+
+  <button id="ctrl-toggle">ctrl</button>
+  <div id="ctrl-panel">
+    <div id="ctrl-panel-inner"></div>
+  </div>
+
+  <div id="case-panel">
+    <iframe id="case-frame-a" class="case-frame" src="" title="Case study"></iframe>
+    <iframe id="case-frame-b" class="case-frame" src="" title="Case study next"></iframe>
+  </div>
+
+<script>
+(() => {
+  'use strict';
+
+  const DS = getComputedStyle(document.documentElement);
+
+  /* ══ CAROUSEL CONFIG ══ */
+  const PRESETS = {
+    split: {
+      R_MULT: 1.5, R_MAX: 1010, PERSPECTIVE: 200,
+      ROT_MULT: 0, ROLL_MAX: 0,
+      SCALE_ACTIVE: 0.89, SCALE_SPHERE: 0.86,
+      OPACITY_MULT: 0.46, OPACITY_BASE: 1.00, BLUR_MAX: 8,
+      FRICTION: 0.93, SPRING: 0.01,
+    },
+    mobile: {
+      R_MULT: 1.5, R_MAX: 1010, PERSPECTIVE: 200,
+      LAT: [-30, 18, -42, 35, -12], LON_SPREAD: 1.0,
+      ROT_MULT: 0, ROLL_MAX: 0,
+      SCALE_ACTIVE: 0.79, SCALE_SPHERE: 0.83,
+      OPACITY_MULT: 0.46, OPACITY_BASE: 1, BLUR_MAX: 8,
+      FRICTION: 0.93, SPRING: 0.01,
+    },
+    desktop: {
+      R_MULT: 1.5, R_MAX: 1010, PERSPECTIVE: 590,
+      LAT: [-25, 15, -38, 30, -10], LON_SPREAD: 1.0,
+      ROT_MULT: 0, ROLL_MAX: 0,
+      SCALE_ACTIVE: 1.29, SCALE_SPHERE: 0.83,
+      OPACITY_MULT: 0.46, OPACITY_BASE: 1, BLUR_MAX: 8,
+      FRICTION: 0.93, SPRING: 0.01,
+    },
+  };
+  const CFG = Object.assign({}, PRESETS.mobile);
+
+  /* ══ CARD EFFECT CONFIG ══ */
+  const REVEAL = { stagger: 58, dur: 682, blur: 8, y: 8 };
+  const INPUT  = { mouseKick: 0.07, touchSens: 0.02 };
+  const TILT   = { max: 16, stiffness: 0.1, damping: 0.75 };
+  const GHOST  = { layers: 4, opacity: 0.16, blur: 0, blend: 'normal', variant: 'behind' };
+
+  /* ══ CARDS DATA ══ */
+  const CARDS = [
+    { id:'001', lines:['Typographic motion,',   'ink meets screen.'],   role:'Motion Designer',        href:'./cases/001/', bg:'#12131a', ac:'#c8ff00', video:'./assets/portfolio-reel.mp4', img:'./Cases%20Files/Frame%201000005628.png' },
+    { id:'002', lines:['Generative systems,',  'designed in code.'],   role:'Creative Technologist',  href:'./cases/002/', bg:'#080e1c', ac:'#4dd0e1', img:'./Cases%20Files/Free_Dropper_Bottle_Mockup.png' },
+    { id:'003', lines:['Audio reactive,',      'visual frequency.'],   role:'Interaction Designer',   href:'./cases/003/', bg:'#1e0a0a', ac:'#ff5252', img:'./Cases%20Files/Frame%201000005182.png' },
+    { id:'004', lines:['Procedural terrain,',  'rendered at runtime.'],role:'Generative Artist',      href:'./cases/004/', bg:'#071207', ac:'#66ff99', img:'./Cases%20Files/image-60.png' },
+    { id:'005', lines:['Fluid simulation,',    'physics made visual.'],role:'Visual Engineer',        href:'./cases/005/', bg:'#141414', ac:'#e0e0e0', img:'./Cases%20Files/Firefly%252020250309110302-enhanced%201%201.png' },
+  ];
+  const N = CARDS.length;
+
+  /* ══ BUILD CARD DOM ══ */
+  const stage    = document.getElementById('stage');
+  const wrapEls  = [];
+  const cardEls  = [];
+
+  CARDS.forEach((card, i) => {
+    const wrap = document.createElement('div');
+    wrap.className    = 'card-wrap';
+    wrap.dataset.index = i;
+
+    const el = document.createElement('div');
+    el.className      = 'card';
+    el.dataset.index  = i;
+    el.style.background = card.bg;
+    el.innerHTML = `
+      ${card.video ? `<video class="card-bg" src="${card.video}" autoplay loop muted playsinline></video>` : card.img ? `<img class="card-bg" src="${card.img}" alt="">` : ''}
+      <div class="card-overlay"></div>
+      <div class="card-content">
+        <p class="type-label-large card-line">${card.role}</p>
+        <p class="type-headline-large card-line">${card.lines[0]}</p>
+        <p class="type-headline-large card-line">${card.lines[1]}</p>
+      </div>
+    `;
+
+    wrap.appendChild(el);
+    stage.appendChild(wrap);
+    wrapEls.push(wrap);
+    cardEls.push(el);
+  });
+
+  /* ══ CASE STUDY PANEL ══ */
+  let caseOpen = false;
+  const frameA         = document.getElementById('case-frame-a');
+  const frameB         = document.getElementById('case-frame-b');
+  let frontFrame       = frameA;
+  let backFrame        = frameB;
+  frameB.style.transform = 'translateX(100%)';
+  const caseToggleBtn  = document.getElementById('case-toggle-btn');
+
+  function runSplitTransition(targetPresetName, onEnd) {
+    const dur       = 570;
+    const t0        = performance.now();
+    const fromScale = CFG.SCALE_ACTIVE;
+    const fromPersp = CFG.PERSPECTIVE;
+    const toPreset  = PRESETS[targetPresetName];
+    const toScale   = toPreset.SCALE_ACTIVE;
+    const toPersp   = toPreset.PERSPECTIVE;
+    function ease(t) { return t * t * (3 - 2 * t); } // smoothstep
+    function frame(now) {
+      const p = Math.min((now - t0) / dur, 1);
+      const e = ease(p);
+      CFG.SCALE_ACTIVE = fromScale + (toScale - fromScale) * e;
+      CFG.PERSPECTIVE  = fromPersp + (toPersp  - fromPersp) * e;
+      syncPerspective();
+      applyTransforms(posY);
+      if (p < 1) { requestAnimationFrame(frame); }
+      else { onEnd(); }
+    }
+    requestAnimationFrame(frame);
+  }
+
+  function switchCaseContent(url) {
+    backFrame.style.opacity = '0';
+    backFrame.addEventListener('load', () => {
+      backFrame.style.opacity = '1';
+      backFrame.style.transform = 'translateX(0)';
+      setTimeout(() => {
+        frontFrame.src = '';
+        frontFrame.style.transition = 'none';
+        frontFrame.style.transform = 'translateX(100%)';
+        requestAnimationFrame(() => { frontFrame.style.transition = ''; });
+        [frontFrame, backFrame] = [backFrame, frontFrame];
+      }, 560);
+    }, { once: true });
+    backFrame.src = url;
+  }
+
+  function openCasePanel() {
+    frontFrame.style.opacity = '0';
+    frontFrame.style.transition = 'none';
+    frontFrame.style.transform = 'translateX(0)';
+    requestAnimationFrame(() => { frontFrame.style.transition = ''; });
+    frontFrame.addEventListener('load', () => {
+      frontFrame.style.opacity = '1';
+    }, { once: true });
+    frontFrame.src = './case-study.html';
+    document.body.classList.add('case-open');
+    caseOpen = true;
+    baseTiltY = TILT.max * 0.5; tiltTy = baseTiltY;
+    caseToggleBtn.innerHTML = '&#x2715;';
+    runSplitTransition('split', () => { loadPreset('split'); applyTransforms(posY); });
+  }
+
+  function closeCasePanel() {
+    document.body.classList.remove('case-open');
+    caseOpen = false;
+    baseTiltY = 0; tiltTy = 0;
+    caseToggleBtn.innerHTML = '&#x2922;';
+    const targetPreset = innerWidth >= 768 ? 'desktop' : 'mobile';
+    runSplitTransition(targetPreset, () => {
+      frontFrame.src = '';
+      backFrame.src = '';
+      backFrame.style.transition = 'none';
+      backFrame.style.transform = 'translateX(100%)';
+      requestAnimationFrame(() => { backFrame.style.transition = ''; });
+      loadPreset(targetPreset); applyTransforms(posY);
+    });
+  }
+
+  caseToggleBtn.addEventListener('click', e => {
+    e.stopPropagation();
+    if (caseOpen) closeCasePanel(); else openCasePanel();
+  });
+
+  /* ══ CLICK TO NAVIGATE + OPEN CASE ══ */
+  wrapEls.forEach((wrap, i) => {
+    wrap.addEventListener('click', () => {
+      if (i !== activeIdx) {
+        const currentMod = (((Math.round(posY) % N) + N) % N);
+        let delta = i - currentMod;
+        if (delta >  N / 2) delta -= N;
+        if (delta < -N / 2) delta += N;
+        velY = delta * INPUT.mouseKick;
+        kick();
+        if (!caseOpen) setTimeout(openCasePanel, 100);
+      } else {
+        if (!caseOpen) openCasePanel();
+      }
+    });
+  });
+
+  /* ══ STATE ══ */
+  let posY = 0, velY = 0, rafId = null;
+  let activeIdx = -1;
+
+  let tiltRx = 0, tiltRy = 0, tiltVx = 0, tiltVy = 0, tiltTx = 0, tiltTy = 0;
+  let baseTiltY = 0;
+  let activeCardEl = null;
+  const ghostClones = [];
+
+  /* ══ HELPERS ══ */
+  const lerp       = (a, b, t) => a + (b - a) * t;
+  const smoothstep = t => t * t * (3 - 2 * t);
+  const clamp      = (v, a, b) => Math.max(a, Math.min(b, v));
+
+  function syncPerspective() { stage.style.perspective = CFG.PERSPECTIVE + 'px'; }
+  syncPerspective();
+
+  /* Seeded roll for ROLL_MAX (currently 0 in presets) */
+  function seededRng(seed) {
+    let s = seed | 0;
+    return () => { s = (Math.imul(s, 1664525) + 1013904223) | 0; return (s >>> 0) / 0xFFFFFFFF; };
+  }
+  const ROLL_BASE = CARDS.map((_, i) => {
+    const r = seededRng(i * 6271 + 3491);
+    return (r() - 0.5) * 2;
+  });
+
+  /* ══ GHOST CLONES ══ */
+  function buildActiveClones() {
+    ghostClones.forEach(c => c.remove());
+    ghostClones.length = 0;
+    if (!activeCardEl) return;
+    const wrap = activeCardEl.parentElement;
+    const zVal = GHOST.variant === 'front' ? '3' : '1';
+    for (let i = 0; i < GHOST.layers; i++) {
+      const clone = activeCardEl.cloneNode(true);
+      clone.classList.add('ghost-clone');
+      clone.style.zIndex = zVal;
+      wrap.insertBefore(clone, activeCardEl);
+      ghostClones.push(clone);
+    }
+  }
+
+  function perspAngle(fullDeg, fraction, halfDim, P) {
+    if (Math.abs(fullDeg) < 0.001) return 0;
+    const sign   = Math.sign(fullDeg);
+    const r      = Math.abs(fullDeg) * Math.PI / 180;
+    const xFull  = halfDim * Math.cos(r) * P / (P - halfDim * Math.sin(r));
+    const xTgt   = halfDim + fraction * (xFull - halfDim);
+    const A = P, B = xTgt, C = xTgt * P / halfDim;
+    const R = Math.hypot(A, B);
+    const phi = Math.atan2(B, A) - Math.acos(Math.min(C / R, 1));
+    return sign * phi * 180 / Math.PI;
+  }
+
+  function drawGhosts() {
+    if (!activeCardEl || ghostClones.length === 0) return;
+    if (!activeCardEl.parentElement?.classList.contains('is-active')) {
+      ghostClones.forEach(c => { c.style.opacity = '0'; });
+      return;
+    }
+    const mag = Math.abs(tiltRx) + Math.abs(tiltRy);
+    if (mag < 0.3) { ghostClones.forEach(c => { c.style.opacity = '0'; }); return; }
+    const P     = parseFloat(DS.getPropertyValue('--card-perspective')) || 800;
+    const halfW = activeCardEl.offsetWidth  / 2;
+    const halfH = activeCardEl.offsetHeight / 2;
+    ghostClones.forEach((clone, i) => {
+      const scalar = (i + 1) / (GHOST.layers + 1);
+      const rx = perspAngle(tiltRx, scalar, halfH, P);
+      const ry = perspAngle(tiltRy, scalar, halfW, P);
+      clone.style.transform    = `rotateX(${rx.toFixed(3)}deg) rotateY(${ry.toFixed(3)}deg)`;
+      clone.style.opacity      = String(GHOST.opacity * scalar);
+      clone.style.filter       = GHOST.blur > 0 ? `blur(${(GHOST.blur * (1 - scalar)).toFixed(2)}px)` : '';
+      clone.style.mixBlendMode = GHOST.blend;
+    });
+  }
+
+  /* ══ WORD REVEAL ══ */
+  function wrapWords(el) {
+    el.innerHTML = el.textContent.trim().split(/\s+/).map(w =>
+      `<span class="word">${w}</span>`
+    ).join(' ');
+  }
+
+  function applyCSS() {
+    document.documentElement.style.setProperty('--blur', REVEAL.blur + 'px');
+    document.documentElement.style.setProperty('--y',    REVEAL.y    + 'px');
+    document.documentElement.style.setProperty('--dur',  REVEAL.dur  + 'ms');
+  }
+
+  function revealActiveCard() {}
+
+  /* ══ TILT RESET ══ */
+  function resetTilt() {
+    tiltRx = tiltRy = tiltVx = tiltVy = 0;
+    // tiltTx/Ty kept — new card springs immediately to current mouse position
+    ghostClones.forEach(c => { c.style.opacity = '0'; });
+  }
+
+  /* ══ ACTIVE CARD LIFECYCLE ══ */
+  function onActiveChange(newIdx) {
+    activeIdx = newIdx;
+    if (caseOpen) switchCaseContent('./case-study.html');
+
+    revealActiveCard();
+  }
+
+  /* ══ CAROUSEL TRANSFORMS ══ */
+  const V_ARC = 0; // px — peak vertical displacement on V-type transitions
+
+  function applyTransforms(pos) {
+    const vw  = stage.offsetWidth || innerWidth;
+    const R   = Math.min(vw * CFG.R_MULT, CFG.R_MAX);
+    const LAT = CFG.LAT.map(d => d * Math.PI / 180);
+
+    // V-arc: every other transition arcs vertically (works for any N)
+    const posW    = ((pos % N) + N) % N;
+    const i0t     = Math.floor(posW) % N;
+    const i1t     = (i0t + 1) % N;
+    const fracT   = posW - Math.floor(posW);
+    const isVStep = (i0t % 2 === 1);
+    const arc     = isVStep ? Math.sin(Math.PI * fracT) : 0;
+    const vDir    = (Math.floor(i0t / 2) % 2 === 0) ? 1 : -1; // alternates above/below per V step
+
+    CARDS.forEach((_, i) => {
+      let off = i - pos;
+      while (off >  N / 2) off -= N;
+      while (off < -N / 2) off += N;
+
+      const wrap    = wrapEls[i];
+      const phi     = LAT[i % LAT.length];
+      const theta   = off * (2 * Math.PI / N) * CFG.LON_SPREAD;
+      const abs     = Math.abs(off);
+      const st      = smoothstep(Math.min(1, abs));
+      const cosPhi  = Math.cos(phi);
+      const sinPhi  = Math.sin(phi);
+
+      let tyBonus = 0;
+      if (i === i0t) tyBonus =  arc * V_ARC * vDir;
+      if (i === i1t) tyBonus = -arc * V_ARC * vDir;
+
+      const tx      = cosPhi * Math.sin(theta) * R * st;
+      const ty      = sinPhi * R * st + tyBonus;
+      const tz      = (cosPhi * Math.cos(theta) - 1) * R * st;
+      const facing  = cosPhi * Math.cos(theta);
+      const ry      = -(theta * 180 / Math.PI) * CFG.ROT_MULT * st;
+      const rx      = -(phi   * 180 / Math.PI) * CFG.ROT_MULT * st;
+      const rollDeg = ROLL_BASE[i] * CFG.ROLL_MAX;
+      const scale   = lerp(CFG.SCALE_ACTIVE, CFG.SCALE_SPHERE, st);
+      const opacity = Math.max(0, Math.min(1, facing * CFG.OPACITY_MULT + CFG.OPACITY_BASE));
+      wrap.style.transform = [
+        `translateX(${tx.toFixed(1)}px)`,
+        `translateY(${ty.toFixed(1)}px)`,
+        `translateZ(${tz.toFixed(1)}px)`,
+        `rotateX(${rx.toFixed(1)}deg)`,
+        `rotateY(${ry.toFixed(1)}deg)`,
+        `rotateZ(${rollDeg.toFixed(1)}deg)`,
+        `scale(${scale.toFixed(3)})`,
+      ].join(' ');
+      wrap.style.opacity = opacity.toFixed(3);
+      wrap.style.zIndex  = abs < 0.5 ? '20' : String(Math.max(1, Math.round(facing * 10 + 5)));
+      wrap.classList.toggle('is-active', abs < 0.5);
+      if (abs < 0.5 && cardEls[i] !== activeCardEl) {
+        if (activeCardEl) activeCardEl.style.transform = '';
+        activeCardEl = cardEls[i];
+        tiltRx = tiltRy = tiltVx = tiltVy = 0;
+        buildActiveClones();
+      }
+    });
+
+  }
+
+  /* ══ PHYSICS LOOP ══ */
+  function loop() {
+    velY *= CFG.FRICTION;
+    posY += velY;
+
+    const target = Math.round(posY);
+    if (Math.abs(velY) < 0.02) {
+      const spring = (target - posY) * CFG.SPRING;
+      posY += spring;
+      if (Math.abs(velY) < 0.003 && Math.abs(posY - target) < 0.002) {
+        posY = ((target % N) + N) % N;
+        velY = 0;
+        applyTransforms(posY);
+        const newIdx = (((Math.round(posY) % N) + N) % N);
+        if (newIdx !== activeIdx) onActiveChange(newIdx);
+        rafId = null;
+        return;
+      }
+    }
+    applyTransforms(posY);
+    rafId = requestAnimationFrame(loop);
+  }
+
+  function kick() { if (!rafId) rafId = requestAnimationFrame(loop); }
+
+  /* ══ TILT LOOP (independent rAF) ══ */
+  (function tiltLoop() {
+    tiltVx += (tiltTx - tiltRx) * TILT.stiffness;
+    tiltVy += (tiltTy - tiltRy) * TILT.stiffness;
+    tiltVx *= TILT.damping;
+    tiltVy *= TILT.damping;
+    tiltRx += tiltVx;
+    tiltRy += tiltVy;
+    if (activeCardEl) {
+      const isActive = activeCardEl.parentElement?.classList.contains('is-active');
+      if (!isActive) { tiltTx = 0; tiltTy = 0; } // spring toward neutral when dragged away
+      activeCardEl.style.transform =
+        `rotateX(${tiltRx.toFixed(3)}deg) rotateY(${tiltRy.toFixed(3)}deg)`;
+      if (!isActive && Math.abs(tiltRx) < 0.05 && Math.abs(tiltRy) < 0.05) {
+        activeCardEl.style.transform = '';
+      }
+    }
+    drawGhosts();
+    requestAnimationFrame(tiltLoop);
+  })();
+
+  /* ══ TILT INPUT ══ */
+  const isMobile = () => navigator.maxTouchPoints > 0;
+
+  document.addEventListener('mousemove', e => {
+    if (isMobile()) return;
+    if (caseOpen) {
+      const stW = stage.offsetWidth;
+      if (e.clientX <= stW) {
+        const rel = (e.clientX / stW - 0.5) * 2;
+        tiltTy = clamp(baseTiltY + rel * TILT.max * 0.6, -TILT.max, TILT.max);
+      }
+    } else {
+      tiltTy = (e.clientX / window.innerWidth - 0.5) * 2 * TILT.max;
+    }
+    tiltTx = -(e.clientY / window.innerHeight - 0.5) * 2 * TILT.max;
+  });
+  stage.addEventListener('mouseleave', () => {
+    if (!isMobile()) tiltTy = baseTiltY;
+  });
+
+  function attachGyro() {
+    window.addEventListener('deviceorientation', e => {
+      const gamma = e.gamma ?? 0;
+      const beta  = e.beta  ?? 0;
+      tiltTy = clamp( (gamma / 30) * TILT.max, -TILT.max, TILT.max);
+      tiltTx = clamp(((beta - 45) / 30) * TILT.max, -TILT.max, TILT.max);
+    });
+  }
+
+  if (isMobile()) {
+    if (typeof DeviceOrientationEvent !== 'undefined' &&
+        typeof DeviceOrientationEvent.requestPermission === 'function') {
+      const permBtn = document.createElement('button');
+      permBtn.textContent = 'enable tilt';
+      permBtn.style.cssText = 'position:fixed;bottom:120px;right:20px;padding:10px 16px;border-radius:8px;border:1px solid rgba(0,0,0,0.15);background:#1c1b1f;color:#fff;font-family:IBM Plex Mono,monospace;font-size:12px;cursor:pointer;z-index:999;touch-action:auto';
+      document.body.appendChild(permBtn);
+      permBtn.addEventListener('click', () => {
+        DeviceOrientationEvent.requestPermission().then(state => {
+          if (state === 'granted') attachGyro();
+          permBtn.remove();
+        }).catch(() => permBtn.remove());
+      });
+    } else {
+      attachGyro();
+    }
+  }
+
+  /* ══ SCRUBBER (hidden, kept for reuse) ══
+  const scrubEl = document.getElementById('scrubber');
+  const sc      = document.createElement('canvas');
+  scrubEl.appendChild(sc);
+  const DPR = Math.min(devicePixelRatio, 2);
+
+  function resizeScrubber() {
+    const elW = scrubEl.offsetWidth;
+    const elH = SCRUB.boxH + SCRUB.hoverBoxH;
+    scrubEl.style.height = elH + 'px';
+    sc.width        = elW * DPR;
+    sc.height       = elH * DPR;
+    sc.style.width  = elW + 'px';
+    sc.style.height = elH + 'px';
+  }
+  resizeScrubber();
+  const sctx = sc.getContext('2d');
+
+  scrubEl.addEventListener('mousemove', e => { scrubHoverX = e.clientX; drawScrubber(posY); });
+  scrubEl.addEventListener('mouseleave', () => { scrubHoverX = null; drawScrubber(posY); });
+
+  let scrubHoverX = null;
+
+  function drawScrubber(pos) {
+    const w  = sc.width, h = sc.height;
+    sctx.clearRect(0, 0, w, h);
+
+    const spacing  = SCRUB.spacing * DPR;
+    const cx       = w / 2;
+    const total    = Math.ceil(w / spacing) + 2;
+    const rawShift = -(pos / N) * w;
+    const shift    = ((rawShift % spacing) + spacing) % spacing;
+
+    sctx.fillStyle = 'rgba(0,0,0,0.3)';
+
+    for (let i = -1; i < total; i++) {
+      const x    = i * spacing + shift;
+      const dist = Math.abs(x - cx) / cx;
+      const t    = Math.exp(-SCRUB.curve * dist);
+      let lh     = (SCRUB.minH + (SCRUB.maxH - SCRUB.minH) * t) * DPR;
+
+      if (scrubHoverX !== null) {
+        const hDist   = Math.abs(x - scrubHoverX * DPR);
+        const hSpread = SCRUB.hoverSpread * DPR;
+        lh += SCRUB.hoverAmt * DPR * Math.exp(-(hDist * hDist) / (hSpread * hSpread));
+      }
+
+      sctx.fillRect(x - DPR / 2, h - lh, DPR, lh);
+    }
+  }
+  */
+
+  /* ══ DRAG INPUTS ══ */
+  const dragK  = () => 1 / (innerWidth * INPUT.touchSens);
+  /* const scrubK = () => 1 / (innerWidth * 0.45); */
+
+  let stageTouch = null, stageMouse = null;
+  let swipeStartX = null;
+  /* let scrubTouch = null, scrubMouse = null; */
+
+  stage.addEventListener('touchstart', e => {
+    swipeStartX = e.touches[0].clientX;
+    stageTouch  = e.touches[0].clientX;
+    if (innerWidth >= 768) velY = 0; // desktop live-drag: take over from physics
+  }, { passive: true });
+  stage.addEventListener('touchmove', e => {
+    if (stageTouch === null) return;
+    if (innerWidth >= 768) {
+      const dPos = -(e.touches[0].clientX - stageTouch) * dragK();
+      velY = velY * 0.5 + dPos * 0.5; posY += dPos;
+      stageTouch = e.touches[0].clientX;
+      applyTransforms(posY);
+    }
+    // mobile: no live drag — wait for touchend swipe
+  }, { passive: true });
+  stage.addEventListener('touchend', e => {
+    if (innerWidth < 768 && swipeStartX !== null) {
+      const delta = (e.changedTouches[0]?.clientX ?? swipeStartX) - swipeStartX;
+      if (Math.abs(delta) > 20) {
+        const now = Date.now();
+        if (now - lastKickMs >= 200) {
+          velY = Math.sign(-delta) * INPUT.mouseKick;
+          lastKickMs = now;
+          kick();
+        }
+      } else {
+        kick(); // tap: spring back to current card
+      }
+    } else {
+      kick();
+    }
+    stageTouch = null; swipeStartX = null;
+  }, { passive: true });
+  stage.addEventListener('mousedown', e => { stageMouse = e.clientX; });
+
+  /* scrubEl drag handlers (hidden, kept for reuse)
+  scrubEl.addEventListener('touchstart', e => { e.stopPropagation(); scrubTouch = e.touches[0].clientX; velY = 0; }, { passive: true });
+  scrubEl.addEventListener('touchmove',  e => {
+    if (scrubTouch === null) return;
+    const dPos = -(e.touches[0].clientX - scrubTouch) * scrubK();
+    velY = velY * 0.5 + dPos * 0.5; posY += dPos;
+    scrubTouch = e.touches[0].clientX;
+    applyTransforms(posY);
+  }, { passive: true });
+  scrubEl.addEventListener('touchend', () => { scrubTouch = null; kick(); }, { passive: true });
+  scrubEl.addEventListener('mousedown', e => { scrubMouse = e.clientX; velY = 0; });
+  */
+
+  window.addEventListener('mousemove', e => {
+    if (stageMouse !== null && !rafId) {
+      const dPos = -(e.clientX - stageMouse) * dragK();
+      velY = velY * 0.5 + dPos * 0.5; posY += dPos;
+      stageMouse = e.clientX;
+      applyTransforms(posY);
+    /* } else if (scrubMouse !== null) {
+      const dPos = -(e.clientX - scrubMouse) * scrubK();
+      velY = velY * 0.5 + dPos * 0.5; posY += dPos;
+      scrubMouse = e.clientX;
+      applyTransforms(posY); */
+    }
+  });
+  window.addEventListener('mouseup', () => {
+    if (stageMouse !== null) kick();
+    stageMouse = null; /* scrubMouse = null; */
+  });
+
+  /* ══ WHEEL INPUT ══ */
+  let lastKickMs = 0;
+
+  window.addEventListener('wheel', e => {
+    e.preventDefault();
+    const d   = e.deltaX + e.deltaY;
+    const mag = Math.abs(d);
+    if (mag < 40) return;
+    const now = Date.now();
+    if (now - lastKickMs >= 200) {
+      velY = Math.sign(d) * INPUT.mouseKick;
+      lastKickMs = now;
+      kick();
+    }
+  }, { passive: false });
+  window.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' && !rafId) { velY += INPUT.mouseKick; kick(); }
+    if (e.key === 'ArrowLeft'  && !rafId) { velY -= INPUT.mouseKick; kick(); }
+  });
+
+  /* ══ BREAKPOINT ══ */
+  const ctrlRowMap = {};
+
+  function loadPreset(name) {
+    const p = PRESETS[name];
+    Object.keys(p).forEach(k => { CFG[k] = Array.isArray(p[k]) ? [...p[k]] : p[k]; });
+    syncPerspective();
+    syncCtrlRows();
+  }
+  function checkBreakpoint() { loadPreset((stage.offsetWidth || innerWidth) >= 768 ? 'desktop' : 'mobile'); }
+
+  window.addEventListener('resize', () => {
+    checkBreakpoint();
+    /* resizeScrubber(); */
+    applyTransforms(posY);
+  });
+
+  /* ══ CTRL PANEL SYSTEM ══ */
+  const ctrlToggle = document.getElementById('ctrl-toggle');
+  const ctrlInner  = document.getElementById('ctrl-panel-inner');
+
+  function toggleCtrl() {
+    document.body.classList.toggle('ctrl-open');
+    setTimeout(() => { /* resizeScrubber(); */ applyTransforms(posY); }, 300);
+  }
+  let ctrlTouchFired = false;
+  ctrlToggle.addEventListener('touchend', e => {
+    e.stopPropagation(); ctrlTouchFired = true; toggleCtrl();
+  }, { passive: true });
+  ctrlToggle.addEventListener('click', () => {
+    if (ctrlTouchFired) { ctrlTouchFired = false; return; }
+    toggleCtrl();
+  });
+
+  /* ── Builder helpers ── */
+  function addCopyBtn(sec, getValues) {
+    const btn = document.createElement('button');
+    btn.className = 'dev-copy';
+    btn.textContent = 'copy';
+    btn.addEventListener('click', () => {
+      navigator.clipboard.writeText(getValues()).then(() => {
+        btn.textContent = 'copied!';
+        btn.classList.add('copied');
+        setTimeout(() => { btn.textContent = 'copy'; btn.classList.remove('copied'); }, 1500);
+      });
+    });
+    btn.addEventListener('touchstart', e => e.stopPropagation(), { passive: true });
+    sec.appendChild(btn);
+  }
+
+  function addSection(text) {
+    const s = document.createElement('div'); s.className = 'dev-section';
+    const t = document.createElement('div'); t.className = 'dev-section-title'; t.textContent = text;
+    s.appendChild(t);
+    ctrlInner.appendChild(s);
+    return s;
+  }
+
+  function addRow(sec, label, key, min, max, step, fmt, onChange, editable = false) {
+    const row = document.createElement('div'); row.className = 'dev-row';
+    const lbl = document.createElement('span'); lbl.className = 'dev-label'; lbl.textContent = label;
+    const range = document.createElement('input');
+    range.type = 'range'; range.min = min; range.max = max; range.step = step;
+    range.value = key ? cfgGet(key) : 0;
+
+    let valEl;
+    if (editable) {
+      valEl = document.createElement('input');
+      valEl.type = 'number'; valEl.className = 'dev-val-input';
+      valEl.step = step; valEl.value = parseFloat(range.value);
+      valEl.addEventListener('change', () => {
+        const v = Math.min(max, Math.max(min, parseFloat(valEl.value) || 0));
+        range.value = v; valEl.value = v;
+        if (key) cfgSet(key, v);
+        if (onChange) onChange(v); else applyTransforms(posY);
+      });
+      valEl.addEventListener('mousedown',  e => e.stopPropagation());
+      valEl.addEventListener('touchstart', e => e.stopPropagation(), { passive: true });
+    } else {
+      valEl = document.createElement('span'); valEl.className = 'dev-val';
+      valEl.textContent = fmt(parseFloat(range.value));
+    }
+
+    range.addEventListener('input', () => {
+      const v = parseFloat(range.value);
+      if (key) cfgSet(key, v);
+      if (editable) valEl.value = v; else valEl.textContent = fmt(v);
+      if (onChange) onChange(v); else applyTransforms(posY);
+    });
+    range.addEventListener('mousedown',  e => e.stopPropagation());
+    range.addEventListener('touchstart', e => e.stopPropagation(), { passive: true });
+
+    row.appendChild(lbl); row.appendChild(range); row.appendChild(valEl);
+    sec.appendChild(row);
+    if (key) ctrlRowMap[key] = { range, val: valEl, fmt };
+    return range;
+  }
+
+  function cfgGet(key) {
+    const [k, idx] = key.split('.');
+    return idx !== undefined ? CFG[k][+idx] : CFG[k];
+  }
+  function cfgSet(key, val) {
+    const [k, idx] = key.split('.');
+    if (idx !== undefined) CFG[k][+idx] = val;
+    else CFG[k] = val;
+    if (k === 'PERSPECTIVE') syncPerspective();
+  }
+  function syncCtrlRows() {
+    Object.entries(ctrlRowMap).forEach(([key, { range, val, fmt }]) => {
+      const v = cfgGet(key);
+      range.value = v;
+      val.textContent = fmt(v);
+    });
+  }
+
+  /* ── Sphere section ── */
+  let sec = addSection('Sphere');
+  addRow(sec, 'R mult',       'R_MULT',      0.3,  1.5,  0.01, v => v.toFixed(2));
+  addRow(sec, 'Perspective',  'PERSPECTIVE', 100,  2000, 10,   v => Math.round(v) + 'px');
+  addCopyBtn(sec, () => `R_MULT: ${CFG.R_MULT.toFixed(2)}, PERSPECTIVE: ${Math.round(CFG.PERSPECTIVE)}`);
+  sec = addSection('Placement');
+  addRow(sec, 'Lat 0',        'LAT.0',       -90, 90, 1, v => Math.round(v) + '°');
+  addRow(sec, 'Lat 1',        'LAT.1',       -90, 90, 1, v => Math.round(v) + '°');
+  addRow(sec, 'Lat 2',        'LAT.2',       -90, 90, 1, v => Math.round(v) + '°');
+  addRow(sec, 'Lat 3',        'LAT.3',       -90, 90, 1, v => Math.round(v) + '°');
+  addRow(sec, 'Lat 4',        'LAT.4',       -90, 90, 1, v => Math.round(v) + '°');
+  addRow(sec, 'Lon spread',   'LON_SPREAD',  0.2, 1.0, 0.01, v => v.toFixed(2));
+  addCopyBtn(sec, () => `LAT: [${CFG.LAT.map(v => Math.round(v)).join(', ')}], LON_SPREAD: ${CFG.LON_SPREAD.toFixed(2)}`);
+  sec = addSection('Appearance');
+  addRow(sec, 'Scale active', 'SCALE_ACTIVE',0.5, 1.8, 0.01, v => v.toFixed(2));
+  addRow(sec, 'Scale sphere', 'SCALE_SPHERE',0.3, 1.2, 0.01, v => v.toFixed(2));
+  addRow(sec, 'Opacity ×',    'OPACITY_MULT',0,   2.0, 0.01, v => v.toFixed(2));
+  addRow(sec, 'Opacity base', 'OPACITY_BASE',0,   1.0, 0.01, v => v.toFixed(2));
+  addRow(sec, 'Blur max',     'BLUR_MAX',    0,   20,  0.5,  v => v.toFixed(1) + 'px');
+  addCopyBtn(sec, () => `SCALE_ACTIVE: ${CFG.SCALE_ACTIVE.toFixed(2)}, SCALE_SPHERE: ${CFG.SCALE_SPHERE.toFixed(2)}, OPACITY_MULT: ${CFG.OPACITY_MULT.toFixed(2)}, OPACITY_BASE: ${CFG.OPACITY_BASE.toFixed(2)}, BLUR_MAX: ${CFG.BLUR_MAX.toFixed(1)}`);
+
+  /* ── Scroll section ── */
+  sec = addSection('Scroll');
+  addRow(sec, 'decel',  'FRICTION', 0.70, 0.99, 0.01, v => v.toFixed(2));
+  addRow(sec, 'spring', 'SPRING',   0.01, 0.40, 0.01, v => v.toFixed(2));
+  const scrollInputRows = [
+    ['mouse kick', 'mouseKick', 0, 2.0, 0.05, v => v.toFixed(2), v => { INPUT.mouseKick = v; }],
+    ['touch sens', 'touchSens', 0, 3.0, 0.02, v => v.toFixed(2), v => { INPUT.touchSens = v; }],
+  ];
+  scrollInputRows.forEach(([label, inputKey, min, max, step, fmt, onChange]) => {
+    const r = addRow(sec, label, null, min, max, step, fmt, onChange, true);
+    r.value = INPUT[inputKey];
+    r.closest('.dev-row').querySelector('.dev-val-input').value = INPUT[inputKey];
+  });
+  addCopyBtn(sec, () => `FRICTION: ${CFG.FRICTION.toFixed(2)}, SPRING: ${CFG.SPRING.toFixed(2)}, mouseKick: ${INPUT.mouseKick.toFixed(2)}, touchSens: ${INPUT.touchSens.toFixed(2)}`);
+
+  /* ── Card section ── */
+  sec = addSection('Ghost');
+  {
+    const brow = document.createElement('div'); brow.className = 'dev-btn-row';
+    const btnF = document.createElement('button'); btnF.className = 'dev-btn active'; btnF.textContent = 'on top';
+    const btnB = document.createElement('button'); btnB.className = 'dev-btn';        btnB.textContent = 'behind';
+    btnF.addEventListener('click', () => {
+      GHOST.variant = 'front';
+      btnF.classList.add('active'); btnB.classList.remove('active');
+      ghostClones.forEach(c => { c.style.zIndex = '3'; });
+    });
+    btnB.addEventListener('click', () => {
+      GHOST.variant = 'behind';
+      btnB.classList.add('active'); btnF.classList.remove('active');
+      ghostClones.forEach(c => { c.style.zIndex = '1'; });
+    });
+    brow.appendChild(btnF); brow.appendChild(btnB);
+    sec.appendChild(brow);
+  }
+  {
+    const layersRange = addRow(sec, 'layers', null, 1, 16, 1, v => Math.round(v), v => {
+      GHOST.layers = Math.round(v); buildActiveClones();
+    });
+    layersRange.value = GHOST.layers;
+    layersRange.closest('.dev-row').querySelector('.dev-val').textContent = GHOST.layers;
+  }
+  {
+    const opaRange = addRow(sec, 'opacity', null, 0.01, 1, 0.01, v => v.toFixed(2), v => { GHOST.opacity = v; });
+    opaRange.value = GHOST.opacity;
+    opaRange.closest('.dev-row').querySelector('.dev-val').textContent = GHOST.opacity.toFixed(2);
+  }
+  {
+    const blurRange = addRow(sec, 'blur', null, 0, 40, 0.5, v => v.toFixed(1) + 'px', v => { GHOST.blur = v; });
+    blurRange.value = GHOST.blur;
+    blurRange.closest('.dev-row').querySelector('.dev-val').textContent = GHOST.blur + 'px';
+  }
+  addCopyBtn(sec, () => `layers: ${GHOST.layers}, opacity: ${GHOST.opacity.toFixed(2)}, blur: ${GHOST.blur.toFixed(1)}, variant: '${GHOST.variant}'`);
+
+  sec = addSection('Tilt');
+  [
+    ['max',       0,    40,   1,    v => Math.round(v) + '°', v => { TILT.max       = v; }],
+    ['stiffness', 0.01, 0.5,  0.01, v => v.toFixed(2),        v => { TILT.stiffness = v; }],
+    ['damping',   0.5,  0.99, 0.01, v => v.toFixed(2),        v => { TILT.damping   = v; }],
+  ].forEach(([label, min, max, step, fmt, onChange]) => {
+    const key = label === 'max' ? 'max' : label;
+    const r = addRow(sec, label, null, min, max, step, fmt, onChange);
+    r.value = TILT[key];
+    r.closest('.dev-row').querySelector('.dev-val').textContent = fmt(TILT[key]);
+  });
+  addCopyBtn(sec, () => `max: ${TILT.max}, stiffness: ${TILT.stiffness.toFixed(2)}, damping: ${TILT.damping.toFixed(2)}`);
+
+  /* ── Reveal section ── */
+  sec = addSection('Reveal');
+  [
+    ['stagger',  20,  300,  1,   v => Math.round(v) + 'ms', v => { REVEAL.stagger = v; }],
+    ['duration', 100, 1200, 1,   v => Math.round(v) + 'ms', v => { REVEAL.dur    = v; applyCSS(); }],
+    ['blur',     0,   24,   0.5, v => v.toFixed(1) + 'px',  v => { REVEAL.blur   = v; applyCSS(); }],
+    ['y offset', 0,   40,   1,   v => Math.round(v) + 'px', v => { REVEAL.y      = v; applyCSS(); }],
+  ].forEach(([label, min, max, step, fmt, onChange]) => {
+    const rKey = label === 'stagger' ? 'stagger' : label === 'duration' ? 'dur' : label === 'blur' ? 'blur' : 'y';
+    const r = addRow(sec, label, null, min, max, step, fmt, onChange);
+    r.value = REVEAL[rKey];
+    r.closest('.dev-row').querySelector('.dev-val').textContent = fmt(REVEAL[rKey]);
+  });
+  {
+    const btn = document.createElement('button');
+    btn.className = 'dev-replay'; btn.textContent = 'replay reveal';
+    btn.addEventListener('click', revealActiveCard);
+    btn.addEventListener('touchstart', e => e.stopPropagation(), { passive: true });
+    sec.appendChild(btn);
+  }
+  addCopyBtn(sec, () => `stagger: ${Math.round(REVEAL.stagger)}, dur: ${Math.round(REVEAL.dur)}, blur: ${REVEAL.blur.toFixed(1)}, y: ${Math.round(REVEAL.y)}`);
+
+
+  /* ══ INIT ══ */
+  checkBreakpoint();
+  applyTransforms(0);
+  requestAnimationFrame(() => { onActiveChange(0); });
+
+})();
+</script>
+</body>
+</html>

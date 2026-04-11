@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Card</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:wght@100..900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./design-system.css">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  min-height: 100dvh;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 32px;
+  background: #e8e8e8;
+  padding: 60px 20px;
+}
+.card-wrap {
+  perspective: var(--card-perspective);
+  flex-shrink: 0;
+  position: relative;
+}
+.card {
+  width: min(92vw, var(--card-width));
+  aspect-ratio: var(--card-aspect-w) / var(--card-aspect-h);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: var(--card-padding);
+  position: relative;
+  z-index: 2;
+  background: var(--card-bg);
+  border-radius: var(--shape-card);
+  transition: none;
+  will-change: transform;
+}
+.card-bg {
+  position: absolute; inset: 0; z-index: 0;
+  width: 100%; height: 100%; object-fit: cover; display: block;
+  transition: transform 1.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+.card:hover .card-bg {
+  transform: scale(1.2);
+  transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+.ghost-clone {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  opacity: 0;
+  will-change: transform, opacity, filter;
+}
+.ghost-clone .card-content { visibility: hidden; }
+.card-zoom-blur {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  width: 100%;
+  height: 100%;
+}
+.card:hover .card-zoom-blur {
+  opacity: 1;
+}
+.card-overlay {
+  position: absolute; inset: 0; z-index: 2;
+  background: linear-gradient(to bottom, rgba(0,0,0,0) 55%, rgba(0,0,0,0.55));
+}
+.card-content {
+  position: relative; z-index: 4;
+  display: flex; flex-direction: column; gap: var(--stack-sm);
+  color: #fff;
+}
+
+/* Word reveal */
+.word {
+  display: inline-block;
+  opacity: 0;
+  filter: blur(var(--blur, 8px));
+  transform: translateY(var(--y, 8px));
+  transition:
+    opacity var(--dur, 400ms) ease,
+    filter   var(--dur, 400ms) ease,
+    transform var(--dur, 400ms) ease;
+}
+.word.visible {
+  opacity: 1;
+  filter: blur(0);
+  transform: translateY(0);
+}
+
+/* Controls */
+.controls {
+  width: min(92vw, 364px);
+  background: rgba(255,255,255,0.7);
+  backdrop-filter: blur(16px);
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  font-family: monospace;
+  font-size: 11px;
+  color: #666;
+}
+.ctrl-row {
+  display: flex; align-items: center; gap: 10px;
+}
+.ctrl-label { width: 80px; flex-shrink: 0; letter-spacing: 0.05em; }
+.ctrl-val   { width: 36px; text-align: right; flex-shrink: 0; color: #333; }
+.ctrl-row input[type=range] {
+  flex: 1; height: 3px; appearance: none; -webkit-appearance: none;
+  background: rgba(0,0,0,0.12); border-radius: 2px; outline: none; cursor: pointer;
+}
+.ctrl-row input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%;
+  background: rgba(255,255,255,0.9); border: 1px solid rgba(0,0,0,0.2);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+}
+.replay-btn {
+  margin-top: 4px;
+  width: 100%; padding: 10px;
+  border: 1px solid rgba(0,0,0,0.15); border-radius: 8px;
+  background: #1c1b1f; color: #fff;
+  font-family: monospace; font-size: 12px; letter-spacing: 0.08em;
+  cursor: pointer; transition: opacity 0.15s;
+}
+.replay-btn:hover { opacity: 0.8; }
+
+.card-shine {
+  position: absolute; inset: 0; z-index: 3;
+  pointer-events: none;
+  border-radius: inherit;
+}
+.card-btn {
+  align-self: flex-end;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--card-btn-size);
+  height: var(--card-btn-size);
+  padding: 0;
+  border: none;
+  background: none;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 28px;
+  line-height: 1;
+  cursor: pointer;
+  border-radius: var(--shape-pill);
+  position: relative;
+  transition:
+    opacity  var(--dur, 400ms) ease,
+    filter   var(--dur, 400ms) ease,
+    transform var(--dur, 400ms) ease;
+  pointer-events: auto;
+}
+.card-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.28) 0%, rgba(255,255,255,0.06) 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.card:hover .card-btn::before {
+  opacity: 1;
+}
+.site-nav { position:fixed;top:20px;left:20px;display:flex;gap:20px;font-family:monospace;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;z-index:100; }
+.site-nav a { color:#999;text-decoration:none;transition:color 0.2s; }
+.site-nav a:hover { color:#333; }
+.site-nav a.active { color:#333; }
+.ctrl-section { font-family:monospace; font-size:10px; letter-spacing:0.1em; text-transform:uppercase; color:#aaa; margin-top:16px; margin-bottom:4px; }
+.ctrl-section:first-child { margin-top:0; }
+.variant-btn { flex:1; padding:7px 0; border:1px solid rgba(0,0,0,0.15); border-radius:6px; background:#fff; color:#999; font-family:monospace; font-size:11px; cursor:pointer; transition:all 0.15s; }
+.variant-btn.active { background:#1c1b1f; color:#fff; border-color:#1c1b1f; }
+.ctrl-select { flex:1; height:28px; border:1px solid rgba(0,0,0,0.15); border-radius:6px; background:#fff; color:#333; font-family:monospace; font-size:11px; padding:0 6px; cursor:pointer; outline:none; appearance:none; -webkit-appearance:none; }
+</style>
+</head>
+<body>
+<nav class="site-nav">
+  <a href="./portfolio.html">Portfolio</a>
+  <a href="./card.html" class="active">Card</a>
+  <a href="./design-system.html">Design System</a>
+</nav>
+
+<div class="card-wrap">
+<div class="card" id="card">
+  <img id="card-img" class="card-bg" src="./Cases%20Files/Firefly%252020250309110302-enhanced%201%201.png" alt="">
+  <canvas id="card-zoom-blur" class="card-zoom-blur"></canvas>
+  <div class="card-overlay"></div>
+  <div class="card-shine" id="card-shine"></div>
+  <div class="card-content">
+    <p class="type-label-medium" id="line1">Lead Brand Designer</p>
+    <p class="type-headline-medium" id="line2">Brand for showmore new 360 agency on the market</p>
+    <button class="card-btn word" id="card-btn" aria-label="View project">›</button>
+  </div>
+</div>
+</div>
+
+<div class="controls">
+  <p class="ctrl-section">tilt</p>
+  <div class="ctrl-row">
+    <span class="ctrl-label">max tilt</span>
+    <input type="range" id="s-tmax" min="1" max="20" step="0.5" value="16">
+    <span class="ctrl-val" id="v-tmax">16°</span>
+  </div>
+  <div class="ctrl-row">
+    <span class="ctrl-label">stiffness</span>
+    <input type="range" id="s-tstiff" min="0.01" max="0.4" step="0.01" value="0.1">
+    <span class="ctrl-val" id="v-tstiff">0.1</span>
+  </div>
+  <div class="ctrl-row">
+    <span class="ctrl-label">damping</span>
+    <input type="range" id="s-tdamp" min="0.5" max="0.98" step="0.01" value="0.75">
+    <span class="ctrl-val" id="v-tdamp">0.75</span>
+  </div>
+
+  <p class="ctrl-section">highlight</p>
+  <div class="ctrl-row">
+    <span class="ctrl-label">intensity</span>
+    <input type="range" id="s-lintensity" min="0" max="1" step="0.01" value="0.5">
+    <span class="ctrl-val" id="v-lintensity">0.5</span>
+  </div>
+  <div class="ctrl-row">
+    <span class="ctrl-label">size</span>
+    <input type="range" id="s-lsize" min="10" max="100" step="1" value="52">
+    <span class="ctrl-val" id="v-lsize">52%</span>
+  </div>
+  <div class="ctrl-row">
+    <span class="ctrl-label">travel</span>
+    <input type="range" id="s-ltravel" min="0" max="120" step="1" value="68">
+    <span class="ctrl-val" id="v-ltravel">68</span>
+  </div>
+  <div class="ctrl-row">
+    <span class="ctrl-label">diffuse</span>
+    <input type="range" id="s-ldiffuse" min="0" max="0.5" step="0.01" value="0.1">
+    <span class="ctrl-val" id="v-ldiffuse">0.1</span>
+  </div>
+  <div class="ctrl-row">
+    <span class="ctrl-label">shadow</span>
+    <input type="range" id="s-lshadow" min="0" max="0.5" step="0.01" value="0.18">
+    <span class="ctrl-val" id="v-lshadow">0.18</span>
+  </div>
+
+  <p class="ctrl-section">ghost effect</p>
+  <div class="ctrl-row" style="gap:4px;">
+    <button class="variant-btn" id="btn-front" onclick="setVariant('front')">on top</button>
+    <button class="variant-btn active" id="btn-behind" onclick="setVariant('behind')">behind</button>
+  </div>
+  <div class="ctrl-row">
+    <span class="ctrl-label">layers</span>
+    <input type="range" id="s-glayers" min="3" max="16" step="1" value="6">
+    <span class="ctrl-val" id="v-glayers">6</span>
+  </div>
+  <div class="ctrl-row">
+    <span class="ctrl-label">opacity</span>
+    <input type="range" id="s-gopa" min="0.01" max="1" step="0.01" value="0.16">
+    <span class="ctrl-val" id="v-gopa">0.16</span>
+  </div>
+  <div class="ctrl-row">
+    <span class="ctrl-label">blur</span>
+    <input type="range" id="s-gblur" min="0" max="40" step="0.5" value="0">
+    <span class="ctrl-val" id="v-gblur">0px</span>
+  </div>
+  <div class="ctrl-row">
+    <span class="ctrl-label">blend</span>
+    <select class="ctrl-select" id="s-gblend">
+      <option value="normal">normal</option>
+      <option value="multiply">multiply</option>
+      <option value="screen">screen</option>
+      <option value="overlay">overlay</option>
+      <option value="soft-light">soft-light</option>
+      <option value="hard-light">hard-light</option>
+      <option value="color-dodge">color-dodge</option>
+      <option value="color-burn">color-burn</option>
+      <option value="lighten">lighten</option>
+      <option value="darken">darken</option>
+    </select>
+  </div>
+
+  <p class="ctrl-section">vignette blur</p>
+  <div class="ctrl-row">
+    <span class="ctrl-label">blur</span>
+    <input type="range" id="s-vblur" min="0" max="40" step="0.5" value="14">
+    <span class="ctrl-val" id="v-vblur">14px</span>
+  </div>
+  <div class="ctrl-row">
+    <span class="ctrl-label">start</span>
+    <input type="range" id="s-vstart" min="0" max="100" step="1" value="72">
+    <span class="ctrl-val" id="v-vstart">72%</span>
+  </div>
+
+  <p class="ctrl-section">reveal</p>
+  <div class="ctrl-row">
+    <span class="ctrl-label">stagger</span>
+    <input type="range" id="s-stagger" min="20" max="200" value="58">
+    <span class="ctrl-val" id="v-stagger">58ms</span>
+  </div>
+  <div class="ctrl-row">
+    <span class="ctrl-label">duration</span>
+    <input type="range" id="s-dur" min="100" max="1200" value="682">
+    <span class="ctrl-val" id="v-dur">682ms</span>
+  </div>
+  <div class="ctrl-row">
+    <span class="ctrl-label">blur</span>
+    <input type="range" id="s-blur" min="0" max="24" value="8">
+    <span class="ctrl-val" id="v-blur">8px</span>
+  </div>
+  <div class="ctrl-row">
+    <span class="ctrl-label">y offset</span>
+    <input type="range" id="s-y" min="0" max="40" value="8">
+    <span class="ctrl-val" id="v-y">8px</span>
+  </div>
+  <div style="display:flex;gap:8px;margin-top:4px;">
+    <button class="replay-btn" id="replayBtn" style="flex:1">replay reveal</button>
+    <button class="replay-btn" id="copyBtn" style="flex:1;background:#fff;color:#333;border-color:rgba(0,0,0,0.15)">copy values</button>
+  </div>
+</div>
+
+<script>
+const CFG      = { stagger: 58, dur: 682, blur: 8, y: 8 };
+const VIGNETTE = { blur: 14, start: 72 };
+
+function wrapWords(el) {
+  el.innerHTML = el.textContent.trim().split(/\s+/).map(w =>
+    `<span class="word">${w}</span>`
+  ).join(' ');
+}
+
+function applyCSS() {
+  document.documentElement.style.setProperty('--blur', CFG.blur + 'px');
+  document.documentElement.style.setProperty('--y', CFG.y + 'px');
+  document.documentElement.style.setProperty('--dur', CFG.dur + 'ms');
+}
+
+function reveal() {
+  const words = document.querySelectorAll('.word');
+  words.forEach(w => w.classList.remove('visible'));
+  applyCSS();
+  words.forEach((w, i) => {
+    setTimeout(() => w.classList.add('visible'), i * CFG.stagger);
+  });
+}
+
+// Init
+['line1','line2'].forEach(id => wrapWords(document.getElementById(id)));
+reveal();
+
+// Sliders
+[
+  ['s-stagger','v-stagger','stagger','ms'],
+  ['s-dur','v-dur','dur','ms'],
+  ['s-blur','v-blur','blur','px'],
+  ['s-y','v-y','y','px'],
+].forEach(([sid, vid, key, unit]) => {
+  const slider = document.getElementById(sid);
+  const val    = document.getElementById(vid);
+  slider.addEventListener('input', () => {
+    CFG[key] = +slider.value;
+    val.textContent = slider.value + unit;
+  });
+});
+
+document.getElementById('replayBtn').addEventListener('click', reveal);
+
+document.getElementById('copyBtn').addEventListener('click', () => {
+  const btn = document.getElementById('copyBtn');
+  const values = {
+    reveal: { stagger: CFG.stagger, duration: CFG.dur, blur: CFG.blur, y: CFG.y },
+    tilt:   { max: TILT.max, radius: TILT.radius, stiffness: TILT.stiffness, damping: TILT.damping }
+  };
+  navigator.clipboard.writeText(JSON.stringify(values, null, 2)).then(() => {
+    btn.textContent = 'copied!';
+    setTimeout(() => { btn.textContent = 'copy values'; }, 1500);
+  });
+});
+
+[
+  ['s-tmax',    'v-tmax',    'max',       '°',   1  ],
+  ['s-tstiff',  'v-tstiff',  'stiffness', '',    100],
+  ['s-tdamp',   'v-tdamp',   'damping',   '',    100],
+].forEach(([sid, vid, key, unit, prec]) => {
+  const sl = document.getElementById(sid);
+  const vl = document.getElementById(vid);
+  sl.addEventListener('input', () => {
+    TILT[key] = +sl.value;
+    vl.textContent = (+sl.value).toFixed(prec > 1 ? 2 : 0) + unit;
+  });
+});
+
+/* ── Card tilt ── */
+const cardEl = document.getElementById('card');
+const TILT = { max: 16, stiffness: 0.1, damping: 0.75 };
+
+let tiltRx = 0, tiltRy = 0, tiltVx = 0, tiltVy = 0, tiltTx = 0, tiltTy = 0;
+
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const isMobile = () => navigator.maxTouchPoints > 0;
+
+/* Desktop — mouse */
+document.addEventListener('mousemove', e => {
+  if (isMobile()) return;
+  tiltTy =  (e.clientX / window.innerWidth  - 0.5) * 2 * TILT.max;
+  tiltTx = -(e.clientY / window.innerHeight - 0.5) * 2 * TILT.max;
+});
+
+/* Mobile — gyroscope */
+function attachGyro() {
+  window.addEventListener('deviceorientation', e => {
+    const gamma = e.gamma ?? 0; // left/right  -90→90
+    const beta  = e.beta  ?? 0; // front/back  -180→180
+    tiltTy = clamp( (gamma / 30) * TILT.max, -TILT.max, TILT.max);
+    tiltTx = clamp(((beta - 45) / 30) * TILT.max, -TILT.max, TILT.max);
+  });
+}
+
+if (isMobile()) {
+  if (typeof DeviceOrientationEvent !== 'undefined' &&
+      typeof DeviceOrientationEvent.requestPermission === 'function') {
+    // iOS 13+ needs a user-gesture permission
+    const permBtn = document.createElement('button');
+    permBtn.textContent = 'enable tilt';
+    permBtn.style.cssText = [
+      'position:fixed','bottom:20px','right:20px',
+      'padding:10px 16px','border-radius:8px','border:1px solid rgba(0,0,0,0.15)',
+      'background:#1c1b1f','color:#fff','font-family:monospace','font-size:12px',
+      'cursor:pointer','z-index:999'
+    ].join(';');
+    document.body.appendChild(permBtn);
+    permBtn.addEventListener('click', () => {
+      DeviceOrientationEvent.requestPermission().then(state => {
+        if (state === 'granted') { attachGyro(); }
+        permBtn.remove();
+      }).catch(() => permBtn.remove());
+    });
+  } else {
+    attachGyro();
+  }
+}
+
+/* ── Ghost clones ── */
+const GHOST = { layers: 6, opacity: 0.16, blur: 0, blend: 'normal' };
+const cardWrap = cardEl.parentElement;
+const ghostClones = [];
+
+function buildClones() {
+  ghostClones.forEach(c => c.remove());
+  ghostClones.length = 0;
+  for (let i = 0; i < GHOST.layers; i++) {
+    const clone = cardEl.cloneNode(true);
+    clone.removeAttribute('id');
+    clone.classList.add('ghost-clone');
+    cardWrap.insertBefore(clone, cardEl);
+    ghostClones.push(clone);
+  }
+}
+
+
+// Returns the rotation angle (deg) that places the leading edge of a card
+// at exactly `fraction` of the way between its neutral and fully-tilted
+// screen-space positions, accounting for CSS perspective projection.
+function perspAngle(fullDeg, fraction, halfDim, P) {
+  if (Math.abs(fullDeg) < 0.001) return 0;
+  const sign = Math.sign(fullDeg);
+  const r    = Math.abs(fullDeg) * Math.PI / 180;
+  // Screen X of leading edge at full tilt
+  const xFull   = halfDim * Math.cos(r) * P / (P - halfDim * Math.sin(r));
+  // Target screen X at this fraction
+  const xTarget = halfDim + fraction * (xFull - halfDim);
+  // Solve: halfDim·cos(φ)·P/(P−halfDim·sin(φ)) = xTarget
+  // => P·cos(φ) + xTarget·sin(φ) = xTarget·P/halfDim
+  const A = P, B = xTarget, C = xTarget * P / halfDim;
+  const R = Math.hypot(A, B);
+  const phi = Math.atan2(B, A) - Math.acos(Math.min(C / R, 1));
+  return sign * phi * 180 / Math.PI;
+}
+
+function drawGhosts() {
+  const mag = Math.abs(tiltRx) + Math.abs(tiltRy);
+  if (mag < 0.3) {
+    ghostClones.forEach(c => { c.style.opacity = 0; });
+    return;
+  }
+  const P     = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--card-perspective')) || 800;
+  const halfW = cardEl.offsetWidth  / 2;
+  const halfH = cardEl.offsetHeight / 2;
+  ghostClones.forEach((clone, i) => {
+    const scalar = (i + 1) / (GHOST.layers + 1);
+    const rx = perspAngle(tiltRx, scalar, halfH, P);
+    const ry = perspAngle(tiltRy, scalar, halfW, P);
+    clone.style.transform    = `rotateX(${rx.toFixed(3)}deg) rotateY(${ry.toFixed(3)}deg)`;
+    clone.style.opacity      = GHOST.opacity * scalar;
+    clone.style.filter       = GHOST.blur > 0 ? `blur(${(GHOST.blur * (1 - scalar)).toFixed(2)}px)` : '';
+    clone.style.mixBlendMode = GHOST.blend;
+  });
+}
+
+buildClones();
+setVariant('behind');
+
+function setVariant(v) {
+  const z = v === 'front' ? 3 : 1;
+  ghostClones.forEach(c => { c.style.zIndex = z; });
+  document.getElementById('btn-front').classList.toggle('active', v === 'front');
+  document.getElementById('btn-behind').classList.toggle('active', v === 'behind');
+}
+
+/* ── Highlight / lighting ── */
+const shineEl = document.getElementById('card-shine');
+const LIGHT = { intensity: 0.50, size: 52, travel: 68, diffuse: 0.10, shadow: 0.18 };
+
+function updateShine() {
+  const maxT = TILT.max || 12;
+  const nx =  tiltRy / maxT;
+  const ny = -tiltRx / maxT;
+  const mag = Math.min(Math.hypot(nx, ny), 1);
+
+  if (mag < 0.015) { shineEl.style.background = 'none'; return; }
+
+  const hx = (50 - nx * LIGHT.travel).toFixed(1);
+  const hy = (50 + ny * LIGHT.travel).toFixed(1);
+  const specPeak  = (LIGHT.intensity * mag).toFixed(3);
+  const specMid   = (LIGHT.intensity * 0.12 * mag).toFixed(3);
+  const sz        = LIGHT.size;
+
+  const litAngle  = (Math.atan2(-nx, -ny) * 180 / Math.PI).toFixed(1);
+  const diffAmt   = (LIGHT.diffuse * mag).toFixed(3);
+  const shadowAmt = (LIGHT.shadow  * mag).toFixed(3);
+
+  shineEl.style.background = [
+    `radial-gradient(ellipse ${sz}% ${sz}% at ${hx}% ${hy}%, rgba(255,255,255,${specPeak}) 0%, rgba(255,255,255,${specMid}) 45%, transparent 72%)`,
+    `linear-gradient(${litAngle}deg, rgba(255,255,255,${diffAmt}) 0%, transparent 55%)`,
+    `linear-gradient(${(+litAngle + 180).toFixed(1)}deg, rgba(0,0,0,${shadowAmt}) 0%, transparent 60%)`
+  ].join(',');
+}
+
+(function tiltLoop() {
+  tiltVx += (tiltTx - tiltRx) * TILT.stiffness;
+  tiltVy += (tiltTy - tiltRy) * TILT.stiffness;
+  tiltVx *= TILT.damping;
+  tiltVy *= TILT.damping;
+  tiltRx += tiltVx;
+  tiltRy += tiltVy;
+  cardEl.style.transform = `rotateX(${tiltRx.toFixed(3)}deg) rotateY(${tiltRy.toFixed(3)}deg)`;
+  drawGhosts();
+  updateShine();
+  requestAnimationFrame(tiltLoop);
+})();
+
+[
+  ['s-gopa',  'v-gopa',  'opacity', ''],
+  ['s-gblur', 'v-gblur', 'blur',    'px'],
+].forEach(([sid, vid, key, unit]) => {
+  const sl = document.getElementById(sid);
+  const vl = document.getElementById(vid);
+  sl.addEventListener('input', () => { GHOST[key] = +sl.value; vl.textContent = sl.value + unit; });
+});
+
+document.getElementById('s-gblend').addEventListener('change', e => { GHOST.blend = e.target.value; });
+
+[
+  ['s-lintensity', 'v-lintensity', 'intensity', ''  ],
+  ['s-lsize',      'v-lsize',      'size',       '%' ],
+  ['s-ltravel',    'v-ltravel',    'travel',     ''  ],
+  ['s-ldiffuse',   'v-ldiffuse',   'diffuse',    ''  ],
+  ['s-lshadow',    'v-lshadow',    'shadow',     ''  ],
+].forEach(([sid, vid, key, unit]) => {
+  const sl = document.getElementById(sid);
+  const vl = document.getElementById(vid);
+  sl.addEventListener('input', () => { LIGHT[key] = +sl.value; vl.textContent = sl.value + unit; });
+});
+
+
+document.getElementById('s-glayers').addEventListener('input', e => {
+  GHOST.layers = Math.round(+e.target.value);
+  document.getElementById('v-glayers').textContent = GHOST.layers;
+  buildClones();
+  const active = document.querySelector('.variant-btn.active')?.id === 'btn-behind' ? 'behind' : 'front';
+  setVariant(active);
+});
+
+/* ── Vignette zoom blur (canvas) ── */
+const zoomCanvas = document.getElementById('card-zoom-blur');
+const zoomCtx    = zoomCanvas.getContext('2d');
+const cardImg    = document.getElementById('card-img');
+const ZOOM_N     = 16;
+
+function renderZoomBlur() {
+  const w = cardEl.offsetWidth;
+  const h = cardEl.offsetHeight;
+  if (!w || !h || !cardImg.complete) return;
+  zoomCanvas.width  = w;
+  zoomCanvas.height = h;
+  const cx = w / 2, cy = h / 2;
+  const spread = VIGNETTE.blur * 0.008; // slider 14 → 0.112 scale spread
+
+  zoomCtx.clearRect(0, 0, w, h);
+  zoomCtx.globalAlpha = 1 / ZOOM_N;
+  for (let i = 0; i < ZOOM_N; i++) {
+    const scale = 1 + (i / (ZOOM_N - 1)) * spread;
+    zoomCtx.save();
+    zoomCtx.translate(cx, cy);
+    zoomCtx.scale(scale, scale);
+    zoomCtx.translate(-cx, -cy);
+    zoomCtx.drawImage(cardImg, 0, 0, w, h);
+    zoomCtx.restore();
+  }
+
+  // Radial mask: transparent center → opaque edges
+  zoomCtx.globalAlpha = 1;
+  zoomCtx.globalCompositeOperation = 'destination-in';
+  const r = Math.hypot(cx, cy);
+  const grad = zoomCtx.createRadialGradient(cx, cy, r * VIGNETTE.start / 100, cx, cy, r);
+  grad.addColorStop(0, 'rgba(0,0,0,0)');
+  grad.addColorStop(1, 'rgba(0,0,0,1)');
+  zoomCtx.fillStyle = grad;
+  zoomCtx.fillRect(0, 0, w, h);
+  zoomCtx.globalCompositeOperation = 'source-over';
+}
+
+if (cardImg.complete) renderZoomBlur();
+else cardImg.addEventListener('load', renderZoomBlur);
+window.addEventListener('resize', renderZoomBlur);
+
+[
+  ['s-vblur',  'v-vblur',  'blur',  'px'],
+  ['s-vstart', 'v-vstart', 'start', '%' ],
+].forEach(([sid, vid, key, unit]) => {
+  const sl = document.getElementById(sid);
+  const vl = document.getElementById(vid);
+  sl.addEventListener('input', () => {
+    VIGNETTE[key] = +sl.value;
+    vl.textContent = sl.value + unit;
+    renderZoomBlur();
+  });
+});
+
+</script>
+</body>
+</html>
