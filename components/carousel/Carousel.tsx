@@ -68,6 +68,9 @@ export default function Carousel() {
   const stageTouch = useRef<number | null>(null)
   const stageMouse = useRef<number | null>(null)
   const swipeStartX = useRef<number | null>(null)
+  const splitRafId = useRef<number | null>(null)
+  const gyroHandler = useRef<((e: Event) => void) | null>(null)
+  const permBtn = useRef<HTMLButtonElement | null>(null)
 
   // Mutable config refs (updated live by DevPanel)
   const revealRef = useRef({ ...REVEAL })
@@ -169,6 +172,7 @@ export default function Carousel() {
 
   // ── Split transition (scale + perspective interpolation) ──
   const runSplitTransition = useCallback((targetPresetName: string, onEnd: () => void) => {
+    if (splitRafId.current) cancelAnimationFrame(splitRafId.current)
     const dur       = 570
     const t0        = performance.now()
     const fromScale = cfg.current.SCALE_ACTIVE
@@ -184,10 +188,10 @@ export default function Carousel() {
       cfg.current.PERSPECTIVE  = fromPersp + (toPersp  - fromPersp) * e
       syncPerspective()
       applyTransforms(posY.current)
-      if (p < 1) { requestAnimationFrame(frame) }
-      else { onEnd() }
+      if (p < 1) { splitRafId.current = requestAnimationFrame(frame) }
+      else { splitRafId.current = null; onEnd() }
     }
-    requestAnimationFrame(frame)
+    splitRafId.current = requestAnimationFrame(frame)
   }, [syncPerspective, applyTransforms])
 
   // ── Case panel content switch ──
@@ -325,12 +329,15 @@ export default function Carousel() {
 
   // ── Gyroscope ──
   const attachGyro = useCallback(() => {
-    window.addEventListener('deviceorientation', e => {
+    if (gyroHandler.current) window.removeEventListener('deviceorientation', gyroHandler.current)
+    const handler = (e: Event) => {
       const gamma = (e as DeviceOrientationEvent).gamma ?? 0
       const beta  = (e as DeviceOrientationEvent).beta  ?? 0
       tiltTy.current = clamp( (gamma / 30) * tiltCfg.current.max, -tiltCfg.current.max, tiltCfg.current.max)
       tiltTx.current = clamp(((beta - 45) / 30) * tiltCfg.current.max, -tiltCfg.current.max, tiltCfg.current.max)
-    })
+    }
+    gyroHandler.current = handler
+    window.addEventListener('deviceorientation', handler)
   }, [])
 
   // ── All input event listeners ──
@@ -459,15 +466,16 @@ export default function Carousel() {
         typeof DeviceOrientationEvent !== 'undefined' &&
         typeof (DeviceOrientationEvent as unknown as { requestPermission?: () => Promise<string> }).requestPermission === 'function'
       ) {
-        const permBtn = document.createElement('button')
-        permBtn.textContent = 'enable tilt'
-        permBtn.style.cssText = 'position:fixed;bottom:120px;right:20px;padding:10px 16px;border-radius:8px;border:1px solid rgba(0,0,0,0.15);background:#1c1b1f;color:#fff;font-family:var(--font-mono),monospace;font-size:12px;cursor:pointer;z-index:999;touch-action:auto'
-        document.body.appendChild(permBtn)
-        permBtn.addEventListener('click', () => {
+        const btn = document.createElement('button')
+        btn.textContent = 'enable tilt'
+        btn.style.cssText = 'position:fixed;bottom:120px;right:20px;padding:10px 16px;border-radius:8px;border:1px solid rgba(0,0,0,0.15);background:#1c1b1f;color:#fff;font-family:var(--font-mono),monospace;font-size:12px;cursor:pointer;z-index:999;touch-action:auto'
+        document.body.appendChild(btn)
+        permBtn.current = btn
+        btn.addEventListener('click', () => {
           ;(DeviceOrientationEvent as unknown as { requestPermission: () => Promise<string> })
             .requestPermission()
-            .then(state => { if (state === 'granted') attachGyro(); permBtn.remove() })
-            .catch(() => permBtn.remove())
+            .then(state => { if (state === 'granted') attachGyro(); btn.remove(); permBtn.current = null })
+            .catch(() => { btn.remove(); permBtn.current = null })
         })
       } else {
         attachGyro()
@@ -495,6 +503,9 @@ export default function Carousel() {
       window.removeEventListener('keydown', onKeyDown)
       window.removeEventListener('resize', onResize)
       if (rafId.current) cancelAnimationFrame(rafId.current)
+      if (splitRafId.current) cancelAnimationFrame(splitRafId.current)
+      if (gyroHandler.current) { window.removeEventListener('deviceorientation', gyroHandler.current); gyroHandler.current = null }
+      if (permBtn.current) { permBtn.current.remove(); permBtn.current = null }
     }
   }, [applyTransforms, loadPreset, kick, attachGyro, switchCaseContent])
 
