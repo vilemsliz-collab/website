@@ -65,6 +65,7 @@ export interface CarouselSceneProps {
   ghostCfg:  MutableRefObject<GhostConfig>
   tiltCfg:   MutableRefObject<TiltConfig>
   caseOpen:  MutableRefObject<boolean>
+  carouselWidthRef: MutableRefObject<number>
   onActiveChange: (idx: number) => void
   onCaseSwitch:   (href: string) => void
   onCardClick:    (i: number) => void
@@ -190,7 +191,7 @@ function AllCards({
 // ─── Physics loop ─────────────────────────────────────────────────────────────
 function Physics({
   posY, cfg, rollBase, tiltRx, tiltRy, activeIdx,
-  ghostCfg, tiltCfg, caseOpen,
+  ghostCfg, tiltCfg, caseOpen, carouselWidthRef,
   onActiveChange, onCaseSwitch,
   groupRefs, meshRefs, ghostRefArrays, cardW, cardH,
 }: CarouselSceneProps & {
@@ -200,42 +201,47 @@ function Physics({
   cardW: number
   cardH: number
 }) {
-  const { camera, size } = useThree()
+  const { camera } = useThree()
 
-  // Camera X spring: shifts scene left when case panel opens
+  // Camera X spring — shifts view so cards appear in left 25vw when case opens
   const camXRef    = useRef(0)
   const camXVelRef = useRef(0)
 
-  // Effective width spring: narrows card spread when case panel opens
-  const wRef    = useRef(size.width)
+  // Card-spread spring — compresses card arrangement to left 25vw
+  const wRef    = useRef(0)
   const wVelRef = useRef(0)
 
-  useFrame(() => {
+  useFrame((state) => {
     const P   = cfg.current.PERSPECTIVE
     const cam = camera as THREE.PerspectiveCamera
+    const { width, height } = state.size  // always-current from R3F store
 
-    // Sync camera Z + FOV with CSS perspective preset
+    // First-frame initialisation
+    if (wRef.current === 0) wRef.current = width
+
+    // Sync camera Z + FOV
     if (Math.abs(cam.position.z - P) > 1) {
       cam.position.z = P
-      cam.fov = 2 * Math.atan(size.height / 2 / P) * (180 / Math.PI)
+      cam.fov = 2 * Math.atan(height / 2 / P) * (180 / Math.PI)
       cam.updateProjectionMatrix()
     }
 
     // On mobile the case panel is fullscreen — no camera shift or spread compression
-    const mobileCase = caseOpen.current && size.width < 768
+    const mobileCase = caseOpen.current && width < 768
 
-    // Camera X spring — positive X shifts view left (carousel visible in left 25vw)
-    const targetCamX = mobileCase ? 0 : (caseOpen.current ? size.width * 0.375 : 0)
-    camXVelRef.current += (targetCamX - camXRef.current) * 0.06
+    // Camera X spring (stiffness 0.02 = 3× softer than original)
+    const targetCamX = mobileCase ? 0 : (caseOpen.current ? width * 0.375 : 0)
+    camXVelRef.current += (targetCamX - camXRef.current) * 0.02
     camXVelRef.current *= 0.85
     camXRef.current += camXVelRef.current
     cam.position.x = camXRef.current
 
-    // Effective width spring — compress card spread for narrow stage
-    const targetW = mobileCase ? size.width : (caseOpen.current ? size.width * 0.25 : size.width)
-    wVelRef.current += (targetW - wRef.current) * 0.06
+    // Card-spread spring (stiffness 0.02 = 3× softer than original)
+    const targetW = mobileCase ? width : (caseOpen.current ? width * 0.25 : width)
+    wVelRef.current += (targetW - wRef.current) * 0.02
     wVelRef.current *= 0.85
     wRef.current += wVelRef.current
+    carouselWidthRef.current = wRef.current
 
     const transforms = computeCardTransforms(posY.current, N, cfg.current, wRef.current, rollBase.current)
     const gc = ghostCfg.current
@@ -251,9 +257,10 @@ function Physics({
       group.rotation.z = t.rollDeg * DEG
       group.scale.setScalar(t.scale)
 
-      // Tilt — signs corrected (right mouse → right face toward viewer)
-      mesh.rotation.x = t.isActive ? -tiltRx.current * DEG : 0
-      mesh.rotation.y = t.isActive ?  tiltRy.current * DEG : 0
+      // Tilt — scale by perspective so the visual effect is consistent across camera distances
+      const tiltScale = Math.min(1, P / 590)
+      mesh.rotation.x = t.isActive ? -tiltRx.current * tiltScale * DEG : 0
+      mesh.rotation.y = t.isActive ?  tiltRy.current * tiltScale * DEG : 0
 
       const mat = mesh.material as THREE.ShaderMaterial
       mat.uniforms.u_opacity.value = t.opacity
@@ -270,8 +277,8 @@ function Physics({
             continue
           }
           const scalar = (gi + 1) / (gc.layers + 1)
-          const gRx = perspAngle(tiltRx.current, scalar, cardH / 2, GHOST_P)
-          const gRy = perspAngle(tiltRy.current, scalar, cardW / 2, GHOST_P)
+          const gRx = perspAngle(tiltRx.current * tiltScale, scalar, cardH / 2, GHOST_P)
+          const gRy = perspAngle(tiltRy.current * tiltScale, scalar, cardW / 2, GHOST_P)
           ghost.visible    = true
           ghost.rotation.x = -gRx * DEG
           ghost.rotation.y =  gRy * DEG
@@ -286,6 +293,7 @@ function Physics({
         if (caseOpen.current) onCaseSwitch(CARDS[i].href)
       }
     })
+
   })
 
   return null
@@ -301,7 +309,6 @@ function SceneContent(props: CarouselSceneProps) {
   const groupRefs      = useRef<THREE.Group[]>([])
   const meshRefs       = useRef<THREE.Mesh[]>([])
   const ghostRefArrays = useRef<THREE.Mesh[][]>([])
-
   const P = props.cfg.current.PERSPECTIVE
 
   return (
@@ -344,7 +351,6 @@ function SceneContent(props: CarouselSceneProps) {
           intensity={0.6}
           radius={0.4}
         />
-
       </EffectComposer>
     </>
   )

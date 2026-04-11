@@ -67,9 +67,9 @@ export interface CardData {
 
 export const PRESETS: Record<string, CarouselPreset> = {
   split: {
-    R_MULT: 1.5, R_MAX: 1010, PERSPECTIVE: 200,
+    R_MULT: 1.5, R_MAX: 1010, PERSPECTIVE: 590,
     ROT_MULT: 0, ROLL_MAX: 0,
-    SCALE_ACTIVE: 0.89, SCALE_SPHERE: 0.86,
+    SCALE_ACTIVE: 0.79, SCALE_SPHERE: 0.86,
     OPACITY_MULT: 0.46, OPACITY_BASE: 1.00, BLUR_MAX: 8,
     FRICTION: 0.93, SPRING: 0.01,
   },

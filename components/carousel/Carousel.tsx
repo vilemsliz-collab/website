@@ -58,6 +58,8 @@ export default function Carousel() {
   const tiltTy    = useRef(0)
   const baseTiltY = useRef(0)
 
+  const carouselWidthRef = useRef(typeof window !== 'undefined' ? window.innerWidth : 1440)
+
   const caseOpen    = useRef(false)
   const frontFrame  = useRef<HTMLIFrameElement | null>(null)
   const backFrame   = useRef<HTMLIFrameElement | null>(null)
@@ -150,8 +152,9 @@ export default function Carousel() {
     front.src = CARDS[cardIdx].href
     caseOpen.current = true
     setCaseOpenState(true)
-    baseTiltY.current = tiltCfg.current.max * 0.5
-    tiltTy.current    = baseTiltY.current
+    baseTiltY.current = 0
+    tiltTx.current    = 0
+    tiltTy.current    = 0
     runSplitTransition('split', () => { loadPreset('split') })
   }, [runSplitTransition, loadPreset])
 
@@ -218,18 +221,7 @@ export default function Carousel() {
     return () => cancelAnimationFrame(tiltRafId)
   }, [])
 
-  // ── Gyroscope ──
-  const attachGyro = useCallback(() => {
-    if (gyroHandler.current) window.removeEventListener('deviceorientation', gyroHandler.current)
-    const handler = (e: Event) => {
-      const gamma = (e as DeviceOrientationEvent).gamma ?? 0
-      const beta  = (e as DeviceOrientationEvent).beta  ?? 0
-      tiltTy.current = clamp( (gamma / 30) * tiltCfg.current.max, -tiltCfg.current.max, tiltCfg.current.max)
-      tiltTx.current = clamp(((beta - 45) / 30) * tiltCfg.current.max, -tiltCfg.current.max, tiltCfg.current.max)
-    }
-    gyroHandler.current = handler
-    window.addEventListener('deviceorientation', handler)
-  }, [])
+  // Gyroscope disabled — tilt is desktop-only for unified feel
 
   // ── All input event listeners ──
   useEffect(() => {
@@ -244,16 +236,8 @@ export default function Carousel() {
     // Combined mouse handler: tilt + drag
     function onMouseMove(e: MouseEvent) {
       // Tilt
-      if (!isMobile()) {
-        if (caseOpen.current) {
-          const stW = window.innerWidth * 0.25
-          if (e.clientX <= stW) {
-            const rel = (e.clientX / stW - 0.5) * 2
-            tiltTy.current = clamp(baseTiltY.current + rel * tiltCfg.current.max * 0.6, -tiltCfg.current.max, tiltCfg.current.max)
-          }
-        } else {
-          tiltTy.current = (e.clientX / window.innerWidth - 0.5) * 2 * tiltCfg.current.max
-        }
+      if (!isMobile() && !caseOpen.current) {
+        tiltTy.current = (e.clientX / window.innerWidth - 0.5) * 2 * tiltCfg.current.max
         tiltTx.current = -(e.clientY / window.innerHeight - 0.5) * 2 * tiltCfg.current.max
       }
       // Drag
@@ -265,7 +249,7 @@ export default function Carousel() {
         stageMouse.current = e.clientX
       }
     }
-    function onMouseLeave() { if (!isMobile()) tiltTy.current = baseTiltY.current }
+    function onMouseLeave() { if (!isMobile()) { tiltTx.current = 0; tiltTy.current = baseTiltY.current } }
     function onMouseDown(e: MouseEvent) { stageMouse.current = e.clientX }
     function onMouseUp() { if (stageMouse.current !== null) kick(); stageMouse.current = null }
 
@@ -341,28 +325,6 @@ export default function Carousel() {
     window.addEventListener('keydown', onKeyDown)
     window.addEventListener('resize', onResize)
 
-    // Gyroscope setup
-    if (isMobile()) {
-      if (
-        typeof DeviceOrientationEvent !== 'undefined' &&
-        typeof (DeviceOrientationEvent as unknown as { requestPermission?: () => Promise<string> }).requestPermission === 'function'
-      ) {
-        const btn = document.createElement('button')
-        btn.textContent  = 'enable tilt'
-        btn.style.cssText = 'position:fixed;bottom:120px;right:20px;padding:10px 16px;border-radius:8px;border:1px solid rgba(0,0,0,0.15);background:#1c1b1f;color:#fff;font-family:var(--font-mono),monospace;font-size:12px;cursor:pointer;z-index:999;touch-action:auto'
-        document.body.appendChild(btn)
-        permBtn.current = btn
-        btn.addEventListener('click', () => {
-          ;(DeviceOrientationEvent as unknown as { requestPermission: () => Promise<string> })
-            .requestPermission()
-            .then(state => { if (state === 'granted') attachGyro(); btn.remove(); permBtn.current = null })
-            .catch(() => { btn.remove(); permBtn.current = null })
-        })
-      } else {
-        attachGyro()
-      }
-    }
-
     checkBreakpoint()
     requestAnimationFrame(() => {
       activeIdx.current = 0
@@ -387,7 +349,7 @@ export default function Carousel() {
       }
       if (permBtn.current) { permBtn.current.remove(); permBtn.current = null }
     }
-  }, [loadPreset, kick, attachGyro, switchCaseContent])
+  }, [loadPreset, kick, switchCaseContent])
 
   // ── Card click ──
   const handleCardClick = useCallback((i: number) => {
@@ -400,45 +362,41 @@ export default function Carousel() {
       kick()
       if (!caseOpen.current) setTimeout(() => openCasePanel(i), 100)
     } else {
-      if (!caseOpen.current) openCasePanel(i)
+      if (caseOpen.current) closeCasePanel()
+      else openCasePanel(i)
     }
-  }, [kick, openCasePanel])
-
-  const handleCaseToggle = useCallback(() => {
-    if (caseOpen.current) closeCasePanel()
-    else openCasePanel(activeIdx.current)
-  }, [closeCasePanel, openCasePanel])
+  }, [kick, openCasePanel, closeCasePanel])
 
   return (
     <div className={`${styles.root} ${caseOpenState ? styles.caseOpen : ''} ${ctrlOpen ? styles.ctrlOpen : ''}`}>
 
       {/* ── WebGL Carousel ── */}
-      <CarouselCanvas
-        posY={posY}
-        cfg={cfg}
-        rollBase={rollBase}
-        tiltRx={tiltRx}
-        tiltRy={tiltRy}
-        activeIdx={activeIdx}
-        ghostCfg={ghostCfg}
-        tiltCfg={tiltCfg}
-        caseOpen={caseOpen}
-        onActiveChange={() => {}}
-        onCaseSwitch={switchCaseContent}
-        onCardClick={handleCardClick}
-      />
-
-      {/* ── Case toggle button (above canvas) ── */}
-      <button
-        className={styles.caseToggleBtn}
-        aria-label="Toggle case study"
-        onClick={handleCaseToggle}
-      >
-        {caseOpenState ? '✕' : '⤢'}
-      </button>
+      <div className={styles.carouselStage}>
+        <CarouselCanvas
+          posY={posY}
+          cfg={cfg}
+          rollBase={rollBase}
+          tiltRx={tiltRx}
+          tiltRy={tiltRy}
+          activeIdx={activeIdx}
+          ghostCfg={ghostCfg}
+          tiltCfg={tiltCfg}
+          caseOpen={caseOpen}
+          carouselWidthRef={carouselWidthRef}
+          onActiveChange={() => {}}
+          onCaseSwitch={switchCaseContent}
+          onCardClick={handleCardClick}
+          onEmptyClick={() => { if (caseOpen.current) closeCasePanel() }}
+        />
+      </div>
 
       {/* ── Case panel ── */}
       <div ref={casePanelRef} className={styles.casePanel}>
+        <button
+          className={styles.casePanelClose}
+          aria-label="Close case study"
+          onClick={closeCasePanel}
+        >✕</button>
         <iframe
           ref={frameARef}
           id="case-frame-a"
