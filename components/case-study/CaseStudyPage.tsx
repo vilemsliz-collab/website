@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import Image from 'next/image'
 import { AnimatePresence, motion } from 'framer-motion'
 import gsap from 'gsap'
 import { SplitText } from 'gsap/SplitText'
@@ -49,24 +50,24 @@ function RevealSection({ children, delay = 0 }: { children: React.ReactNode; del
   useEffect(() => {
     const el = ref.current
     if (!el) return
-    const io = new IntersectionObserver(
-      entries => {
-        entries.forEach(e => {
-          if (e.isIntersecting) { el.classList.add(styles.inView); io.unobserve(el) }
-        })
-      },
-      { threshold: 0.08 }
-    )
-    el.style.transitionDelay = delay + 'ms'
-    io.observe(el)
-    return () => io.disconnect()
+    const ctx = gsap.context(() => {
+      gsap.from(el, {
+        opacity: 0,
+        y: 12,
+        duration: 0.55,
+        delay: delay / 1000,
+        ease: 'power2.out',
+        scrollTrigger: {
+          trigger: el,
+          start: 'top 88%',
+          toggleActions: 'play none none reverse',
+        },
+      })
+    }, el)
+    return () => ctx.revert()
   }, [delay])
 
-  return (
-    <div ref={ref} className={styles.reveal}>
-      {children}
-    </div>
-  )
+  return <div ref={ref}>{children}</div>
 }
 
 function HeadlineReveal({ dark, muted }: { dark: string; muted: string }) {
@@ -153,7 +154,15 @@ export default function CaseStudyPage({ cs }: Props) {
         <RevealSection delay={180}>
           <div className={styles.csMediaBlock}>
             <div className={styles.csMediaFrame}>
-              {cs.mediaImg && <img src={cs.mediaImg} alt="" />}
+              {cs.mediaImg && (
+                <Image
+                  src={cs.mediaImg}
+                  alt=""
+                  fill
+                  sizes="100vw"
+                  style={{ objectFit: 'cover' }}
+                />
+              )}
             </div>
             <p className={`${styles.csBody} ${styles.csMediaCaption} ${styles.csTextInset}`}>
               {cs.mediaCaption}
@@ -167,7 +176,15 @@ export default function CaseStudyPage({ cs }: Props) {
             {cs.strip.map((item, i) => (
               <div key={i} className={styles.csStripCard}>
                 <div className={styles.csStripImg}>
-                  {item.img && <img src={item.img} alt="" />}
+                  {item.img && (
+                    <Image
+                      src={item.img}
+                      alt=""
+                      fill
+                      sizes="(max-width: 768px) calc(50vw - 3px), 25vw"
+                      style={{ objectFit: 'cover' }}
+                    />
+                  )}
                 </div>
                 <p className={`${styles.csBody} ${styles.csStripCaption}`}>{item.caption}</p>
               </div>
@@ -181,7 +198,13 @@ export default function CaseStudyPage({ cs }: Props) {
             <div className={styles.csPair}>
               {pair.map((img, ii) => (
                 <div key={ii} className={styles.csPairImg}>
-                  <img src={img} alt="" />
+                  <Image
+                    src={img}
+                    alt=""
+                    fill
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                    style={{ objectFit: 'cover' }}
+                  />
                 </div>
               ))}
               {pair.length === 0 && (

@@ -134,6 +134,7 @@
   background: var(--color-surface);
   border-radius: var(--shape-md);
   overflow: hidden;
+  position: relative;
 }
 .csMediaFrame img,
 .csMediaFrame video {
@@ -164,6 +165,7 @@
   background: var(--color-surface);
   border-radius: 6px;
   overflow: hidden;
+  position: relative;
 }
 .csStripImg img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .csStripCaption { flex-shrink: 0; padding: var(--space-3); }
@@ -179,6 +181,7 @@
   background: var(--color-surface);
   border-radius: var(--shape-md);
   overflow: hidden;
+  position: relative;
 }
 .csPairImg img { width: 100%; height: 100%; object-fit: cover; display: block; }
 

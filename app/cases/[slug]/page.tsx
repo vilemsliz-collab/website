@@ -15,7 +15,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
   const cs = getCaseBySlug(slug)
   if (!cs) return {}
-  return { title: `${cs.title} — Lab` }
+  return {
+    title: `${cs.title} — Lab`,
+    description: cs.challenge.slice(0, 160),
+  }
 }
 
 export default async function Page({ params }: Props) {

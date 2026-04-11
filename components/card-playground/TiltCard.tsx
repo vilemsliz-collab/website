@@ -1,6 +1,7 @@
 'use client'
 
 import { useRef, useEffect, useCallback } from 'react'
+import Image from 'next/image'
 import { perspAngle, clamp } from '@/lib/carouselPhysics'
 import CanvasVignetteBlur from './CanvasVignetteBlur'
 import styles from './CardPlayground.module.css'
@@ -207,8 +208,16 @@ export default function TiltCard({ imgSrc, line1, line2, tilt, ghost, light, rev
   return (
     <div ref={cardWrapRef} className={styles.cardWrap}>
       <div ref={cardRef} className={styles.card}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img ref={imgRef} className={styles.cardBg} src={imgSrc} alt="" />
+        <Image
+          ref={imgRef}
+          className={styles.cardBg}
+          src={imgSrc}
+          alt=""
+          fill
+          sizes="(max-width: 768px) 92vw, 364px"
+          style={{ objectFit: 'cover' }}
+          priority
+        />
         <CanvasVignetteBlur imgRef={imgRef} blur={vignette.blur} start={vignette.start} />
         <div className={styles.cardOverlay} />
         <div ref={shineRef} className={styles.cardShine} />

@@ -5,6 +5,7 @@ import {
   PRESETS, CARDS, REVEAL, INPUT, TILT, GHOST,
   type CarouselCFG,
 } from '@/lib/carouselConfig'
+import Image from 'next/image'
 import {
   lerp, smoothstep, clamp,
   computeCardTransforms, perspAngle, buildRollBase,
@@ -565,8 +566,15 @@ export default function Carousel() {
                   playsInline
                 />
               ) : card.img ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img className={styles.cardBg} src={card.img} alt="" />
+                <Image
+                  className={styles.cardBg}
+                  src={card.img}
+                  alt=""
+                  fill
+                  sizes="(max-width: 768px) 92vw, 364px"
+                  style={{ objectFit: 'cover' }}
+                  priority={i === 0}
+                />
               ) : null}
               <div className={styles.cardOverlay} />
               <div className={styles.cardContent}>
