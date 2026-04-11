@@ -1,0 +1,61 @@
+.page {
+  background: var(--color-background);
+  color: var(--color-on-background);
+  padding: 72px 40px 80px;
+  max-width: 900px;
+}
+
+.siteNav {
+  position: fixed; top: 20px; left: 20px;
+  display: flex; gap: 20px;
+  font-family: var(--font-mono, monospace);
+  font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;
+  z-index: 100;
+}
+.siteNav a { color: var(--gray-500); text-decoration: none; transition: color 0.2s; }
+.siteNav a:hover { color: var(--gray-800); }
+.navActive { color: var(--gray-800) !important; }
+
+.section { margin-bottom: 56px; }
+.sectionTitle {
+  font-family: var(--font-mono, monospace);
+  font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--gray-400); margin-bottom: 24px; padding-bottom: 8px;
+  border-bottom: 1px solid var(--gray-100);
+  font-weight: 400;
+}
+
+/* ── Typography rows ── */
+.row { display: flex; align-items: baseline; gap: 32px; padding: 12px 0; border-bottom: 1px solid var(--gray-50); }
+.rowLabel { font-family: var(--font-mono, monospace); font-size: 11px; color: var(--gray-400); width: 160px; flex-shrink: 0; }
+.rowMeta  { font-family: var(--font-mono, monospace); font-size: 10px; color: var(--gray-300); width: 140px; flex-shrink: 0; }
+.rowSample { flex: 1; }
+
+/* ── Spacing rows ── */
+.spRow { display: flex; align-items: center; gap: 20px; padding: 8px 0; border-bottom: 1px solid var(--gray-50); }
+.spLabel { font-family: var(--font-mono, monospace); font-size: 11px; color: var(--gray-400); width: 120px; flex-shrink: 0; }
+.spVal   { font-family: var(--font-mono, monospace); font-size: 10px; color: var(--gray-300); width: 48px; flex-shrink: 0; }
+.spBar   { height: 8px; background: var(--color-on-background); border-radius: 2px; flex-shrink: 0; }
+.spGroupLabel { font-family: var(--font-mono, monospace); font-size: 10px; color: var(--gray-300); letter-spacing: 0.08em; margin: 16px 0 4px; }
+
+/* ── Color swatches ── */
+.colorStrip { display: flex; gap: 0; margin-bottom: 4px; border-radius: 6px; overflow: hidden; }
+.swatch { flex: 1; height: 56px; }
+.colorStripLabels { display: flex; gap: 0; }
+.colorStripLabel  { flex: 1; font-family: var(--font-mono, monospace); font-size: 9px; color: var(--gray-300); padding-top: 4px; }
+.swatchMeta { display: flex; flex-direction: column; gap: 2px; padding: 6px 0; border-bottom: 1px solid var(--gray-50); }
+.swatchName { font-family: var(--font-mono, monospace); font-size: 11px; color: var(--gray-400); }
+.swatchHex  { font-family: var(--font-mono, monospace); font-size: 10px; color: var(--gray-300); }
+
+/* ── Color role rows ── */
+.colorRoleRow { display: flex; align-items: center; gap: 16px; padding: 8px 0; border-bottom: 1px solid var(--gray-50); }
+.colorRoleName { font-family: var(--font-mono, monospace); font-size: 11px; color: var(--gray-400); width: 220px; flex-shrink: 0; }
+.colorRoleRef  { font-family: var(--font-mono, monospace); font-size: 10px; color: var(--gray-300); flex: 1; }
+.colorRoleDot  { width: 24px; height: 24px; border-radius: 4px; flex-shrink: 0; border: 1px solid var(--color-outline-variant); }
+
+/* ── Shape rows ── */
+.shRow  { display: flex; align-items: center; gap: 20px; padding: 10px 0; border-bottom: 1px solid var(--gray-50); }
+.shLabel { font-family: var(--font-mono, monospace); font-size: 11px; color: var(--gray-400); width: 120px; flex-shrink: 0; }
+.shVal  { font-family: var(--font-mono, monospace); font-size: 10px; color: var(--gray-300); width: 48px; flex-shrink: 0; }
+.shBox  { width: 60px; height: 60px; background: var(--color-on-background); flex-shrink: 0; }
+.shNote { font-family: var(--font-mono, monospace); font-size: 10px; color: var(--gray-300); }

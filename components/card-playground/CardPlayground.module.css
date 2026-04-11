@@ -1,0 +1,211 @@
+/* ── Card wrap ── */
+.cardWrap {
+  perspective: var(--card-perspective);
+  flex-shrink: 0;
+  position: relative;
+}
+
+/* ── Card ── */
+.card {
+  width: min(92vw, var(--card-width));
+  aspect-ratio: var(--card-aspect-w) / var(--card-aspect-h);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: var(--card-padding);
+  position: relative;
+  z-index: 2;
+  background: var(--card-bg);
+  border-radius: var(--shape-card);
+  will-change: transform;
+}
+
+.cardBg {
+  position: absolute; inset: 0; z-index: 0;
+  width: 100%; height: 100%; object-fit: cover; display: block;
+  transition: transform 1.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+.card:hover .cardBg {
+  transform: scale(1.2);
+  transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* ── Ghost clone ── */
+.ghostClone {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  opacity: 0;
+  will-change: transform, opacity, filter;
+}
+
+/* ── Vignette blur canvas ── */
+.cardZoomBlur {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  width: 100%;
+  height: 100%;
+}
+.card:hover .cardZoomBlur { opacity: 1; }
+
+/* ── Overlay / shine ── */
+.cardOverlay {
+  position: absolute; inset: 0; z-index: 2;
+  background: linear-gradient(to bottom, rgba(0,0,0,0) 55%, rgba(0,0,0,0.55));
+}
+.cardShine {
+  position: absolute; inset: 0; z-index: 3;
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+/* ── Content ── */
+.cardContent {
+  position: relative; z-index: 4;
+  display: flex; flex-direction: column; gap: var(--stack-sm);
+  color: #fff;
+}
+.cardLine { line-height: 1.17; }
+
+/* ── Card button ── */
+.cardBtn {
+  align-self: flex-end;
+  display: flex; align-items: center; justify-content: center;
+  width: var(--card-btn-size); height: var(--card-btn-size);
+  padding: 0; border: none; background: none;
+  color: rgba(255,255,255,0.9);
+  font-size: 28px; line-height: 1;
+  cursor: pointer;
+  border-radius: var(--shape-pill);
+  position: relative;
+  transition:
+    opacity  var(--card-dur, 400ms) ease,
+    filter   var(--card-dur, 400ms) ease,
+    transform var(--card-dur, 400ms) ease;
+}
+.cardBtn::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.28) 0%, rgba(255,255,255,0.06) 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.card:hover .cardBtn::before { opacity: 1; }
+
+/* ── Word reveal ── */
+.word {
+  display: inline-block;
+  opacity: 0;
+  filter: blur(var(--card-blur, 8px));
+  transform: translateY(var(--card-y, 8px));
+  transition:
+    opacity   var(--card-dur, 400ms) ease,
+    filter    var(--card-dur, 400ms) ease,
+    transform var(--card-dur, 400ms) ease;
+}
+.wordVisible {
+  opacity: 1;
+  filter: blur(0);
+  transform: translateY(0);
+}
+
+/* ── Controls ── */
+.controls {
+  width: min(92vw, 364px);
+  background: rgba(255,255,255,0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  font-family: var(--font-mono, monospace);
+  font-size: 11px;
+  color: #666;
+}
+
+.ctrlSection {
+  font-family: var(--font-mono, monospace);
+  font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+  color: #aaa; margin-top: 16px; margin-bottom: 4px;
+}
+.ctrlSection:first-child { margin-top: 0; }
+
+.ctrlRow {
+  display: flex; align-items: center; gap: 10px;
+}
+.ctrlLabel { width: 80px; flex-shrink: 0; letter-spacing: 0.05em; }
+.ctrlVal   { width: 36px; text-align: right; flex-shrink: 0; color: #333; }
+
+.ctrlRow input[type=range] {
+  flex: 1; height: 3px; appearance: none; -webkit-appearance: none;
+  background: rgba(0,0,0,0.12); border-radius: 2px; outline: none; cursor: pointer;
+}
+.ctrlRow input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%;
+  background: rgba(255,255,255,0.9); border: 1px solid rgba(0,0,0,0.2);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+}
+
+.ctrlBtnRow { display: flex; gap: 4px; }
+.variantBtn {
+  flex: 1; padding: 7px 0;
+  border: 1px solid rgba(0,0,0,0.15); border-radius: 6px;
+  background: #fff; color: #999;
+  font-family: var(--font-mono, monospace); font-size: 11px;
+  cursor: pointer; transition: all 0.15s;
+}
+.variantBtnActive { background: #1c1b1f !important; color: #fff !important; border-color: #1c1b1f !important; }
+
+.ctrlSelect {
+  flex: 1; height: 28px;
+  border: 1px solid rgba(0,0,0,0.15); border-radius: 6px;
+  background: #fff; color: #333;
+  font-family: var(--font-mono, monospace); font-size: 11px;
+  padding: 0 6px; cursor: pointer; outline: none;
+  appearance: none; -webkit-appearance: none;
+}
+
+.replayBtn {
+  margin-top: 4px; flex: 1;
+  width: 100%; padding: 10px;
+  border: 1px solid rgba(0,0,0,0.15); border-radius: 8px;
+  background: #1c1b1f; color: #fff;
+  font-family: var(--font-mono, monospace); font-size: 12px;
+  letter-spacing: 0.08em; cursor: pointer; transition: opacity 0.15s;
+}
+.replayBtn:hover { opacity: 0.8; }
+.copyBtn {
+  background: #fff !important; color: #333 !important;
+  border-color: rgba(0,0,0,0.15) !important;
+}
+
+.btnRow { display: flex; gap: 8px; margin-top: 4px; }
+
+/* ── Page layout ── */
+.page {
+  min-height: 100dvh;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 32px;
+  background: #e8e8e8;
+  padding: 60px 20px;
+}
+
+/* ── Site nav ── */
+.siteNav {
+  position: fixed; top: 20px; left: 20px;
+  display: flex; gap: 20px;
+  font-family: var(--font-mono, monospace);
+  font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;
+  z-index: 100;
+}
+.siteNav a { color: #999; text-decoration: none; transition: color 0.2s; }
+.siteNav a:hover { color: #333; }
+.navActive { color: #333 !important; }
