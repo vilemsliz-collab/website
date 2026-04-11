@@ -46,6 +46,14 @@ export interface GhostConfig {
   variant: 'front' | 'behind'
 }
 
+export interface LightConfig {
+  intensity: number
+  size: number
+  travel: number
+  diffuse: number
+  shadow: number
+}
+
 export interface CardData {
   id: string
   lines: [string, string]
@@ -87,6 +95,7 @@ export const REVEAL: RevealConfig = { stagger: 58, dur: 682, blur: 8, y: 8 }
 export const INPUT: InputConfig   = { mouseKick: 0.07, touchSens: 0.02 }
 export const TILT: TiltConfig     = { max: 16, stiffness: 0.1, damping: 0.75 }
 export const GHOST: GhostConfig   = { layers: 4, opacity: 0.16, blur: 0, blend: 'normal', variant: 'behind' }
+export const LIGHT: LightConfig   = { intensity: 0.5, size: 52, travel: 68, diffuse: 0.10, shadow: 0.18 }
 
 export const CARDS: CardData[] = [
   { id: '001', lines: ['Typographic motion,', 'ink meets screen.'],    role: 'Motion Designer',       href: '/cases/001', bg: '#12131a', ac: '#c8ff00', video: '/assets/portfolio-reel.mp4', img: '/cases/case-001-thumb.png' },
