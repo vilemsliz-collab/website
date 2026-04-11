@@ -8,72 +8,37 @@ export const vert = /* glsl */ `
 
 export const frag = /* glsl */ `
   uniform sampler2D u_map;
+  uniform sampler2D u_text;      // text overlay (canvas texture, pre-multiplied alpha)
   uniform float     u_opacity;
-  uniform float     u_active;    // 1.0 = this is the active card
-  uniform vec2      u_tilt;      // (tiltRy/max,  -tiltRx/max)  −1..1
-  uniform float     u_intensity;
-  uniform float     u_size;      // specular radius in %  (0..100)
-  uniform float     u_travel;    // light-position travel  (0..120)
-  uniform float     u_diffuse;
-  uniform float     u_shadow;
+  uniform vec2      u_uvScale;   // object-fit: cover scale  (default 1,1)
+  uniform vec2      u_uvOffset;  // object-fit: cover offset (default 0,0)
 
   varying vec2 v_uv;
 
+  // Rounded corners — 32px radius on 364×555 card
+  const float RX = 0.0879;   // 32 / 364
+  const float RY = 0.0577;   // 32 / 555
+
   void main() {
-    vec4 tex = texture2D(u_map, v_uv);
+    // ── Rounded corner discard ───────────────────────────────
+    vec2 abs_uv = abs(v_uv - 0.5);
+    if (abs_uv.x > (0.5 - RX) && abs_uv.y > (0.5 - RY)) {
+      float nx = (abs_uv.x - (0.5 - RX)) / RX;
+      float ny = (abs_uv.y - (0.5 - RY)) / RY;
+      if (nx * nx + ny * ny > 1.0) discard;
+    }
 
-    // Gradient overlay (replaces the cardOverlay div)
+    // ── Texture sample with cover UV transform ───────────────
+    vec2 uv  = v_uv * u_uvScale + u_uvOffset;
+    vec4 tex = texture2D(u_map, uv);
+
+    // ── Bottom gradient (darkens bottom for text legibility) ─
     float t = 1.0 - v_uv.y;
-    vec3  col = mix(tex.rgb, vec3(0.0), t * t * 0.55);
+    vec3 col = mix(tex.rgb, vec3(0.0), t * t * 0.55);
 
-    if (u_active < 0.5) {
-      gl_FragColor = vec4(col, tex.a * u_opacity);
-      return;
-    }
-
-    float nx  = u_tilt.x;
-    float ny  = u_tilt.y;
-    float mag = min(length(vec2(nx, ny)), 1.0);
-
-    if (mag < 0.015) {
-      gl_FragColor = vec4(col, tex.a * u_opacity);
-      return;
-    }
-
-    // ── Specular highlight (radial) ──────────────────────────
-    float hx = clamp(0.5 - nx * u_travel * 0.01, 0.0, 1.0);
-    float hy = clamp(0.5 + ny * u_travel * 0.01, 0.0, 1.0);
-    vec2  lp = vec2(hx, hy);
-
-    float d    = distance(v_uv, lp);
-    float r    = u_size * 0.005;           // 52 → 0.26 UV units
-
-    float peak = u_intensity * mag;
-    float mid  = u_intensity * 0.12 * mag;
-    float spec = 0.0;
-    if (d < r) {
-      float s = d / r;                     // 0 at centre, 1 at edge
-      spec = s < 0.45
-        ? mix(peak, mid,  s / 0.45)
-        : mix(mid,  0.0, (s - 0.45) / 0.27);
-    }
-
-    // ── Diffuse + shadow (directional) ───────────────────────
-    float litA = atan(-nx, -ny);           // matches CSS atan2(-nx,-ny)
-    vec2  litV = vec2(cos(litA), sin(litA));
-    vec2  fdir = v_uv - 0.5;
-    float flen = length(fdir);
-    vec2  fnorm = flen > 0.001 ? fdir / flen : vec2(0.0);
-
-    float dp   = dot(fnorm, litV);
-    float fade = 1.0 - min(flen * 2.0 / 0.55, 1.0);  // 55 % falloff
-
-    float diff = max(0.0,  dp) * u_diffuse * mag * fade;
-    float shad = max(0.0, -dp) * u_shadow  * mag * fade;
-
-    col += vec3(spec + diff);
-    col -= vec3(shad);
-    col  = clamp(col, 0.0, 1.0);
+    // ── Text overlay (alpha-composite over gradient) ─────────
+    vec4 txt = texture2D(u_text, v_uv);
+    col = mix(col, txt.rgb, txt.a);
 
     gl_FragColor = vec4(col, tex.a * u_opacity);
   }

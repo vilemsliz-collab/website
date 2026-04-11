@@ -108,7 +108,8 @@ interface Props {
 }
 
 export default function CaseStudyPage({ cs }: Props) {
-  const isIframe = typeof window !== 'undefined' && window.self !== window.top
+  const [isIframe, setIsIframe] = useState(false)
+  useEffect(() => { setIsIframe(window.self !== window.top) }, [])
 
   return (
     <>

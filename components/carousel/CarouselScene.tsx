@@ -1,19 +1,19 @@
 'use client'
 
-import { useRef, useMemo, Suspense, type MutableRefObject } from 'react'
+import { useRef, useMemo, useEffect, Suspense, type MutableRefObject } from 'react'
 import { useThree, useFrame } from '@react-three/fiber'
-import { PerspectiveCamera, useTexture, useVideoTexture, Html } from '@react-three/drei'
-import { EffectComposer, Bloom, DepthOfField } from '@react-three/postprocessing'
+import { PerspectiveCamera, useTexture, useVideoTexture } from '@react-three/drei'
+import { EffectComposer, Bloom } from '@react-three/postprocessing'
 import * as THREE from 'three'
 import {
   CARDS,
   type CarouselCFG,
   type GhostConfig,
-  type LightConfig,
   type TiltConfig,
 } from '@/lib/carouselConfig'
 import { computeCardTransforms, perspAngle } from '@/lib/carouselPhysics'
 import { vert, frag } from '@/lib/cardShader'
+import { makeTextCanvas, drawCardText } from '@/lib/cardTextCanvas'
 
 const N          = CARDS.length
 const DEG        = Math.PI / 180
@@ -22,17 +22,36 @@ const CARD_VW    = 0.92
 const CARD_RATIO = 555 / 364   // height / width
 const GHOST_P    = 800
 
-function makeUniforms(tex: THREE.Texture, lc: LightConfig) {
+// ── Cover UV helpers ──────────────────────────────────────────────────────────
+function computeCover(iw: number, ih: number) {
+  const imgRatio   = iw / ih
+  const planeRatio = 1 / CARD_RATIO   // cardW / cardH ≈ 0.656
+  const scale  = new THREE.Vector2(1, 1)
+  const offset = new THREE.Vector2(0, 0)
+  if (!iw || !ih) return { scale, offset }
+  if (imgRatio > planeRatio) {
+    const s = planeRatio / imgRatio
+    scale.set(s, 1)
+    offset.set((1 - s) / 2, 0)
+  } else {
+    const s = imgRatio / planeRatio
+    scale.set(1, s)
+    offset.set(0, (1 - s) / 2)
+  }
+  return { scale, offset }
+}
+
+function makeUniforms(tex: THREE.Texture, textTex: THREE.Texture) {
+  const img = tex.image as HTMLImageElement | null
+  const iw  = img?.naturalWidth  ?? img?.width  ?? 0
+  const ih  = img?.naturalHeight ?? img?.height ?? 0
+  const { scale, offset } = computeCover(iw, ih)
   return {
     u_map:       { value: tex },
+    u_text:      { value: textTex },
     u_opacity:   { value: 1.0 },
-    u_active:    { value: 0.0 },
-    u_tilt:      { value: new THREE.Vector2() },
-    u_intensity: { value: lc.intensity },
-    u_size:      { value: lc.size },
-    u_travel:    { value: lc.travel },
-    u_diffuse:   { value: lc.diffuse },
-    u_shadow:    { value: lc.shadow },
+    u_uvScale:   { value: scale },
+    u_uvOffset:  { value: offset },
   }
 }
 
@@ -44,7 +63,6 @@ export interface CarouselSceneProps {
   tiltRy:    MutableRefObject<number>
   activeIdx: MutableRefObject<number>
   ghostCfg:  MutableRefObject<GhostConfig>
-  lightCfg:  MutableRefObject<LightConfig>
   tiltCfg:   MutableRefObject<TiltConfig>
   caseOpen:  MutableRefObject<boolean>
   onActiveChange: (idx: number) => void
@@ -52,68 +70,72 @@ export interface CarouselSceneProps {
   onCardClick:    (i: number) => void
 }
 
-// ─── Card HTML content ────────────────────────────────────────────────────────
-function CardHtml({ card, cardW, cardH }: { card: typeof CARDS[0]; cardW: number; cardH: number }) {
-  const pad = 40
-  return (
-    <Html
-      transform
-      position={[0, 0, 2]}
-      style={{
-        width: cardW,
-        height: cardH,
-        pointerEvents: 'none',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'flex-end',
-        padding: pad,
-        gap: 4,
-        boxSizing: 'border-box',
-      }}
-    >
-      <p style={{ fontFamily: 'var(--font-brand)', fontSize: 14, lineHeight: 1.43, letterSpacing: '0.1em', color: 'rgba(255,255,255,0.8)', fontVariationSettings: "'wght' 300", margin: 0 }}>
-        {card.role}
-      </p>
-      <p style={{ fontFamily: 'var(--font-brand)', fontSize: 32, lineHeight: 1.17, color: '#fff', fontVariationSettings: "'wght' 300", margin: 0 }}>
-        {card.lines[0]}
-      </p>
-      <p style={{ fontFamily: 'var(--font-brand)', fontSize: 32, lineHeight: 1.17, color: '#fff', fontVariationSettings: "'wght' 300", margin: 0 }}>
-        {card.lines[1]}
-      </p>
-    </Html>
-  )
-}
-
 // ─── All cards — loads textures then renders all geometry ─────────────────────
 function AllCards({
   cardW, cardH,
   groupRefs, meshRefs, ghostRefArrays,
-  lightCfg, ghostCfg, onCardClick,
+  ghostCfg, onCardClick,
 }: {
   cardW: number; cardH: number
   groupRefs: MutableRefObject<THREE.Group[]>
   meshRefs: MutableRefObject<THREE.Mesh[]>
   ghostRefArrays: MutableRefObject<THREE.Mesh[][]>
-  lightCfg: MutableRefObject<LightConfig>
   ghostCfg: MutableRefObject<GhostConfig>
   onCardClick: (i: number) => void
 }) {
-  // Image textures for cards 1–4
   const imgTextures = useTexture([CARDS[1].img!, CARDS[2].img!, CARDS[3].img!, CARDS[4].img!])
   imgTextures.forEach(t => { t.colorSpace = THREE.SRGBColorSpace })
 
-  // Video texture for card 0
   const videoTex = useVideoTexture(CARDS[0].video!, { start: true, loop: true, muted: true, playsInline: true })
   videoTex.colorSpace = THREE.SRGBColorSpace
 
   const textures: THREE.Texture[] = [videoTex, ...imgTextures]
 
-  // Create uniforms once per card
+  // Per-card canvas textures for text overlay
+  const textCanvases = useMemo(() => CARDS.map(card => makeTextCanvas(card)), [])
+  const textTextures = useMemo(() => textCanvases.map(c => {
+    const t = new THREE.CanvasTexture(c)
+    t.colorSpace = THREE.SRGBColorSpace
+    return t
+  }), [textCanvases])
+
+  // Re-draw with correct fonts once they are loaded
+  useEffect(() => {
+    document.fonts.ready.then(() => {
+      CARDS.forEach((card, i) => {
+        drawCardText(textCanvases[i], card)
+        textTextures[i].needsUpdate = true
+      })
+    })
+  }, [textCanvases, textTextures])
+
   const allUniforms = useMemo(
-    () => textures.map(tex => makeUniforms(tex, lightCfg.current)),
+    () => textures.map((tex, i) => makeUniforms(tex, textTextures[i])),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
   )
+
+  // Apply cover to video once metadata is available (videoWidth not set immediately)
+  useEffect(() => {
+    const video = videoTex.image as HTMLVideoElement | null
+    if (!video) return
+    function apply() {
+      const vw = video!.videoWidth
+      const vh = video!.videoHeight
+      if (!vw || !vh) return
+      const { scale, offset } = computeCover(vw, vh)
+      const uni = allUniforms[0]
+      uni.u_uvScale.value.copy(scale)
+      uni.u_uvOffset.value.copy(offset)
+    }
+    if (video.videoWidth > 0) {
+      apply()
+    } else {
+      video.addEventListener('loadedmetadata', apply, { once: true })
+    }
+    return () => video.removeEventListener('loadedmetadata', apply)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   return (
     <>
@@ -123,7 +145,6 @@ function AllCards({
           ref={el => { if (el) groupRefs.current[i] = el }}
           onClick={e => { e.stopPropagation(); onCardClick(i) }}
         >
-          {/* Card mesh */}
           <mesh
             ref={el => { if (el) meshRefs.current[i] = el }}
             renderOrder={2}
@@ -138,7 +159,6 @@ function AllCards({
             />
           </mesh>
 
-          {/* Ghost meshes (max 16, visibility controlled in useFrame) */}
           {Array.from({ length: 16 }, (_, gi) => (
             <mesh
               key={gi}
@@ -153,7 +173,7 @@ function AllCards({
             >
               <planeGeometry args={[cardW, cardH]} />
               <shaderMaterial
-                uniforms={makeUniforms(textures[i], lightCfg.current)}
+                uniforms={makeUniforms(textures[i], textTextures[i])}
                 vertexShader={vert}
                 fragmentShader={frag}
                 transparent
@@ -161,18 +181,16 @@ function AllCards({
               />
             </mesh>
           ))}
-
-          <CardHtml card={card} cardW={cardW} cardH={cardH} />
         </group>
       ))}
     </>
   )
 }
 
-// ─── Physics loop (reads refs, writes to Three.js objects every frame) ────────
+// ─── Physics loop ─────────────────────────────────────────────────────────────
 function Physics({
   posY, cfg, rollBase, tiltRx, tiltRy, activeIdx,
-  ghostCfg, lightCfg, tiltCfg, caseOpen,
+  ghostCfg, tiltCfg, caseOpen,
   onActiveChange, onCaseSwitch,
   groupRefs, meshRefs, ghostRefArrays, cardW, cardH,
 }: CarouselSceneProps & {
@@ -184,53 +202,60 @@ function Physics({
 }) {
   const { camera, size } = useThree()
 
+  // Camera X spring: shifts scene left when case panel opens
+  const camXRef    = useRef(0)
+  const camXVelRef = useRef(0)
+
+  // Effective width spring: narrows card spread when case panel opens
+  const wRef    = useRef(size.width)
+  const wVelRef = useRef(0)
+
   useFrame(() => {
     const P   = cfg.current.PERSPECTIVE
     const cam = camera as THREE.PerspectiveCamera
 
-    // Sync camera with CSS perspective preset
+    // Sync camera Z + FOV with CSS perspective preset
     if (Math.abs(cam.position.z - P) > 1) {
       cam.position.z = P
       cam.fov = 2 * Math.atan(size.height / 2 / P) * (180 / Math.PI)
       cam.updateProjectionMatrix()
     }
 
-    const transforms = computeCardTransforms(posY.current, N, cfg.current, size.width, rollBase.current)
-    const lc = lightCfg.current
+    // Camera X spring — positive X shifts view left (carousel visible in left 25vw)
+    const targetCamX = caseOpen.current ? size.width * 0.375 : 0
+    camXVelRef.current += (targetCamX - camXRef.current) * 0.06
+    camXVelRef.current *= 0.85
+    camXRef.current += camXVelRef.current
+    cam.position.x = camXRef.current
+
+    // Effective width spring — compress card spread for narrow stage
+    const targetW = caseOpen.current ? size.width * 0.25 : size.width
+    wVelRef.current += (targetW - wRef.current) * 0.06
+    wVelRef.current *= 0.85
+    wRef.current += wVelRef.current
+
+    const transforms = computeCardTransforms(posY.current, N, cfg.current, wRef.current, rollBase.current)
     const gc = ghostCfg.current
-    const tc = tiltCfg.current
 
     transforms.forEach((t, i) => {
       const group = groupRefs.current[i]
       const mesh  = meshRefs.current[i]
       if (!group || !mesh) return
 
-      // Wrap transform (CSS px → Three.js units, negate ty for Y-up)
       group.position.set(t.tx, -t.ty, t.tz)
-      group.rotation.x = t.rx       * DEG
-      group.rotation.y = -t.ry      * DEG   // CSS rotateY convention is opposite
-      group.rotation.z = t.rollDeg  * DEG
+      group.rotation.x = t.rx      * DEG
+      group.rotation.y = -t.ry     * DEG
+      group.rotation.z = t.rollDeg * DEG
       group.scale.setScalar(t.scale)
 
-      // Card tilt (only on active card, same negation for Y)
-      mesh.rotation.x = t.isActive ?  tiltRx.current * DEG : 0
-      mesh.rotation.y = t.isActive ? -tiltRy.current * DEG : 0
+      // Tilt — signs corrected (right mouse → right face toward viewer)
+      mesh.rotation.x = t.isActive ? -tiltRx.current * DEG : 0
+      mesh.rotation.y = t.isActive ?  tiltRy.current * DEG : 0
 
-      // Shader uniforms
       const mat = mesh.material as THREE.ShaderMaterial
       mat.uniforms.u_opacity.value = t.opacity
-      mat.uniforms.u_active.value  = t.isActive ? 1.0 : 0.0
-      if (t.isActive) {
-        const max = tc.max || 16
-        mat.uniforms.u_tilt.value.set(tiltRy.current / max, -tiltRx.current / max)
-        mat.uniforms.u_intensity.value = lc.intensity
-        mat.uniforms.u_size.value      = lc.size
-        mat.uniforms.u_travel.value    = lc.travel
-        mat.uniforms.u_diffuse.value   = lc.diffuse
-        mat.uniforms.u_shadow.value    = lc.shadow
-      }
 
-      // Ghost clones for active card
+      // Ghost clones
       const ghosts = ghostRefArrays.current[i]
       if (ghosts?.length) {
         const mag = Math.abs(tiltRx.current) + Math.abs(tiltRy.current)
@@ -245,15 +270,13 @@ function Physics({
           const gRx = perspAngle(tiltRx.current, scalar, cardH / 2, GHOST_P)
           const gRy = perspAngle(tiltRy.current, scalar, cardW / 2, GHOST_P)
           ghost.visible    = true
-          ghost.rotation.x =  gRx * DEG
-          ghost.rotation.y = -gRy * DEG
+          ghost.rotation.x = -gRx * DEG
+          ghost.rotation.y =  gRy * DEG
           ghost.renderOrder = gc.variant === 'front' ? 3 : 1;
-          (ghost.material as THREE.ShaderMaterial).uniforms.u_opacity.value = gc.opacity * scalar;
-          (ghost.material as THREE.ShaderMaterial).uniforms.u_active.value  = 0.0
+          (ghost.material as THREE.ShaderMaterial).uniforms.u_opacity.value = gc.opacity * scalar
         }
       }
 
-      // Active card tracking
       if (t.isActive && i !== activeIdx.current) {
         activeIdx.current = i
         onActiveChange(i)
@@ -265,7 +288,7 @@ function Physics({
   return null
 }
 
-// ─── Scene content (inside Suspense, after texture load) ─────────────────────
+// ─── Scene content ────────────────────────────────────────────────────────────
 function SceneContent(props: CarouselSceneProps) {
   const { size } = useThree()
 
@@ -297,7 +320,6 @@ function SceneContent(props: CarouselSceneProps) {
           groupRefs={groupRefs}
           meshRefs={meshRefs}
           ghostRefArrays={ghostRefArrays}
-          lightCfg={props.lightCfg}
           ghostCfg={props.ghostCfg}
           onCardClick={props.onCardClick}
         />
@@ -319,11 +341,7 @@ function SceneContent(props: CarouselSceneProps) {
           intensity={0.6}
           radius={0.4}
         />
-        <DepthOfField
-          focusDistance={0}
-          focalLength={0.018}
-          bokehScale={2.5}
-        />
+
       </EffectComposer>
     </>
   )

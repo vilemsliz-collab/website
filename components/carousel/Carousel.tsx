@@ -3,7 +3,7 @@
 import { useRef, useEffect, useCallback, useState } from 'react'
 import dynamic from 'next/dynamic'
 import {
-  PRESETS, CARDS, REVEAL, INPUT, TILT, GHOST, LIGHT,
+  PRESETS, CARDS, REVEAL, INPUT, TILT, GHOST,
   type CarouselCFG,
 } from '@/lib/carouselConfig'
 import {
@@ -74,12 +74,10 @@ export default function Carousel() {
   const inputRef  = useRef({ ...INPUT })
   const tiltCfg   = useRef({ ...TILT })
   const ghostCfg  = useRef({ ...GHOST })
-  const lightCfg  = useRef({ ...LIGHT })
 
   // ── React state (only for things that need re-render) ──
   const [caseOpenState, setCaseOpenState] = useState(false)
   const [ctrlOpen, setCtrlOpen] = useState(false)
-  const [activeIdxState, setActiveIdxState] = useState(-1)
 
   const isMobile = () => navigator.maxTouchPoints > 0
 
@@ -244,7 +242,7 @@ export default function Carousel() {
       // Tilt
       if (!isMobile()) {
         if (caseOpen.current) {
-          const stW = window.innerWidth / 2
+          const stW = window.innerWidth * 0.25
           if (e.clientX <= stW) {
             const rel = (e.clientX / stW - 0.5) * 2
             tiltTy.current = clamp(baseTiltY.current + rel * tiltCfg.current.max * 0.6, -tiltCfg.current.max, tiltCfg.current.max)
@@ -360,7 +358,6 @@ export default function Carousel() {
     checkBreakpoint()
     requestAnimationFrame(() => {
       activeIdx.current = 0
-      setActiveIdxState(0)
     })
 
     return () => {
@@ -416,10 +413,9 @@ export default function Carousel() {
         tiltRy={tiltRy}
         activeIdx={activeIdx}
         ghostCfg={ghostCfg}
-        lightCfg={lightCfg}
         tiltCfg={tiltCfg}
         caseOpen={caseOpen}
-        onActiveChange={(idx) => { setActiveIdxState(idx) }}
+        onActiveChange={() => {}}
         onCaseSwitch={switchCaseContent}
         onCardClick={handleCardClick}
       />
@@ -439,14 +435,12 @@ export default function Carousel() {
           ref={frameARef}
           id="case-frame-a"
           className={styles.caseFrame}
-          src=""
           title="Case study"
         />
         <iframe
           ref={frameBRef}
           id="case-frame-b"
           className={styles.caseFrame}
-          src=""
           title="Case study next"
         />
       </div>
