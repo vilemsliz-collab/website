@@ -1,3 +1,11 @@
+export interface MobileSection {
+  type: 'hero' | 'text' | 'media' | 'claims'
+  img?: string
+  headline?: string
+  body?: string
+  items?: string[]
+}
+
 export interface CaseClaim {
   text: string
   bold: string
@@ -22,6 +30,7 @@ export interface CaseStudy {
   strip: CaseStripItem[]
   stripCols?: number
   pairs: string[][]
+  mobileSections?: MobileSection[]
 }
 
 export const CASES: CaseStudy[] = [

@@ -4,13 +4,15 @@ import { useRef, useEffect, useCallback, useState } from 'react'
 import dynamic from 'next/dynamic'
 import {
   PRESETS, CARDS, REVEAL, INPUT, TILT, GHOST,
-  type CarouselCFG, type CarouselPreset,
+  type CarouselCFG, type CarouselPreset, type ExitAnim,
 } from '@/lib/carouselConfig'
 import {
   clamp, buildRollBase,
 } from '@/lib/carouselPhysics'
+import { CASES } from '@/data/cases'
 import styles from './Carousel.module.css'
 import DevPanel, { type GlassConfig } from './DevPanel'
+import MobileCaseStudy from '@/components/mobile-case/MobileCaseStudy'
 
 const CarouselCanvas = dynamic(() => import('./CarouselCanvas'), { ssr: false })
 
@@ -91,9 +93,16 @@ export default function Carousel() {
   // Apply glass values on mount so inline styles match config from the start
   useEffect(() => { applyGlass() }, [applyGlass])
 
+  // ── Mobile case study refs/state ──
+  const exitAnim        = useRef<ExitAnim | null>(null)
+  const mobileCaseIdxRef = useRef<number | null>(null)
+  const touchStartY     = useRef<number | null>(null)
+
   // ── React state (only for things that need re-render) ──
   const [caseOpenState, setCaseOpenState] = useState(false)
   const [ctrlOpen, setCtrlOpen] = useState(false)
+  const [mobileCaseState, setMobileCaseState] = useState<{ idx: number } | null>(null)
+  const [showMobileCase, setShowMobileCase] = useState(false)
 
   const isMobile = () => navigator.maxTouchPoints > 0
 
@@ -179,7 +188,38 @@ export default function Carousel() {
     splitRafId.current = requestAnimationFrame(frame)
   }, [])
 
+  const enterMobileCase = useCallback((idx: number) => {
+    velY.current = 0
+    if (rafId.current) { cancelAnimationFrame(rafId.current); rafId.current = null }
+    mobileCaseIdxRef.current = idx
+    setMobileCaseState({ idx })
+    exitAnim.current = { progress: 0, phase: 'out', activeCard: idx }
+    setTimeout(() => {
+      setShowMobileCase(true)
+      exitAnim.current = null
+    }, 580)
+  }, [])
+
+  const exitMobileCase = useCallback(() => {
+    const nextIdx = ((mobileCaseIdxRef.current! + 1) % N)
+    posY.current = nextIdx
+    velY.current = 0
+    activeIdx.current = nextIdx
+    setShowMobileCase(false)
+    exitAnim.current = { progress: 0, phase: 'in', activeCard: nextIdx }
+    setTimeout(() => {
+      exitAnim.current = null
+      setMobileCaseState(null)
+      mobileCaseIdxRef.current = null
+    }, 600)
+  }, [])
+
+  // Stable refs so stale closures inside the input useEffect can always call the latest
+  const enterMobileCaseRef = useRef(enterMobileCase)
+  useEffect(() => { enterMobileCaseRef.current = enterMobileCase }, [enterMobileCase])
+
   const openCasePanel = useCallback((cardIdx: number) => {
+    if (isMobile()) return
     const front = frontFrame.current
     if (!front) return
     // Write target top-Y to a CSS var on the parent doc BEFORE setting src so the
@@ -299,6 +339,7 @@ export default function Carousel() {
     // Touch
     function onTouchStart(e: TouchEvent) {
       swipeStartX.current = e.touches[0].clientX
+      touchStartY.current = e.touches[0].clientY
       stageTouch.current  = e.touches[0].clientX
       if (window.innerWidth >= 768) velY.current = 0
     }
@@ -314,26 +355,38 @@ export default function Carousel() {
     }
     function onTouchEnd(e: TouchEvent) {
       if (window.innerWidth < 768 && swipeStartX.current !== null) {
-        const delta = (e.changedTouches[0]?.clientX ?? swipeStartX.current) - swipeStartX.current
-        if (Math.abs(delta) > 20) {
+        const touchEndX = e.changedTouches[0]?.clientX ?? swipeStartX.current
+        const touchEndY = e.changedTouches[0]?.clientY ?? (touchStartY.current ?? 0)
+        const deltaX = touchEndX - swipeStartX.current
+        const deltaY = (touchStartY.current ?? touchEndY) - touchEndY  // positive = swipe up
+
+        // Vertical swipe up → enter mobile case study
+        if (deltaY > 60 && deltaY > Math.abs(deltaX) * 1.2 && mobileCaseIdxRef.current === null) {
+          enterMobileCaseRef.current(activeIdx.current < 0 ? 0 : activeIdx.current)
+          stageTouch.current  = null
+          swipeStartX.current = null
+          touchStartY.current = null
+          return
+        }
+
+        // Horizontal swipe → navigate carousel
+        if (Math.abs(deltaX) > 20) {
           const now = Date.now()
           if (now - lastKickMs.current >= 200) {
-            velY.current   = Math.sign(-delta) * inputRef.current.mouseKick
+            velY.current       = Math.sign(-deltaX) * inputRef.current.mouseKick
             lastKickMs.current = now
             kick()
           }
         } else {
-          // Tap — snap carousel and open case panel for the active card
+          // Tap — snap only (no tap-to-open on mobile; use swipe up instead)
           kick()
-          if (activeIdx.current >= 0 && !caseOpen.current) {
-            openCasePanelRef.current(activeIdx.current)
-          }
         }
       } else {
         kick()
       }
       stageTouch.current  = null
       swipeStartX.current = null
+      touchStartY.current = null
     }
 
     // Wheel
@@ -411,6 +464,7 @@ export default function Carousel() {
 
   // ── Card click ──
   const handleCardClick = useCallback((i: number) => {
+    if (isMobile()) return  // mobile: case study via swipe up only
     if (i !== activeIdx.current) {
       const currentMod = (((Math.round(posY.current) % N) + N) % N)
       let delta = i - currentMod
@@ -442,6 +496,7 @@ export default function Carousel() {
           caseOpen={caseOpen}
           shakeVel={shakeVel}
           carouselWidthRef={carouselWidthRef}
+          exitAnim={exitAnim}
           onActiveChange={() => {}}
           onCaseSwitch={switchCaseContent}
           onCardClick={handleCardClick}
@@ -491,6 +546,19 @@ export default function Carousel() {
         onGhostRebuild={() => {}}
         onGlassChange={applyGlass}
       />
+
+      {/* ── Mobile case study overlay ── */}
+      {mobileCaseState !== null && (() => {
+        const cs = CASES.find(c => c.slug === CARDS[mobileCaseState.idx].id)
+        return cs ? (
+          <MobileCaseStudy
+            cs={cs}
+            cardIdx={mobileCaseState.idx}
+            show={showMobileCase}
+            onScrollEnd={exitMobileCase}
+          />
+        ) : null
+      })()}
     </div>
   )
 }
