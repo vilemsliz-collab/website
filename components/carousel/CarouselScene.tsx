@@ -3,7 +3,6 @@
 import { useRef, useMemo, useEffect, Suspense, type MutableRefObject } from 'react'
 import { useThree, useFrame } from '@react-three/fiber'
 import { PerspectiveCamera, useTexture, useVideoTexture } from '@react-three/drei'
-import { EffectComposer, Bloom } from '@react-three/postprocessing'
 import * as THREE from 'three'
 import {
   CARDS,
@@ -336,14 +335,6 @@ function SceneContent(props: CarouselSceneProps) {
         cardH={cardH}
       />
 
-      <EffectComposer>
-        <Bloom
-          luminanceThreshold={0.55}
-          luminanceSmoothing={0.9}
-          intensity={0.6}
-          radius={0.4}
-        />
-      </EffectComposer>
     </>
   )
 }
