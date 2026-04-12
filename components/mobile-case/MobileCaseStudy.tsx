@@ -5,7 +5,7 @@ import type { CaseStudy } from '@/data/cases'
 import CaseStudyPage from '@/components/case-study/CaseStudyPage'
 import styles from './MobileCaseStudy.module.css'
 
-export const PEEK_PCT = 82
+export const PEEK_PCT = 68
 
 export interface MobileCaseStudyHandle {
   setDragOffset(percent: number): void
@@ -67,6 +67,7 @@ const MobileCaseStudy = forwardRef<MobileCaseStudyHandle, Props>(
         className={styles.overlay}
         onScroll={onScroll}
       >
+        <div className={styles.handle} />
         <CaseStudyPage cs={cs} isOverlay />
         <div className={styles.scrollSpacer} />
       </div>
