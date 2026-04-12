@@ -17,17 +17,17 @@
 .csPage {
   display: flex;
   flex-direction: column;
-  gap: 56px;
+  gap: var(--space-16);
   padding: var(--space-16) var(--space-16) var(--space-24);
 }
 
-.csTextInset { padding-left: 20px; padding-right: 20px; }
+.csTextInset { padding-left: var(--space-5); padding-right: var(--space-5); }
 .csMuted     { color: var(--color-on-surface-variant); }
 
 .csBody {
   font-size: 16px;
-  line-height: 1.4;
-  letter-spacing: 0;
+  line-height: var(--type-body-large-lh);
+  letter-spacing: var(--type-body-large-ls);
   font-weight: 400;
   font-variation-settings: 'wght' 400;
   color: var(--color-on-surface-variant);
@@ -69,14 +69,14 @@
   font-family: var(--font-brand);
   font-size: var(--type-headline-large-size);
   line-height: var(--type-headline-large-lh);
-  letter-spacing: 0.48px;
+  letter-spacing: var(--type-headline-large-ls);
   font-weight: 400;
   font-variation-settings: 'wght' 400;
   color: var(--gray-300);
   margin: 0;
 }
 .csClaim strong {
-  color: #ffffff;
+  color: var(--white);
   font-weight: 400;
   font-variation-settings: 'wght' 400;
 }
@@ -103,8 +103,8 @@
 .csRoleLabel {
   font-family: var(--font-brand);
   color: var(--gray-800);
-  font-size: 24px;
-  line-height: 1.2;
+  font-size: var(--type-headline-small-size);
+  line-height: var(--type-headline-small-lh);
   font-weight: 400;
   font-variation-settings: 'wght' 400;
 }
@@ -123,8 +123,8 @@
 .csCsLabel {
   font-family: var(--font-brand);
   color: var(--color-on-background);
-  font-size: 24px;
-  line-height: 1.2;
+  font-size: var(--type-headline-small-size);
+  line-height: var(--type-headline-small-lh);
   font-weight: 400;
   font-variation-settings: 'wght' 400;
 }
@@ -211,6 +211,7 @@
   .csHeadline { font-size: 36px; }
   .csMeta { flex-direction: column; }
   .csCs { flex-direction: column; gap: var(--space-8); }
+  .csClaim { font-size: var(--type-headline-medium-size); line-height: var(--type-headline-medium-lh); }
   .csStrip { height: auto; flex-wrap: wrap; }
   .csStripCard { flex: 1 1 calc(50% - 3px); height: 200px; }
   .csPair { height: auto; flex-direction: column; }
