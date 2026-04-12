@@ -9,9 +9,8 @@ import {
   type CarouselCFG,
   type GhostConfig,
   type TiltConfig,
-  type ExitAnim,
 } from '@/lib/carouselConfig'
-import { computeCardTransforms, perspAngle, smoothstep, clamp } from '@/lib/carouselPhysics'
+import { computeCardTransforms, perspAngle } from '@/lib/carouselPhysics'
 import { vert, frag } from '@/lib/cardShader'
 import { makeTextCanvas, drawCardText } from '@/lib/cardTextCanvas'
 
@@ -67,7 +66,6 @@ export interface CarouselSceneProps {
   caseOpen:  MutableRefObject<boolean>
   shakeVel:  MutableRefObject<number>
   carouselWidthRef: MutableRefObject<number>
-  exitAnim:  MutableRefObject<ExitAnim | null>
   onActiveChange: (idx: number) => void
   onCaseSwitch:   (href: string) => void
   onCardClick:    (i: number) => void
@@ -195,7 +193,7 @@ function AllCards({
 // ─── Physics loop ─────────────────────────────────────────────────────────────
 function Physics({
   posY, cfg, rollBase, tiltRx, tiltRy, activeIdx,
-  ghostCfg, tiltCfg, caseOpen, shakeVel, carouselWidthRef, exitAnim,
+  ghostCfg, tiltCfg, caseOpen, shakeVel, carouselWidthRef,
   onActiveChange, onCaseSwitch,
   groupRefs, meshRefs, ghostRefArrays, cardW, cardH,
 }: CarouselSceneProps & {
@@ -214,7 +212,7 @@ function Physics({
   // Shake spring state (driven by shakeVel from parent)
   const shakePos = useRef(0)
 
-  useFrame((state, delta) => {
+  useFrame((state) => {
     const P   = cfg.current.PERSPECTIVE
     const cam = camera as THREE.PerspectiveCamera
     const { width, height } = state.size  // always-current from R3F store
@@ -298,32 +296,6 @@ function Physics({
         if (caseOpen.current) onCaseSwitch(CARDS[i].href)
       }
     })
-
-    // ── Mobile exit/entry fade animation ──
-    const ea = exitAnim.current
-    if (ea) {
-      const DRIFT = 20  // world units ≈ screen pixels with mobile camera
-      ea.progress = Math.min(ea.progress + delta / 0.5, 1)
-      const p = ea.progress
-
-      meshRefs.current.forEach((mesh, i) => {
-        const group = groupRefs.current[i]
-        if (!mesh || !group) return
-        const isActive = i === ea.activeCard
-        // Active card is delayed by 100ms (≈ 0.2 progress units at 0.5s total)
-        const tp = isActive ? clamp((p - 0.2) / 0.8, 0, 1) : clamp(p, 0, 1)
-        const t = smoothstep(tp)
-        const mat = mesh.material as THREE.ShaderMaterial
-
-        if (ea.phase === 'out') {
-          mat.uniforms.u_opacity.value *= (1 - t)
-          group.position.y += t * DRIFT
-        } else {
-          mat.uniforms.u_opacity.value *= t
-          group.position.y += (1 - t) * DRIFT
-        }
-      })
-    }
 
   })
 

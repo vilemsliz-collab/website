@@ -11,10 +11,6 @@
   will-change: transform;
 }
 
-.overlayVisible {
-  transform: none;
-}
-
 .scrollSpacer {
   height: var(--space-24);
   flex-shrink: 0;

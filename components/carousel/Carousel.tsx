@@ -4,7 +4,7 @@ import { useRef, useEffect, useCallback, useState } from 'react'
 import dynamic from 'next/dynamic'
 import {
   PRESETS, CARDS, REVEAL, INPUT, TILT, GHOST,
-  type CarouselCFG, type CarouselPreset, type ExitAnim,
+  type CarouselCFG, type CarouselPreset,
 } from '@/lib/carouselConfig'
 import {
   clamp, buildRollBase,
@@ -12,7 +12,7 @@ import {
 import { CASES } from '@/data/cases'
 import styles from './Carousel.module.css'
 import DevPanel, { type GlassConfig } from './DevPanel'
-import MobileCaseStudy from '@/components/mobile-case/MobileCaseStudy'
+import MobileCaseStudy, { type MobileCaseStudyHandle } from '@/components/mobile-case/MobileCaseStudy'
 
 const CarouselCanvas = dynamic(() => import('./CarouselCanvas'), { ssr: false })
 
@@ -94,15 +94,17 @@ export default function Carousel() {
   useEffect(() => { applyGlass() }, [applyGlass])
 
   // ── Mobile case study refs/state ──
-  const exitAnim        = useRef<ExitAnim | null>(null)
+  const mobileCaseRef    = useRef<MobileCaseStudyHandle>(null)
   const mobileCaseIdxRef = useRef<number | null>(null)
-  const touchStartY     = useRef<number | null>(null)
+  const pendingCaseIdx   = useRef<number | null>(null)
+  const verticalDragRef  = useRef(false)
+  const caseModeRef      = useRef(false)
+  const touchStartY      = useRef<number | null>(null)
 
   // ── React state (only for things that need re-render) ──
   const [caseOpenState, setCaseOpenState] = useState(false)
   const [ctrlOpen, setCtrlOpen] = useState(false)
   const [mobileCaseState, setMobileCaseState] = useState<{ idx: number } | null>(null)
-  const [showMobileCase, setShowMobileCase] = useState(false)
 
   const isMobile = () => navigator.maxTouchPoints > 0
 
@@ -189,34 +191,25 @@ export default function Carousel() {
   }, [])
 
   const enterMobileCase = useCallback((idx: number) => {
-    velY.current = 0
-    if (rafId.current) { cancelAnimationFrame(rafId.current); rafId.current = null }
     mobileCaseIdxRef.current = idx
+    caseModeRef.current = true
     setMobileCaseState({ idx })
-    exitAnim.current = { progress: 0, phase: 'out', activeCard: idx }
-    setTimeout(() => {
-      setShowMobileCase(true)
-      exitAnim.current = null
-    }, 580)
+    requestAnimationFrame(() => mobileCaseRef.current?.snapOpen())
   }, [])
 
   const exitMobileCase = useCallback(() => {
+    caseModeRef.current = false
     const nextIdx = ((mobileCaseIdxRef.current! + 1) % N)
     posY.current = nextIdx
     velY.current = 0
     activeIdx.current = nextIdx
-    setShowMobileCase(false)
-    exitAnim.current = { progress: 0, phase: 'in', activeCard: nextIdx }
+    mobileCaseRef.current?.snapClosed()
     setTimeout(() => {
-      exitAnim.current = null
       setMobileCaseState(null)
       mobileCaseIdxRef.current = null
-    }, 600)
+      pendingCaseIdx.current = null
+    }, 450)
   }, [])
-
-  // Stable refs so stale closures inside the input useEffect can always call the latest
-  const enterMobileCaseRef = useRef(enterMobileCase)
-  useEffect(() => { enterMobileCaseRef.current = enterMobileCase }, [enterMobileCase])
 
   const openCasePanel = useCallback((cardIdx: number) => {
     if (isMobile()) return
@@ -338,36 +331,70 @@ export default function Carousel() {
 
     // Touch
     function onTouchStart(e: TouchEvent) {
-      swipeStartX.current = e.touches[0].clientX
-      touchStartY.current = e.touches[0].clientY
-      stageTouch.current  = e.touches[0].clientX
+      swipeStartX.current  = e.touches[0].clientX
+      touchStartY.current  = e.touches[0].clientY
+      stageTouch.current   = e.touches[0].clientX
+      verticalDragRef.current  = false
+      pendingCaseIdx.current   = null
       if (window.innerWidth >= 768) velY.current = 0
     }
     function onTouchMove(e: TouchEvent) {
       if (stageTouch.current === null) return
+
       if (window.innerWidth >= 768) {
         const dragK = 1 / (window.innerWidth * inputRef.current.touchSens)
         const dPos  = -(e.touches[0].clientX - stageTouch.current) * dragK
         velY.current   = velY.current * 0.5 + dPos * 0.5
         posY.current  += dPos
         stageTouch.current = e.touches[0].clientX
+        return
+      }
+
+      // Mobile: detect vertical drag to open case study
+      if (!caseModeRef.current) {
+        const deltaY = (touchStartY.current ?? 0) - e.touches[0].clientY   // positive = drag down
+        const deltaX = Math.abs(e.touches[0].clientX - (swipeStartX.current ?? 0))
+
+        if (!verticalDragRef.current && deltaY > 8 && deltaY > deltaX * 1.5) {
+          verticalDragRef.current = true
+          const idx = activeIdx.current < 0 ? 0 : activeIdx.current
+          pendingCaseIdx.current   = idx
+          mobileCaseIdxRef.current = idx
+          setMobileCaseState({ idx })
+        }
+
+        if (verticalDragRef.current && deltaY > 0) {
+          e.preventDefault()
+          const pct = Math.max(0, 100 - (deltaY / window.innerHeight) * 100)
+          mobileCaseRef.current?.setDragOffset(pct)
+        }
       }
     }
     function onTouchEnd(e: TouchEvent) {
-      if (window.innerWidth < 768 && swipeStartX.current !== null) {
-        const touchEndX = e.changedTouches[0]?.clientX ?? swipeStartX.current
-        const touchEndY = e.changedTouches[0]?.clientY ?? (touchStartY.current ?? 0)
-        const deltaX = touchEndX - swipeStartX.current
-        const deltaY = (touchStartY.current ?? touchEndY) - touchEndY  // positive = swipe up
-
-        // Vertical swipe up → enter mobile case study
-        if (deltaY > 60 && deltaY > Math.abs(deltaX) * 1.2 && mobileCaseIdxRef.current === null) {
-          enterMobileCaseRef.current(activeIdx.current < 0 ? 0 : activeIdx.current)
-          stageTouch.current  = null
-          swipeStartX.current = null
-          touchStartY.current = null
-          return
+      // Mobile vertical drag — snap open or cancel
+      if (window.innerWidth < 768 && verticalDragRef.current) {
+        verticalDragRef.current = false
+        const endY   = e.changedTouches[0]?.clientY ?? (touchStartY.current ?? 0)
+        const deltaY = (touchStartY.current ?? 0) - endY
+        if (deltaY > window.innerHeight * 0.25) {
+          caseModeRef.current = true
+          requestAnimationFrame(() => mobileCaseRef.current?.snapOpen())
+        } else {
+          mobileCaseRef.current?.snapClosed()
+          setTimeout(() => {
+            setMobileCaseState(null)
+            mobileCaseIdxRef.current = null
+            pendingCaseIdx.current   = null
+          }, 420)
         }
+        stageTouch.current  = null
+        swipeStartX.current = null
+        touchStartY.current = null
+        return
+      }
+
+      if (window.innerWidth < 768 && swipeStartX.current !== null) {
+        const deltaX = (e.changedTouches[0]?.clientX ?? swipeStartX.current) - swipeStartX.current
 
         // Horizontal swipe → navigate carousel
         if (Math.abs(deltaX) > 20) {
@@ -378,7 +405,7 @@ export default function Carousel() {
             kick()
           }
         } else {
-          // Tap — snap only (no tap-to-open on mobile; use swipe up instead)
+          // Tap — snap only
           kick()
         }
       } else {
@@ -392,9 +419,19 @@ export default function Carousel() {
     // Wheel
     function onWheel(e: WheelEvent) {
       e.preventDefault()
+      // Desktop: scroll down → open case study (for DevTools mobile simulation)
+      if (e.deltaY > 40 && !caseModeRef.current && mobileCaseIdxRef.current === null) {
+        const idx = activeIdx.current < 0 ? 0 : activeIdx.current
+        mobileCaseIdxRef.current = idx
+        caseModeRef.current = true
+        setMobileCaseState({ idx })
+        requestAnimationFrame(() => mobileCaseRef.current?.snapOpen())
+        return
+      }
       const d   = e.deltaX + e.deltaY
       const mag = Math.abs(d)
       if (mag < 40) return
+      if (caseModeRef.current) return  // in case mode, wheel handled by overlay scroll
       const now = Date.now()
       if (now - lastKickMs.current >= 200) {
         velY.current   = Math.sign(d) * inputRef.current.mouseKick
@@ -428,7 +465,7 @@ export default function Carousel() {
     window.addEventListener('mousedown', onMouseDown)
     window.addEventListener('mouseup', onMouseUp)
     window.addEventListener('touchstart', onTouchStart, { passive: true })
-    window.addEventListener('touchmove',  onTouchMove,  { passive: true })
+    window.addEventListener('touchmove',  onTouchMove,  { passive: false })
     window.addEventListener('touchend',   onTouchEnd,   { passive: true })
     window.addEventListener('wheel', onWheel, { passive: false })
     window.addEventListener('keydown', onKeyDown)
@@ -496,7 +533,6 @@ export default function Carousel() {
           caseOpen={caseOpen}
           shakeVel={shakeVel}
           carouselWidthRef={carouselWidthRef}
-          exitAnim={exitAnim}
           onActiveChange={() => {}}
           onCaseSwitch={switchCaseContent}
           onCardClick={handleCardClick}
@@ -552,8 +588,8 @@ export default function Carousel() {
         const cs = CASES.find(c => c.slug === CARDS[mobileCaseState.idx].id)
         return cs ? (
           <MobileCaseStudy
+            ref={mobileCaseRef}
             cs={cs}
-            show={showMobileCase}
             onScrollEnd={exitMobileCase}
           />
         ) : null

@@ -1,51 +1,73 @@
 'use client'
 
-import { useRef, useEffect, useCallback } from 'react'
+import { useRef, useCallback, forwardRef, useImperativeHandle } from 'react'
 import type { CaseStudy } from '@/data/cases'
 import CaseStudyPage from '@/components/case-study/CaseStudyPage'
 import styles from './MobileCaseStudy.module.css'
 
+export interface MobileCaseStudyHandle {
+  setDragOffset(percent: number): void
+  snapOpen(): void
+  snapClosed(): void
+}
+
 interface Props {
   cs: CaseStudy
-  show: boolean
   onScrollEnd: () => void
 }
 
-export default function MobileCaseStudy({ cs, show, onScrollEnd }: Props) {
-  const scrollRef = useRef<HTMLDivElement>(null)
-  const scrollEndFiredRef = useRef(false)
-  const readyRef = useRef(false)
+const MobileCaseStudy = forwardRef<MobileCaseStudyHandle, Props>(
+  function MobileCaseStudy({ cs, onScrollEnd }, ref) {
+    const scrollRef  = useRef<HTMLDivElement>(null)
+    const readyRef   = useRef(false)
+    const firedRef   = useRef(false)
 
-  useEffect(() => {
-    if (show) {
-      scrollEndFiredRef.current = false
-      if (scrollRef.current) scrollRef.current.scrollTop = 0
-      const t = setTimeout(() => { readyRef.current = true }, 600)
-      return () => clearTimeout(t)
-    } else {
-      readyRef.current = false
-    }
-  }, [show])
+    useImperativeHandle(ref, () => ({
+      setDragOffset(percent: number) {
+        const el = scrollRef.current
+        if (!el) return
+        el.style.transition = 'none'
+        el.style.transform  = `translateY(${percent}%)`
+      },
+      snapOpen() {
+        const el = scrollRef.current
+        if (!el) return
+        el.scrollTop = 0
+        firedRef.current = false
+        el.style.transition = 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+        el.style.transform  = 'translateY(0)'
+        setTimeout(() => { readyRef.current = true }, 350)
+      },
+      snapClosed() {
+        readyRef.current = false
+        const el = scrollRef.current
+        if (!el) return
+        el.style.transition = 'transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)'
+        el.style.transform  = 'translateY(100%)'
+      },
+    }))
 
-  const onScroll = useCallback(() => {
-    if (!readyRef.current || scrollEndFiredRef.current) return
-    const el = scrollRef.current
-    if (!el) return
-    if (el.scrollTop + el.clientHeight >= el.scrollHeight - 80) {
-      scrollEndFiredRef.current = true
-      onScrollEnd()
-    }
-  }, [onScrollEnd])
+    const onScroll = useCallback(() => {
+      if (!readyRef.current || firedRef.current) return
+      const el = scrollRef.current
+      if (!el) return
+      if (el.scrollTop + el.clientHeight >= el.scrollHeight - 80) {
+        firedRef.current = true
+        onScrollEnd()
+      }
+    }, [onScrollEnd])
 
-  return (
-    <div
-      ref={scrollRef}
-      className={`${styles.overlay} ${show ? styles.overlayVisible : ''}`}
-      onScroll={onScroll}
-      aria-hidden={!show}
-    >
-      <CaseStudyPage cs={cs} isOverlay />
-      <div className={styles.scrollSpacer} />
-    </div>
-  )
-}
+    return (
+      <div
+        ref={scrollRef}
+        className={styles.overlay}
+        onScroll={onScroll}
+      >
+        <CaseStudyPage cs={cs} isOverlay />
+        <div className={styles.scrollSpacer} />
+      </div>
+    )
+  }
+)
+
+export default MobileCaseStudy

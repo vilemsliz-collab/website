@@ -46,12 +46,6 @@ export interface GhostConfig {
   variant: 'front' | 'behind'
 }
 
-export interface ExitAnim {
-  progress: number
-  phase: 'out' | 'in'
-  activeCard: number
-}
-
 export interface LightConfig {
   intensity: number
   size: number
