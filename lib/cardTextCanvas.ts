@@ -32,13 +32,13 @@ export function drawCardText(canvas: HTMLCanvasElement, card: CardData): void {
   const roleY  = line1Y - lh - gap   // generous gap above lines
 
   // Role label
-  ctx.font          = `300 ${roleFs}px "Google Sans Flex", system-ui, sans-serif`
+  ctx.font          = `400 ${roleFs}px "Google Sans Flex", system-ui, sans-serif`
   ctx.letterSpacing = '2.8px'   // 0.1em × 28px
   ctx.fillStyle     = 'rgba(255,255,255,0.8)'
   ctx.fillText(card.role, padH, roleY)
 
   // Two headline lines
-  ctx.font          = `300 ${lineFs}px "Google Sans Flex", system-ui, sans-serif`
+  ctx.font          = `400 ${lineFs}px "Google Sans Flex", system-ui, sans-serif`
   ctx.letterSpacing = '0px'
   ctx.fillStyle     = '#ffffff'
   ctx.fillText(card.lines[0], padH, line1Y)

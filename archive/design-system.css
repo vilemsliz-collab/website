@@ -34,7 +34,7 @@
   --type-display-medium-size:   45px;
   --type-display-medium-lh:     52px;
   --type-display-medium-ls:     0px;
-  --type-display-medium-weight: 300;
+  --type-display-medium-weight: 400;
 
   --type-display-small-size:    36px;
   --type-display-small-lh:      44px;
@@ -49,7 +49,7 @@
   --type-headline-medium-size:   28px;
   --type-headline-medium-lh:     36px;
   --type-headline-medium-ls:     0px;
-  --type-headline-medium-weight: 300;
+  --type-headline-medium-weight: 400;
 
   --type-headline-small-size:    24px;
   --type-headline-small-lh:      32px;
@@ -64,7 +64,7 @@
   --type-title-medium-size:   16px;
   --type-title-medium-lh:     24px;
   --type-title-medium-ls:     0.15px;
-  --type-title-medium-weight: 300;
+  --type-title-medium-weight: 400;
 
   --type-title-small-size:    14px;
   --type-title-small-lh:      20px;
@@ -79,7 +79,7 @@
   --type-label-medium-size:   14px;
   --type-label-medium-lh:     20px;
   --type-label-medium-ls:     0.5px;
-  --type-label-medium-weight: 300;
+  --type-label-medium-weight: 400;
 
   --type-label-small-size:    11px;
   --type-label-small-lh:      16px;
@@ -94,7 +94,7 @@
   --type-body-medium-size:   14px;
   --type-body-medium-lh:     20px;
   --type-body-medium-ls:     0.25px;
-  --type-body-medium-weight: 300;
+  --type-body-medium-weight: 400;
 
   --type-body-small-size:    12px;
   --type-body-small-lh:      16px;

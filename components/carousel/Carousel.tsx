@@ -87,7 +87,7 @@ export default function Carousel() {
     el.style.background = `rgba(${color},${color},${color},${opacity})`
   }, [])
 
-  // Apply glass values on mount so inline styles match glassCfg from the start
+  // Apply glass values on mount so inline styles match config from the start
   useEffect(() => { applyGlass() }, [applyGlass])
 
   // ── React state (only for things that need re-render) ──

@@ -39,8 +39,8 @@
   font-size: 64px;
   line-height: 1.05;
   letter-spacing: -0.25px;
-  font-weight: 300;
-  font-variation-settings: 'wght' 300;
+  font-weight: 400;
+  font-variation-settings: 'wght' 400;
 }
 .csHeadlineDark  { color: var(--color-on-background); }
 .csHeadlineMuted { color: var(--color-on-surface-variant); }
@@ -71,15 +71,15 @@
   font-size: 48px;
   line-height: 1.1;
   letter-spacing: 0.48px;
-  font-weight: 300;
-  font-variation-settings: 'wght' 300;
+  font-weight: 400;
+  font-variation-settings: 'wght' 400;
   color: var(--gray-300);
   margin: 0;
 }
 .csClaim strong {
   color: #ffffff;
-  font-weight: 300;
-  font-variation-settings: 'wght' 300;
+  font-weight: 400;
+  font-variation-settings: 'wght' 400;
 }
 
 .csRoleCard {
@@ -98,8 +98,8 @@
   color: var(--gray-800);
   font-size: 24px;
   line-height: 1.2;
-  font-weight: 300;
-  font-variation-settings: 'wght' 300;
+  font-weight: 400;
+  font-variation-settings: 'wght' 400;
 }
 
 /* ── Challenge / Solution ── */
@@ -118,8 +118,8 @@
   color: var(--color-on-background);
   font-size: 24px;
   line-height: 1.2;
-  font-weight: 300;
-  font-variation-settings: 'wght' 300;
+  font-weight: 400;
+  font-variation-settings: 'wght' 400;
 }
 
 /* ── Media block ── */
