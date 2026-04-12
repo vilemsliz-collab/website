@@ -68,7 +68,7 @@ export function computeCardTransforms(
     if (i === i1t) tyBonus = -arc * V_ARC * vDir
 
     const tx     = cosPhi * Math.sin(theta) * R * st
-    const ty     = sinPhi * R * st + tyBonus
+    const ty     = sinPhi * R * st + tyBonus + cfg.Y_OFFSET
     const tz     = (cosPhi * Math.cos(theta) - 1) * R * st
     const facing = cosPhi * Math.cos(theta)
     const ry     = -(theta * 180 / Math.PI) * cfg.ROT_MULT * st

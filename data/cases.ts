@@ -20,6 +20,7 @@ export interface CaseStudy {
   mediaImg?: string
   mediaCaption: string
   strip: CaseStripItem[]
+  stripCols?: number
   pairs: string[][]
 }
 
@@ -28,21 +29,19 @@ export const CASES: CaseStudy[] = [
     slug: '001',
     title: 'I made Wrike AI glow',
     headlineDark: 'I made Wrike AI glow',
-    headlineMuted: ' from Top of the Funnel to product',
+    headlineMuted: '',
     claims: [
       { bold: '2M users', text: 'Shipped to {bold} in product' },
       { bold: '34%', text: 'Increased sign-ups by {bold} in Q2' },
       { bold: '3 platforms', text: 'Launched across {bold} in one quarter' },
     ],
-    roleBody: 'We audited every existing pattern, distilled a minimal token architecture, and rebuilt the component library from the ground up — optimised for composability. One source of truth, adopted across all three surfaces within the same quarter.',
-    challenge: 'Three separate product teams were shipping UI at different speeds with no shared vocabulary. Each surface had its own component library, leading to inconsistent patterns, duplicated effort, and a fragmented user experience that was hard to maintain at scale.',
-    solution: 'We audited every existing pattern, distilled a minimal token architecture, and rebuilt the component library from the ground up — optimised for composability. One source of truth, adopted across all three surfaces within the same quarter.',
-    mediaCaption: 'Three separate product teams were shipping UI at different speeds with no shared vocabulary. Each surface had its own component library, leading to inconsistent patterns, duplicated effort, and a fragmented user experience that was hard to maintain at scale.',
+    roleBody: 'We audited every existing pattern, distilled a minimal token architecture, and rebuilt the component library from the ground up — optimised for composability.',
+    challenge: 'Three separate product teams were shipping UI at different speeds with no shared vocabulary.',
+    solution: 'We audited every existing pattern, distilled a minimal token architecture, and rebuilt the component library from the ground up — optimised for composability.',
+    mediaCaption: 'Three separate product teams were shipping UI at different speeds with no shared vocabulary.',
     strip: [
-      { caption: 'Three separate product teams were shipping UI at different speeds with no shared vocabulary.' },
-      { caption: 'Three separate product teams were shipping UI at different speeds with no shared vocabulary.' },
-      { caption: 'Three separate product teams were shipping UI at different speeds with no shared vocabulary.' },
-      { caption: 'Three separate product teams were shipping UI at different speeds with no shared vocabulary.' },
+      { caption: 'Three teams, one design system.' },
+      { caption: 'Three teams, one design system.' },
     ],
     pairs: [[], []],
   },
@@ -61,10 +60,10 @@ export const CASES: CaseStudy[] = [
     solution: 'We audited every existing pattern, distilled a minimal token architecture, and rebuilt the component library from the ground up — optimised for composability.',
     mediaCaption: 'Three separate product teams were shipping UI at different speeds with no shared vocabulary.',
     strip: [
-      { caption: 'Three separate product teams were shipping UI at different speeds with no shared vocabulary.' },
-      { caption: 'Three separate product teams were shipping UI at different speeds with no shared vocabulary.' },
-      { caption: 'Three separate product teams were shipping UI at different speeds with no shared vocabulary.' },
-      { caption: 'Three separate product teams were shipping UI at different speeds with no shared vocabulary.' },
+      { caption: 'Three teams, one design system.' },
+      { caption: 'Three teams, one design system.' },
+      { caption: 'Three teams, one design system.' },
+      { caption: 'Three teams, one design system.' },
     ],
     pairs: [[], []],
   },
@@ -83,10 +82,10 @@ export const CASES: CaseStudy[] = [
     solution: 'We audited every existing pattern, distilled a minimal token architecture, and rebuilt the component library from the ground up — optimised for composability.',
     mediaCaption: 'Three separate product teams were shipping UI at different speeds with no shared vocabulary.',
     strip: [
-      { caption: 'Three separate product teams were shipping UI at different speeds with no shared vocabulary.' },
-      { caption: 'Three separate product teams were shipping UI at different speeds with no shared vocabulary.' },
-      { caption: 'Three separate product teams were shipping UI at different speeds with no shared vocabulary.' },
-      { caption: 'Three separate product teams were shipping UI at different speeds with no shared vocabulary.' },
+      { caption: 'Three teams, one design system.' },
+      { caption: 'Three teams, one design system.' },
+      { caption: 'Three teams, one design system.' },
+      { caption: 'Three teams, one design system.' },
     ],
     pairs: [[], []],
   },
@@ -105,11 +104,10 @@ export const CASES: CaseStudy[] = [
     solution: 'We audited every existing pattern, distilled a minimal token architecture, and rebuilt the component library from the ground up — optimised for composability.',
     mediaCaption: 'Three separate product teams were shipping UI at different speeds with no shared vocabulary.',
     strip: [
-      { caption: 'Three separate product teams were shipping UI at different speeds with no shared vocabulary.' },
-      { caption: 'Three separate product teams were shipping UI at different speeds with no shared vocabulary.' },
-      { caption: 'Three separate product teams were shipping UI at different speeds with no shared vocabulary.' },
-      { caption: 'Three separate product teams were shipping UI at different speeds with no shared vocabulary.' },
+      { caption: 'Three teams, one design system.' },
+      { caption: 'Three teams, one design system.' },
     ],
+    stripCols: 2,
     pairs: [[], []],
   },
   {
@@ -127,10 +125,10 @@ export const CASES: CaseStudy[] = [
     solution: 'We audited every existing pattern, distilled a minimal token architecture, and rebuilt the component library from the ground up — optimised for composability.',
     mediaCaption: 'Three separate product teams were shipping UI at different speeds with no shared vocabulary.',
     strip: [
-      { caption: 'Three separate product teams were shipping UI at different speeds with no shared vocabulary.' },
-      { caption: 'Three separate product teams were shipping UI at different speeds with no shared vocabulary.' },
-      { caption: 'Three separate product teams were shipping UI at different speeds with no shared vocabulary.' },
-      { caption: 'Three separate product teams were shipping UI at different speeds with no shared vocabulary.' },
+      { caption: 'Three teams, one design system.' },
+      { caption: 'Three teams, one design system.' },
+      { caption: 'Three teams, one design system.' },
+      { caption: 'Three teams, one design system.' },
     ],
     pairs: [[], []],
   },

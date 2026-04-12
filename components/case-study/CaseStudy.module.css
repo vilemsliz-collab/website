@@ -50,26 +50,25 @@
   display: flex;
   gap: var(--space-2);
   align-items: stretch;
-  height: 197px;
 }
 
 .csStatCard {
   flex: 1;
   background: var(--gray-900);
   border-radius: var(--shape-md);
-  padding: var(--space-7) var(--space-7) 0;
+  padding: var(--space-7);
   overflow: hidden;
   position: relative;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
+  justify-content: center;
 }
 
-.csClaims { position: relative; min-height: 106px; overflow: hidden; }
+.csClaims { position: relative; overflow: hidden; }
 .csClaim {
   font-family: var(--font-brand);
-  font-size: 48px;
-  line-height: 1.1;
+  font-size: var(--type-headline-large-size);
+  line-height: var(--type-headline-large-lh);
   letter-spacing: 0.48px;
   font-weight: 400;
   font-variation-settings: 'wght' 400;
@@ -80,6 +79,15 @@
   color: #ffffff;
   font-weight: 400;
   font-variation-settings: 'wght' 400;
+}
+.csClaimWord {
+  display: inline-block;
+  animation: csWordIn 0.65s cubic-bezier(0.25, 0, 0, 1) backwards;
+  animation-delay: calc(var(--i) * 70ms);
+}
+@keyframes csWordIn {
+  from { opacity: 0; filter: blur(6px); transform: translateY(8px); }
+  to   { opacity: 1; filter: blur(0px); transform: translateY(0); }
 }
 
 .csRoleCard {
@@ -145,11 +153,16 @@
   padding: 0 var(--space-5);
 }
 
-/* ── 4-column strip ── */
+/* ── Strip group + rows ── */
+.csStripGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
 .csStrip {
   display: flex;
   gap: 6px;
-  height: 381px;
+  height: calc(var(--card-height) / 2);
 }
 .csStripCard {
   flex: 1;
@@ -162,7 +175,7 @@
 }
 .csStripImg {
   flex: 1;
-  background: var(--color-surface);
+  background: var(--color-background);
   border-radius: 6px;
   overflow: hidden;
   position: relative;
@@ -170,15 +183,21 @@
 .csStripImg img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .csStripCaption { flex-shrink: 0; padding: var(--space-3); }
 
-/* ── Portrait pair ── */
+/* ── Portrait pairs ── */
+.csPairsGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
 .csPair {
   display: flex;
   gap: var(--space-3);
-  height: 675px;
+  height: var(--card-height);
 }
 .csPairImg {
   flex: 1;
-  background: var(--color-surface);
+  background: var(--color-background);
+  border: 1px solid var(--gray-100);
   border-radius: var(--shape-md);
   overflow: hidden;
   position: relative;
@@ -191,10 +210,7 @@
   .csPage { gap: var(--space-12); padding: var(--space-10) var(--space-5) var(--space-20); }
   .csTextInset { padding-left: 0; padding-right: 0; }
   .csHeadline { font-size: 36px; }
-  .csMeta { flex-direction: column; height: auto; }
-  .csStatCard { height: 160px; }
-  .csClaims { min-height: 72px; }
-  .csClaim { font-size: 32px; }
+  .csMeta { flex-direction: column; }
   .csCs { flex-direction: column; gap: var(--space-8); }
   .csStrip { height: auto; flex-wrap: wrap; }
   .csStripCard { flex: 1 1 calc(50% - 3px); height: 200px; }

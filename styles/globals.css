@@ -102,17 +102,17 @@ html, body {
   --type-label-small-weight:  300;
 
   --type-body-large-size:    16px;
-  --type-body-large-lh:      24px;
+  --type-body-large-lh:      26px;
   --type-body-large-ls:      0.5px;
   --type-body-large-weight:  300;
 
   --type-body-medium-size:   14px;
-  --type-body-medium-lh:     20px;
+  --type-body-medium-lh:     22px;
   --type-body-medium-ls:     0.25px;
   --type-body-medium-weight: 400;
 
   --type-body-small-size:    12px;
-  --type-body-small-lh:      16px;
+  --type-body-small-lh:      18px;
   --type-body-small-ls:      0.4px;
   --type-body-small-weight:  300;
 
@@ -153,6 +153,7 @@ html, body {
 
   /* ── Card layout ── */
   --card-width:       364px;
+  --card-height:      555px;
   --card-aspect-w:    364;
   --card-aspect-h:    555;
   --card-padding:     var(--inset-lg);   /* 24px */

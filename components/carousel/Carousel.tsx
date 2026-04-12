@@ -113,6 +113,11 @@ export default function Carousel() {
     front.style.opacity    = '0'
 
     back.addEventListener('load', () => {
+      // Send position to back frame before it slides in so content renders at the
+      // correct offset and doesn't shift after the slide-in completes.
+      const topY = window.innerHeight / 2 + cfg.current.Y_OFFSET - (555 * cfg.current.SCALE_ACTIVE / 2) - 20
+      back.contentWindow?.postMessage({ type: 'card-top-y', value: topY }, '*')
+      document.documentElement.style.setProperty('--card-top-y', `${topY}px`)
       requestAnimationFrame(() => {
         back.style.transition = 'transform 0.55s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.35s ease'
         back.style.transform  = 'translateX(0)'
@@ -176,6 +181,13 @@ export default function Carousel() {
   const openCasePanel = useCallback((cardIdx: number) => {
     const front = frontFrame.current
     if (!front) return
+    // Write target top-Y to a CSS var on the parent doc BEFORE setting src so the
+    // iframe can read it synchronously via useLayoutEffect on mount (no layout shift).
+    const targetTopY = window.innerHeight / 2
+      + (PRESETS.split.Y_OFFSET as number)
+      - (555 * (PRESETS.split.SCALE_ACTIVE as number) / 2)
+      - 20  // panel sits 20px from viewport top; iframe y=0 starts there
+    document.documentElement.style.setProperty('--card-top-y', `${targetTopY}px`)
     front.style.transition = 'none'
     front.style.transform  = 'translateX(0)'
     requestAnimationFrame(() => { front.style.transition = '' })

@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useLayoutEffect, useState } from 'react'
 import Image from 'next/image'
 import type { CaseStudy } from '@/data/cases'
 import styles from './CaseStudy.module.css'
@@ -9,20 +9,27 @@ function RotatingClaims({ claims }: { claims: CaseStudy['claims'] }) {
   const [cur, setCur] = useState(0)
 
   useEffect(() => {
-    const id = setInterval(() => {
-      setCur(c => (c + 1) % claims.length)
-    }, 3000)
+    const id = setInterval(() => setCur(c => (c + 1) % claims.length), 3500)
     return () => clearInterval(id)
   }, [claims.length])
 
-  function renderClaim(claim: CaseStudy['claims'][0]) {
-    const [before, after] = claim.text.split('{bold}')
-    return <>{before}<strong>{claim.bold}</strong>{after}</>
-  }
+  const claim = claims[cur]
+  const [before, after] = claim.text.split('{bold}')
+  const words = [
+    ...(before || '').split(' ').filter(Boolean).map(w => ({ w, bold: false })),
+    ...claim.bold.split(' ').filter(Boolean).map(w => ({ w, bold: true })),
+    ...(after  || '').split(' ').filter(Boolean).map(w => ({ w, bold: false })),
+  ]
 
   return (
     <div className={styles.csClaims}>
-      <p className={styles.csClaim}>{renderClaim(claims[cur])}</p>
+      <p key={cur} className={styles.csClaim}>
+        {words.map((item, i) => (
+          <span key={i} className={styles.csClaimWord} style={{ '--i': i } as React.CSSProperties}>
+            {item.bold ? <strong>{item.w}</strong> : item.w}&nbsp;
+          </span>
+        ))}
+      </p>
     </div>
   )
 }
@@ -35,23 +42,34 @@ export default function CaseStudyPage({ cs }: Props) {
   const [isIframe, setIsIframe] = useState(false)
   useEffect(() => { setIsIframe(window.self !== window.top) }, [])
 
+  const [cardTop, setCardTop] = useState<number | null>(null)
+  // Read the CSS var the carousel parent wrote before setting iframe src — runs
+  // synchronously before first paint so there is no layout shift on open.
+  useLayoutEffect(() => {
+    if (window.self === window.top) return
+    try {
+      const v = window.parent.document.documentElement.style.getPropertyValue('--card-top-y')
+      if (v) setCardTop(parseFloat(v))
+    } catch {}
+  }, [])
+  // postMessage listener for subsequent content switches (back-frame swaps)
+  useEffect(() => {
+    const handle = (e: MessageEvent) => {
+      if (e.data?.type === 'card-top-y') setCardTop(e.data.value as number)
+    }
+    window.addEventListener('message', handle)
+    return () => window.removeEventListener('message', handle)
+  }, [])
+
   return (
     <>
       {!isIframe && (
         <a className={styles.back} href="/portfolio">← portfolio</a>
       )}
 
-      <div className={styles.csPage}>
+      <div className={styles.csPage} style={isIframe && cardTop !== null ? { paddingTop: `${cardTop}px` } : undefined}>
 
-        {/* ── 1. Hero ── */}
-        <section className={`${styles.csHero} ${styles.csTextInset}`}>
-          <h1 className={styles.csHeadline}>
-            <span className={styles.csHeadlineDark}>{cs.headlineDark}</span>
-            <span className={styles.csHeadlineMuted}>{cs.headlineMuted}</span>
-          </h1>
-        </section>
-
-        {/* ── 2. Stat + Role ── */}
+        {/* ── 1. Stat + Role ── */}
         <div className={styles.csMeta}>
           <div className={styles.csStatCard}>
             <RotatingClaims claims={cs.claims} />
@@ -92,48 +110,62 @@ export default function CaseStudyPage({ cs }: Props) {
           </p>
         </div>
 
-        {/* ── 5. 4-column strip ── */}
-        <div className={styles.csStrip}>
-          {cs.strip.map((item, i) => (
-            <div key={i} className={styles.csStripCard}>
-              <div className={styles.csStripImg}>
-                {item.img && (
+        {/* ── 5. Strip (chunked into rows by stripCols) ── */}
+        {(() => {
+          const cols = cs.stripCols ?? 4
+          const rows = Array.from({ length: Math.ceil(cs.strip.length / cols) }, (_, gi) =>
+            cs.strip.slice(gi * cols, gi * cols + cols)
+          )
+          return (
+            <div className={styles.csStripGroup}>
+              {rows.map((row, gi) => (
+                <div key={gi} className={styles.csStrip}>
+                  {row.map((item, i) => (
+                    <div key={i} className={styles.csStripCard}>
+                      <div className={styles.csStripImg}>
+                        {item.img && (
+                          <Image
+                            src={item.img}
+                            alt=""
+                            fill
+                            sizes="(max-width: 768px) calc(50vw - 3px), 25vw"
+                            style={{ objectFit: 'cover' }}
+                          />
+                        )}
+                      </div>
+                      <p className={`${styles.csBody} ${styles.csStripCaption}`}>{item.caption}</p>
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
+          )
+        })()}
+
+        {/* ── 6. Portrait pairs ── */}
+        <div className={styles.csPairsGroup}>
+          {cs.pairs.map((pair, pi) => (
+            <div key={pi} className={styles.csPair}>
+              {pair.map((img, ii) => (
+                <div key={ii} className={styles.csPairImg}>
                   <Image
-                    src={item.img}
+                    src={img}
                     alt=""
                     fill
-                    sizes="(max-width: 768px) calc(50vw - 3px), 25vw"
+                    sizes="(max-width: 768px) 100vw, 50vw"
                     style={{ objectFit: 'cover' }}
                   />
-                )}
-              </div>
-              <p className={`${styles.csBody} ${styles.csStripCaption}`}>{item.caption}</p>
+                </div>
+              ))}
+              {pair.length === 0 && (
+                <>
+                  <div className={styles.csPairImg} />
+                  <div className={styles.csPairImg} />
+                </>
+              )}
             </div>
           ))}
         </div>
-
-        {/* ── 6. Portrait pairs ── */}
-        {cs.pairs.map((pair, pi) => (
-          <div key={pi} className={styles.csPair}>
-            {pair.map((img, ii) => (
-              <div key={ii} className={styles.csPairImg}>
-                <Image
-                  src={img}
-                  alt=""
-                  fill
-                  sizes="(max-width: 768px) 100vw, 50vw"
-                  style={{ objectFit: 'cover' }}
-                />
-              </div>
-            ))}
-            {pair.length === 0 && (
-              <>
-                <div className={styles.csPairImg} />
-                <div className={styles.csPairImg} />
-              </>
-            )}
-          </div>
-        ))}
 
       </div>
     </>

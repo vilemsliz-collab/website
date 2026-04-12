@@ -96,7 +96,9 @@ function AllCards({
   const textCanvases = useMemo(() => CARDS.map(card => makeTextCanvas(card)), [])
   const textTextures = useMemo(() => textCanvases.map(c => {
     const t = new THREE.CanvasTexture(c)
-    t.colorSpace = THREE.SRGBColorSpace
+    t.colorSpace      = THREE.SRGBColorSpace
+    t.generateMipmaps = false
+    t.minFilter       = THREE.LinearFilter
     return t
   }), [textCanvases])
 

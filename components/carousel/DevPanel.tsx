@@ -77,32 +77,21 @@ export default function DevPanel({
       <div className={`${styles.ctrlPanel} ${open ? styles.ctrlPanelOpen : ''}`}>
         <div className={styles.ctrlPanelInner}>
 
-          {/* ── Sphere ── */}
+          {/* ── Carousel settings ── */}
           <div className={styles.devSection}>
-            <div className={styles.devSectionTitle}>Sphere</div>
-            <DevRow label="R mult"      min={0.3} max={1.5} step={0.01} value={cfg.current.R_MULT}      fmt={v => v.toFixed(2)} onChange={v => { cfg.current.R_MULT = v; onCfgChange() }} />
-            <DevRow label="Perspective" min={100} max={2000} step={10}  value={cfg.current.PERSPECTIVE} fmt={v => Math.round(v) + 'px'} onChange={v => { cfg.current.PERSPECTIVE = v; onCfgChange() }} />
-            <button className={styles.devCopy} onClick={e => copyToClipboard(`R_MULT: ${cfg.current.R_MULT.toFixed(2)}, PERSPECTIVE: ${Math.round(cfg.current.PERSPECTIVE)}`, e.currentTarget)}>copy</button>
-          </div>
-
-          {/* ── Placement ── */}
-          <div className={styles.devSection}>
-            <div className={styles.devSectionTitle}>Placement</div>
+            <div className={styles.devSectionTitle}>Carousel settings</div>
+            <DevRow label="R mult"       min={0.3}  max={1.5}  step={0.01} value={cfg.current.R_MULT}       fmt={v => v.toFixed(2)}         onChange={v => { cfg.current.R_MULT = v; onCfgChange() }} />
+            <DevRow label="Perspective"  min={100}  max={2000} step={10}   value={cfg.current.PERSPECTIVE}  fmt={v => Math.round(v) + 'px'} onChange={v => { cfg.current.PERSPECTIVE = v; onCfgChange() }} />
             {[0,1,2,3,4].map(i => (
               <DevRow key={i} label={`Lat ${i}`} min={-90} max={90} step={1} value={cfg.current.LAT[i]} fmt={v => Math.round(v) + '°'} onChange={v => { cfg.current.LAT[i] = v; onCfgChange() }} />
             ))}
-            <DevRow label="Lon spread" min={0.2} max={1.0} step={0.01} value={cfg.current.LON_SPREAD} fmt={v => v.toFixed(2)} onChange={v => { cfg.current.LON_SPREAD = v; onCfgChange() }} />
-            <button className={styles.devCopy} onClick={e => copyToClipboard(`LAT: [${cfg.current.LAT.map(v => Math.round(v)).join(', ')}], LON_SPREAD: ${cfg.current.LON_SPREAD.toFixed(2)}`, e.currentTarget)}>copy</button>
-          </div>
-
-          {/* ── Appearance ── */}
-          <div className={styles.devSection}>
-            <div className={styles.devSectionTitle}>Appearance</div>
-            <DevRow label="Scale active" min={0.5} max={1.8} step={0.01} value={cfg.current.SCALE_ACTIVE} fmt={v => v.toFixed(2)} onChange={v => { cfg.current.SCALE_ACTIVE = v; onCfgChange() }} />
-            <DevRow label="Scale sphere" min={0.3} max={1.2} step={0.01} value={cfg.current.SCALE_SPHERE} fmt={v => v.toFixed(2)} onChange={v => { cfg.current.SCALE_SPHERE = v; onCfgChange() }} />
-            <DevRow label="Opacity ×"   min={0}   max={2.0} step={0.01} value={cfg.current.OPACITY_MULT} fmt={v => v.toFixed(2)} onChange={v => { cfg.current.OPACITY_MULT = v; onCfgChange() }} />
-            <DevRow label="Opacity base" min={0}  max={1.0} step={0.01} value={cfg.current.OPACITY_BASE} fmt={v => v.toFixed(2)} onChange={v => { cfg.current.OPACITY_BASE = v; onCfgChange() }} />
-            <button className={styles.devCopy} onClick={e => copyToClipboard(`SCALE_ACTIVE: ${cfg.current.SCALE_ACTIVE.toFixed(2)}, SCALE_SPHERE: ${cfg.current.SCALE_SPHERE.toFixed(2)}, OPACITY_MULT: ${cfg.current.OPACITY_MULT.toFixed(2)}, OPACITY_BASE: ${cfg.current.OPACITY_BASE.toFixed(2)}`, e.currentTarget)}>copy</button>
+            <DevRow label="Lon spread"   min={0.2}  max={1.0}  step={0.01} value={cfg.current.LON_SPREAD}  fmt={v => v.toFixed(2)}         onChange={v => { cfg.current.LON_SPREAD = v; onCfgChange() }} />
+            <DevRow label="Y offset"     min={-300} max={300}  step={5}    value={cfg.current.Y_OFFSET}    fmt={v => Math.round(v) + 'px'} onChange={v => { cfg.current.Y_OFFSET = v; onCfgChange() }} />
+            <DevRow label="Scale active" min={0.5}  max={1.8}  step={0.01} value={cfg.current.SCALE_ACTIVE} fmt={v => v.toFixed(2)}        onChange={v => { cfg.current.SCALE_ACTIVE = v; onCfgChange() }} />
+            <DevRow label="Scale sphere" min={0.3}  max={1.2}  step={0.01} value={cfg.current.SCALE_SPHERE} fmt={v => v.toFixed(2)}        onChange={v => { cfg.current.SCALE_SPHERE = v; onCfgChange() }} />
+            <DevRow label="Opacity ×"    min={0}    max={2.0}  step={0.01} value={cfg.current.OPACITY_MULT} fmt={v => v.toFixed(2)}        onChange={v => { cfg.current.OPACITY_MULT = v; onCfgChange() }} />
+            <DevRow label="Opacity base" min={0}    max={1.0}  step={0.01} value={cfg.current.OPACITY_BASE} fmt={v => v.toFixed(2)}        onChange={v => { cfg.current.OPACITY_BASE = v; onCfgChange() }} />
+            <button className={styles.devCopy} onClick={e => copyToClipboard(`R_MULT: ${cfg.current.R_MULT.toFixed(2)}, PERSPECTIVE: ${Math.round(cfg.current.PERSPECTIVE)}, LAT: [${cfg.current.LAT.map(v => Math.round(v)).join(', ')}], LON_SPREAD: ${cfg.current.LON_SPREAD.toFixed(2)}, Y_OFFSET: ${Math.round(cfg.current.Y_OFFSET)}, SCALE_ACTIVE: ${cfg.current.SCALE_ACTIVE.toFixed(2)}, SCALE_SPHERE: ${cfg.current.SCALE_SPHERE.toFixed(2)}, OPACITY_MULT: ${cfg.current.OPACITY_MULT.toFixed(2)}, OPACITY_BASE: ${cfg.current.OPACITY_BASE.toFixed(2)}`, e.currentTarget)}>copy</button>
           </div>
 
           {/* ── Scroll ── */}
