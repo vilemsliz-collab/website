@@ -422,7 +422,7 @@ export default function Carousel() {
     function onWheel(e: WheelEvent) {
       e.preventDefault()
       // Scroll down → open case study (desktop DevTools testing + mobile wheel)
-      if (e.deltaY > 40 && !caseModeRef.current) {
+      if (isMobile() && e.deltaY > 40 && !caseModeRef.current) {
         caseModeRef.current = true
         requestAnimationFrame(() => mobileCaseRef.current?.snapOpen())
         return
