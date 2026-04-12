@@ -3,7 +3,6 @@
 import { useEffect, useLayoutEffect, useState } from 'react'
 import Image from 'next/image'
 import type { CaseStudy } from '@/data/cases'
-import { CARDS } from '@/lib/carouselConfig'
 import styles from './CaseStudy.module.css'
 
 function RotatingClaims({ claims }: { claims: CaseStudy['claims'] }) {
@@ -41,8 +40,6 @@ interface Props {
 }
 
 export default function CaseStudyPage({ cs, isOverlay }: Props) {
-  const card = isOverlay ? (CARDS.find(c => c.id === cs.slug) ?? null) : null
-
   const [isIframe, setIsIframe] = useState(false)
   useEffect(() => { setIsIframe(window.self !== window.top) }, [])
 
@@ -71,18 +68,7 @@ export default function CaseStudyPage({ cs, isOverlay }: Props) {
         <a className={styles.back} href="/portfolio">← portfolio</a>
       )}
 
-      {isOverlay && card && (
-        <div className={styles.mobileHero} style={{ background: card.bg }}>
-          <h1 className={styles.mobileHeroTitle}>
-            {card.lines.map((line, i) => (
-              <span key={i} className={styles.mobileHeroLine}>{line}</span>
-            ))}
-          </h1>
-          <p className={styles.mobileHeroRole} style={{ color: card.ac }}>{card.role}</p>
-        </div>
-      )}
-
-      <div className={`${styles.csPage}${isOverlay ? ` ${styles.csPageOverlay}` : ''}`} style={isIframe && cardTop !== null ? { paddingTop: `${cardTop}px` } : undefined}>
+      <div className={styles.csPage} style={isIframe && cardTop !== null ? { paddingTop: `${cardTop}px` } : undefined}>
 
         {/* ── 1. Stat + Role ── */}
         <div className={styles.csMeta}>
