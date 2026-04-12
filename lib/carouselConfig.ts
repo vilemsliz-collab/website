@@ -10,7 +10,6 @@ export interface CarouselPreset {
   SCALE_SPHERE: number
   OPACITY_MULT: number
   OPACITY_BASE: number
-  BLUR_MAX: number
   FRICTION: number
   SPRING: number
 }
@@ -71,7 +70,7 @@ export const PRESETS: Record<string, CarouselPreset> = {
     LAT: [-25, 15, -38, 30, -10], LON_SPREAD: 1.00,
     ROT_MULT: 0, ROLL_MAX: 0,
     SCALE_ACTIVE: 0.88, SCALE_SPHERE: 0.86,
-    OPACITY_MULT: 0.46, OPACITY_BASE: 1.00, BLUR_MAX: 8,
+    OPACITY_MULT: 0.46, OPACITY_BASE: 1.00,
     FRICTION: 0.93, SPRING: 0.01,
   },
   mobile: {
@@ -79,7 +78,7 @@ export const PRESETS: Record<string, CarouselPreset> = {
     LAT: [-30, 18, -42, 35, -12], LON_SPREAD: 1.0,
     ROT_MULT: 0, ROLL_MAX: 0,
     SCALE_ACTIVE: 0.79, SCALE_SPHERE: 0.83,
-    OPACITY_MULT: 0.46, OPACITY_BASE: 1, BLUR_MAX: 8,
+    OPACITY_MULT: 0.46, OPACITY_BASE: 1,
     FRICTION: 0.93, SPRING: 0.01,
   },
   desktop: {
@@ -87,7 +86,7 @@ export const PRESETS: Record<string, CarouselPreset> = {
     LAT: [-25, 15, -38, 30, -10], LON_SPREAD: 0.80,
     ROT_MULT: 0, ROLL_MAX: 0,
     SCALE_ACTIVE: 1.29, SCALE_SPHERE: 0.83,
-    OPACITY_MULT: 0.46, OPACITY_BASE: 1, BLUR_MAX: 8,
+    OPACITY_MULT: 0.46, OPACITY_BASE: 1,
     FRICTION: 0.93, SPRING: 0.01,
   },
 }

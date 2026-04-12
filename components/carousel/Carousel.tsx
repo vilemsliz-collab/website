@@ -4,7 +4,7 @@ import { useRef, useEffect, useCallback, useState } from 'react'
 import dynamic from 'next/dynamic'
 import {
   PRESETS, CARDS, REVEAL, INPUT, TILT, GHOST,
-  type CarouselCFG,
+  type CarouselCFG, type CarouselPreset,
 } from '@/lib/carouselConfig'
 import {
   clamp, buildRollBase,
@@ -30,7 +30,6 @@ function makeCFG(): CarouselCFG {
     SCALE_SPHERE: p.SCALE_SPHERE,
     OPACITY_MULT: p.OPACITY_MULT,
     OPACITY_BASE: p.OPACITY_BASE,
-    BLUR_MAX:     p.BLUR_MAX,
     FRICTION:     p.FRICTION,
     SPRING:       p.SPRING,
   }
@@ -64,6 +63,7 @@ export default function Carousel() {
   const frontFrame  = useRef<HTMLIFrameElement | null>(null)
   const backFrame   = useRef<HTMLIFrameElement | null>(null)
   const lastKickMs  = useRef(0)
+  const shakeVel    = useRef(0)
   const stageTouch  = useRef<number | null>(null)
   const stageMouse  = useRef<number | null>(null)
   const swipeStartX = useRef<number | null>(null)
@@ -101,21 +101,32 @@ export default function Carousel() {
     const back  = backFrame.current
     const front = frontFrame.current
     if (!back || !front) return
-    back.style.opacity = '0'
-    const onLoad = () => {
-      back.style.opacity  = '1'
-      back.style.transform = 'translateX(0)'
-      setTimeout(() => {
-        front.src = ''
-        front.style.transition = 'none'
-        front.style.transform  = 'translateX(100%)'
-        requestAnimationFrame(() => { front.style.transition = '' })
-        frontFrame.current = back
-        backFrame.current  = front
-      }, 560)
-    }
-    back.addEventListener('load', onLoad, { once: true })
+
+    // Position back frame off-screen left, invisible — no transition
+    back.style.transition = 'none'
+    back.style.transform  = 'translateX(-40px)'
+    back.style.opacity    = '0'
     back.src = url
+
+    // Fade out front
+    front.style.transition = 'opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+    front.style.opacity    = '0'
+
+    back.addEventListener('load', () => {
+      requestAnimationFrame(() => {
+        back.style.transition = 'transform 0.55s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.35s ease'
+        back.style.transform  = 'translateX(0)'
+        back.style.opacity    = '1'
+        setTimeout(() => {
+          front.style.transition = 'none'
+          front.style.opacity    = '1'
+          front.style.transform  = 'translateX(100%)'
+          front.src = ''
+          frontFrame.current = back
+          backFrame.current  = front
+        }, 560)
+      })
+    }, { once: true })
   }, [])
 
   const loadPreset = useCallback((name: string) => {
@@ -132,24 +143,32 @@ export default function Carousel() {
     })
   }, [])
 
-  // ── Split transition (animates SCALE_ACTIVE + PERSPECTIVE in cfg; R3F reads them each frame) ──
+  // ── Split transition (interpolates ALL numeric preset values so nothing snaps) ──
   const runSplitTransition = useCallback((targetPresetName: string, onEnd: () => void) => {
     if (splitRafId.current) cancelAnimationFrame(splitRafId.current)
-    const dur       = 570
-    const t0        = performance.now()
-    const fromScale = cfg.current.SCALE_ACTIVE
-    const fromPersp = cfg.current.PERSPECTIVE
-    const toPreset  = PRESETS[targetPresetName]
-    const toScale   = toPreset.SCALE_ACTIVE
-    const toPersp   = toPreset.PERSPECTIVE
-    const ease = (t: number) => t * t * (3 - 2 * t)
+    const dur      = 570
+    const t0       = performance.now()
+    const toPreset = PRESETS[targetPresetName]
+    const ease     = (t: number) => t * t * (3 - 2 * t)
+
+    const keys = (Object.keys(toPreset) as (keyof CarouselPreset)[])
+      .filter(k => typeof toPreset[k] === 'number')
+    const fromVals: Partial<Record<keyof CarouselPreset, number>> = {}
+    const toVals:   Partial<Record<keyof CarouselPreset, number>> = {}
+    keys.forEach(k => {
+      fromVals[k] = cfg.current[k] as number
+      toVals[k]   = toPreset[k]   as number
+    })
+
     function frame(now: number) {
       const p = Math.min((now - t0) / dur, 1)
       const e = ease(p)
-      cfg.current.SCALE_ACTIVE = fromScale + (toScale - fromScale) * e
-      cfg.current.PERSPECTIVE  = fromPersp + (toPersp  - fromPersp) * e
+      keys.forEach(k => {
+        ;(cfg.current as unknown as Record<string, number>)[k] =
+          fromVals[k]! + (toVals[k]! - fromVals[k]!) * e
+      })
       if (p < 1) { splitRafId.current = requestAnimationFrame(frame) }
-      else { splitRafId.current = null; onEnd() }
+      else        { splitRafId.current = null; onEnd() }
     }
     splitRafId.current = requestAnimationFrame(frame)
   }, [])
@@ -157,11 +176,9 @@ export default function Carousel() {
   const openCasePanel = useCallback((cardIdx: number) => {
     const front = frontFrame.current
     if (!front) return
-    front.style.opacity    = '0'
     front.style.transition = 'none'
     front.style.transform  = 'translateX(0)'
     requestAnimationFrame(() => { front.style.transition = '' })
-    front.addEventListener('load', () => { front.style.opacity = '1' }, { once: true })
     front.src = CARDS[cardIdx].href
     caseOpen.current = true
     setCaseOpenState(true)
@@ -327,6 +344,19 @@ export default function Carousel() {
 
     function onResize() { checkBreakpoint() }
 
+    // Overscroll from case study iframe → gentle shake of active card
+    function onIframeScroll(e: MessageEvent) {
+      if (!caseOpen.current) return
+      if (e.data?.type !== 'carousel-overscroll') return
+      const d = e.data.delta as number
+      if (!d) return
+      const now = Date.now()
+      if (now - lastKickMs.current >= 500) {
+        shakeVel.current = Math.sign(d) * 0.036
+        lastKickMs.current = now
+      }
+    }
+
     window.addEventListener('mousemove', onMouseMove)
     document.documentElement.addEventListener('mouseleave', onMouseLeave)
     window.addEventListener('mousedown', onMouseDown)
@@ -337,6 +367,7 @@ export default function Carousel() {
     window.addEventListener('wheel', onWheel, { passive: false })
     window.addEventListener('keydown', onKeyDown)
     window.addEventListener('resize', onResize)
+    window.addEventListener('message', onIframeScroll)
 
     checkBreakpoint()
     requestAnimationFrame(() => {
@@ -354,6 +385,7 @@ export default function Carousel() {
       window.removeEventListener('wheel', onWheel)
       window.removeEventListener('keydown', onKeyDown)
       window.removeEventListener('resize', onResize)
+      window.removeEventListener('message', onIframeScroll)
       if (rafId.current)      cancelAnimationFrame(rafId.current)
       if (splitRafId.current) cancelAnimationFrame(splitRafId.current)
       if (gyroHandler.current) {
@@ -395,6 +427,7 @@ export default function Carousel() {
           ghostCfg={ghostCfg}
           tiltCfg={tiltCfg}
           caseOpen={caseOpen}
+          shakeVel={shakeVel}
           carouselWidthRef={carouselWidthRef}
           onActiveChange={() => {}}
           onCaseSwitch={switchCaseContent}

@@ -185,20 +185,6 @@
 }
 .csPairImg img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
-/* ── SplitText chars ── */
-.csHeadline { overflow: hidden; }
-.splitChar { display: inline-block; will-change: transform, opacity, filter; }
-
-/* ── Reveal ── */
-.reveal {
-  opacity: 0;
-  transform: translateY(12px);
-  transition: opacity 0.5s ease, transform 0.5s ease;
-}
-.inView {
-  opacity: 1;
-  transform: translateY(0);
-}
 
 /* ── Responsive ── */
 @media (max-width: 768px) {

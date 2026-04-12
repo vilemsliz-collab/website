@@ -64,6 +64,7 @@ export interface CarouselSceneProps {
   ghostCfg:  MutableRefObject<GhostConfig>
   tiltCfg:   MutableRefObject<TiltConfig>
   caseOpen:  MutableRefObject<boolean>
+  shakeVel:  MutableRefObject<number>
   carouselWidthRef: MutableRefObject<number>
   onActiveChange: (idx: number) => void
   onCaseSwitch:   (href: string) => void
@@ -84,10 +85,10 @@ function AllCards({
   onCardClick: (i: number) => void
 }) {
   const imgTextures = useTexture([CARDS[1].img!, CARDS[2].img!, CARDS[3].img!, CARDS[4].img!])
-  imgTextures.forEach(t => { t.colorSpace = THREE.SRGBColorSpace })
+  imgTextures.forEach(t => { t.colorSpace = THREE.LinearSRGBColorSpace })
 
   const videoTex = useVideoTexture(CARDS[0].video!, { start: true, loop: true, muted: true, playsInline: true })
-  videoTex.colorSpace = THREE.SRGBColorSpace
+  videoTex.colorSpace = THREE.LinearSRGBColorSpace
 
   const textures: THREE.Texture[] = [videoTex, ...imgTextures]
 
@@ -190,7 +191,7 @@ function AllCards({
 // ─── Physics loop ─────────────────────────────────────────────────────────────
 function Physics({
   posY, cfg, rollBase, tiltRx, tiltRy, activeIdx,
-  ghostCfg, tiltCfg, caseOpen, carouselWidthRef,
+  ghostCfg, tiltCfg, caseOpen, shakeVel, carouselWidthRef,
   onActiveChange, onCaseSwitch,
   groupRefs, meshRefs, ghostRefArrays, cardW, cardH,
 }: CarouselSceneProps & {
@@ -205,6 +206,9 @@ function Physics({
   // Card-spread spring — compresses card arrangement to left 25vw
   const wRef    = useRef(0)
   const wVelRef = useRef(0)
+
+  // Shake spring state (driven by shakeVel from parent)
+  const shakePos = useRef(0)
 
   useFrame((state) => {
     const P   = cfg.current.PERSPECTIVE
@@ -225,7 +229,7 @@ function Physics({
     const mobileCase = caseOpen.current && width < 768
 
     // Card-spread spring (stiffness 0.02 = 3× softer than original)
-    const targetW = mobileCase ? width : (caseOpen.current ? width * 0.25 : width)
+    const targetW = mobileCase ? width : (caseOpen.current ? width * 0.30 : width)
     wVelRef.current += (targetW - wRef.current) * 0.02
     wVelRef.current *= 0.85
     wRef.current += wVelRef.current
@@ -236,6 +240,11 @@ function Physics({
 
     const transforms = computeCardTransforms(posY.current, N, cfg.current, wRef.current, rollBase.current)
     const gc = ghostCfg.current
+
+    // Shake spring (once per frame)
+    shakeVel.current += -shakePos.current * 0.12
+    shakeVel.current *= 0.80
+    shakePos.current += shakeVel.current
 
     transforms.forEach((t, i) => {
       const group = groupRefs.current[i]
@@ -252,6 +261,7 @@ function Physics({
       const tiltScale = Math.min(1, P / 590)
       mesh.rotation.x = t.isActive ? -tiltRx.current * tiltScale * DEG : 0
       mesh.rotation.y = t.isActive ?  tiltRy.current * tiltScale * DEG : 0
+      mesh.rotation.z = t.isActive ?  shakePos.current : 0
 
       const mat = mesh.material as THREE.ShaderMaterial
       mat.uniforms.u_opacity.value = t.opacity

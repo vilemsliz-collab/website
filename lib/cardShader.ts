@@ -32,11 +32,9 @@ export const frag = /* glsl */ `
     vec2 uv  = v_uv * u_uvScale + u_uvOffset;
     vec4 tex = texture2D(u_map, uv);
 
-    // ── Bottom gradient (darkens bottom for text legibility) ─
-    float t = 1.0 - v_uv.y;
-    vec3 col = mix(tex.rgb, vec3(0.0), t * t * 0.55);
+    vec3 col = tex.rgb;
 
-    // ── Text overlay (alpha-composite over gradient) ─────────
+    // ── Text overlay (alpha-composite over image) ────────────
     vec4 txt = texture2D(u_text, v_uv);
     col = mix(col, txt.rgb, txt.a);
 

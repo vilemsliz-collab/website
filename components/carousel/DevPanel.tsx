@@ -102,8 +102,7 @@ export default function DevPanel({
             <DevRow label="Scale sphere" min={0.3} max={1.2} step={0.01} value={cfg.current.SCALE_SPHERE} fmt={v => v.toFixed(2)} onChange={v => { cfg.current.SCALE_SPHERE = v; onCfgChange() }} />
             <DevRow label="Opacity ×"   min={0}   max={2.0} step={0.01} value={cfg.current.OPACITY_MULT} fmt={v => v.toFixed(2)} onChange={v => { cfg.current.OPACITY_MULT = v; onCfgChange() }} />
             <DevRow label="Opacity base" min={0}  max={1.0} step={0.01} value={cfg.current.OPACITY_BASE} fmt={v => v.toFixed(2)} onChange={v => { cfg.current.OPACITY_BASE = v; onCfgChange() }} />
-            <DevRow label="Blur max"    min={0}   max={20}  step={0.5}  value={cfg.current.BLUR_MAX}     fmt={v => v.toFixed(1) + 'px'} onChange={v => { cfg.current.BLUR_MAX = v; onCfgChange() }} />
-            <button className={styles.devCopy} onClick={e => copyToClipboard(`SCALE_ACTIVE: ${cfg.current.SCALE_ACTIVE.toFixed(2)}, SCALE_SPHERE: ${cfg.current.SCALE_SPHERE.toFixed(2)}, OPACITY_MULT: ${cfg.current.OPACITY_MULT.toFixed(2)}, OPACITY_BASE: ${cfg.current.OPACITY_BASE.toFixed(2)}, BLUR_MAX: ${cfg.current.BLUR_MAX.toFixed(1)}`, e.currentTarget)}>copy</button>
+            <button className={styles.devCopy} onClick={e => copyToClipboard(`SCALE_ACTIVE: ${cfg.current.SCALE_ACTIVE.toFixed(2)}, SCALE_SPHERE: ${cfg.current.SCALE_SPHERE.toFixed(2)}, OPACITY_MULT: ${cfg.current.OPACITY_MULT.toFixed(2)}, OPACITY_BASE: ${cfg.current.OPACITY_BASE.toFixed(2)}`, e.currentTarget)}>copy</button>
           </div>
 
           {/* ── Scroll ── */}
