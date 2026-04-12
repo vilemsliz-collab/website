@@ -36,9 +36,10 @@ function RotatingClaims({ claims }: { claims: CaseStudy['claims'] }) {
 
 interface Props {
   cs: CaseStudy
+  isOverlay?: boolean
 }
 
-export default function CaseStudyPage({ cs }: Props) {
+export default function CaseStudyPage({ cs, isOverlay }: Props) {
   const [isIframe, setIsIframe] = useState(false)
   useEffect(() => { setIsIframe(window.self !== window.top) }, [])
 
@@ -63,7 +64,7 @@ export default function CaseStudyPage({ cs }: Props) {
 
   return (
     <>
-      {!isIframe && (
+      {!isIframe && !isOverlay && (
         <a className={styles.back} href="/portfolio">← portfolio</a>
       )}
 

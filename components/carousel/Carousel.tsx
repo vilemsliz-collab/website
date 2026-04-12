@@ -553,7 +553,6 @@ export default function Carousel() {
         return cs ? (
           <MobileCaseStudy
             cs={cs}
-            cardIdx={mobileCaseState.idx}
             show={showMobileCase}
             onScrollEnd={exitMobileCase}
           />
