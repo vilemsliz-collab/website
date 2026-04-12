@@ -203,10 +203,6 @@ function Physics({
 }) {
   const { camera } = useThree()
 
-  // Camera X spring — shifts view so cards appear in left 25vw when case opens
-  const camXRef    = useRef(0)
-  const camXVelRef = useRef(0)
-
   // Card-spread spring — compresses card arrangement to left 25vw
   const wRef    = useRef(0)
   const wVelRef = useRef(0)
@@ -229,19 +225,15 @@ function Physics({
     // On mobile the case panel is fullscreen — no camera shift or spread compression
     const mobileCase = caseOpen.current && width < 768
 
-    // Camera X spring (stiffness 0.02 = 3× softer than original)
-    const targetCamX = mobileCase ? 0 : (caseOpen.current ? width * 0.375 : 0)
-    camXVelRef.current += (targetCamX - camXRef.current) * 0.02
-    camXVelRef.current *= 0.85
-    camXRef.current += camXVelRef.current
-    cam.position.x = camXRef.current
-
     // Card-spread spring (stiffness 0.02 = 3× softer than original)
     const targetW = mobileCase ? width : (caseOpen.current ? width * 0.25 : width)
     wVelRef.current += (targetW - wRef.current) * 0.02
     wVelRef.current *= 0.85
     wRef.current += wVelRef.current
     carouselWidthRef.current = wRef.current
+
+    // Camera X derived directly from card-spread — vanishing point always at carousel strip center
+    cam.position.x = mobileCase ? 0 : (width / 2 - wRef.current / 2)
 
     const transforms = computeCardTransforms(posY.current, N, cfg.current, wRef.current, rollBase.current)
     const gc = ghostCfg.current
