@@ -76,7 +76,7 @@ export default function Carousel() {
   const inputRef  = useRef({ ...INPUT })
   const tiltCfg   = useRef({ ...TILT })
   const ghostCfg  = useRef({ ...GHOST })
-  const glassCfg  = useRef<GlassConfig>({ blur: 10, opacity: 0.15, color: 255 })
+  const glassCfg  = useRef<GlassConfig>({ blur: 40, opacity: 0.60, color: 255 })
 
   const applyGlass = useCallback(() => {
     const el = casePanelRef.current
