@@ -32,6 +32,7 @@ function makeCFG(): CarouselCFG {
     OPACITY_BASE: p.OPACITY_BASE,
     FRICTION:     p.FRICTION,
     SPRING:       p.SPRING,
+    Y_OFFSET:     p.Y_OFFSET,
   }
 }
 
