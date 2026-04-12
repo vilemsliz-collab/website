@@ -99,6 +99,7 @@ export default function Carousel() {
   const pendingCaseIdx   = useRef<number | null>(null)
   const verticalDragRef  = useRef(false)
   const caseModeRef      = useRef(false)
+  const dismissingRef    = useRef(false)
   const touchStartY      = useRef<number | null>(null)
   const dragStartPctRef  = useRef(PEEK_PCT)
 
@@ -330,10 +331,11 @@ export default function Carousel() {
 
     // Touch
     function onTouchStart(e: TouchEvent) {
+      touchStartY.current  = e.touches[0].clientY
+      dismissingRef.current = false
       // Don't capture carousel touch state while case study is fully open
       if (window.innerWidth < 768 && caseModeRef.current) return
       swipeStartX.current  = e.touches[0].clientX
-      touchStartY.current  = e.touches[0].clientY
       stageTouch.current   = e.touches[0].clientX
       verticalDragRef.current  = false
       pendingCaseIdx.current   = null
@@ -351,7 +353,7 @@ export default function Carousel() {
         return
       }
 
-      // Mobile: detect vertical drag to open case study
+      // Mobile: detect vertical drag to open case study OR dismiss it
       if (!caseModeRef.current) {
         const deltaY = (touchStartY.current ?? 0) - e.touches[0].clientY   // positive = finger moved up
         const deltaX = Math.abs(e.touches[0].clientX - (swipeStartX.current ?? 0))
@@ -367,9 +369,39 @@ export default function Carousel() {
           const pct = Math.max(0, dragStartPctRef.current - (deltaY / window.innerHeight) * 100)
           mobileCaseRef.current?.setDragOffset(pct)
         }
+      } else {
+        // Case fully open — detect overscroll-up dismiss (scrollTop=0 + drag down)
+        if (mobileCaseRef.current?.getScrollTop() === 0) {
+          const deltaY = (touchStartY.current ?? 0) - e.touches[0].clientY  // negative = drag down
+          if (!dismissingRef.current && deltaY < -8) {
+            dismissingRef.current = true
+          }
+          if (dismissingRef.current) {
+            e.preventDefault()
+            const pct = Math.min(PEEK_PCT, Math.max(0, (-deltaY / window.innerHeight) * 100))
+            mobileCaseRef.current.setDragOffset(pct)
+          }
+        }
       }
     }
     function onTouchEnd(e: TouchEvent) {
+      // Mobile dismiss gesture — release during overscroll-down
+      if (window.innerWidth < 768 && dismissingRef.current) {
+        dismissingRef.current = false
+        const endY   = e.changedTouches[0]?.clientY ?? (touchStartY.current ?? 0)
+        const deltaY = (touchStartY.current ?? 0) - endY  // negative = dragged down
+        if (-deltaY > window.innerHeight * 0.15) {
+          caseModeRef.current = false
+          mobileCaseRef.current?.snapPeek()
+        } else {
+          mobileCaseRef.current?.snapOpen()
+        }
+        stageTouch.current  = null
+        swipeStartX.current = null
+        touchStartY.current = null
+        return
+      }
+
       // Mobile vertical drag — snap open or back to peek
       if (window.innerWidth < 768 && verticalDragRef.current) {
         verticalDragRef.current = false

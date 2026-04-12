@@ -8,6 +8,7 @@ import styles from './MobileCaseStudy.module.css'
 export const PEEK_PCT = 90
 
 export interface MobileCaseStudyHandle {
+  getScrollTop(): number
   setDragOffset(percent: number): void
   snapOpen(): void
   snapPeek(): void
@@ -20,34 +21,57 @@ interface Props {
 
 const MobileCaseStudy = forwardRef<MobileCaseStudyHandle, Props>(
   function MobileCaseStudy({ cs, onScrollEnd }, ref) {
-    const scrollRef  = useRef<HTMLDivElement>(null)
-    const readyRef   = useRef(false)
-    const firedRef   = useRef(false)
+    const outerRef  = useRef<HTMLDivElement>(null)  // visual layer: transform, blur, border-radius
+    const scrollRef = useRef<HTMLDivElement>(null)  // scroll layer: scrollTop reads/writes
+    const readyRef  = useRef(false)
+    const firedRef  = useRef(false)
+
+    const EASE = '0.45s cubic-bezier(0.4, 0, 0.2, 1)'
+    const SIDE_TRANSITION = `width ${EASE}, left ${EASE}, border-radius ${EASE}`
 
     useImperativeHandle(ref, () => ({
+      getScrollTop() {
+        return scrollRef.current?.scrollTop ?? 0
+      },
       setDragOffset(percent: number) {
-        const el = scrollRef.current
+        const el = outerRef.current
         if (!el) return
-        el.style.transition = 'none'
-        el.style.transform  = `translateY(${percent}%)`
+        const progress = 1 - percent / PEEK_PCT
+        const cardW = Math.min(window.innerWidth * 0.92, 364)
+        const w = cardW + (window.innerWidth - cardW) * progress
+        const l = Math.max(0, (window.innerWidth - w) / 2)
+        const r = Math.round(24 * (1 - progress))
+        el.style.transition   = 'none'
+        el.style.transform    = `translateY(${percent}%)`
+        el.style.width        = `${w}px`
+        el.style.left         = `${l}px`
+        el.style.borderRadius = `${r}px ${r}px 0 0`
       },
       snapOpen() {
-        const el = scrollRef.current
+        const el = outerRef.current
         if (!el) return
-        el.scrollTop = 0
+        if (scrollRef.current) scrollRef.current.scrollTop = 0
         firedRef.current = false
-        el.style.transition = 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
-        el.style.transform  = 'translateY(0)'
+        el.style.transition   = `transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), ${SIDE_TRANSITION}`
+        el.style.transform    = 'translateY(0)'
+        el.style.width        = '100vw'
+        el.style.left         = '0px'
+        el.style.borderRadius = '24px 24px 0 0'
         setTimeout(() => { readyRef.current = true }, 350)
       },
       snapPeek() {
         readyRef.current = false
         firedRef.current = false
-        const el = scrollRef.current
+        const el = outerRef.current
         if (!el) return
-        el.scrollTop = 0
-        el.style.transition = 'transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)'
-        el.style.transform  = `translateY(${PEEK_PCT}%)`
+        if (scrollRef.current) scrollRef.current.scrollTop = 0
+        const cardW = Math.min(window.innerWidth * 0.92, 364)
+        const l = Math.max(0, (window.innerWidth - cardW) / 2)
+        el.style.transition   = `transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), ${SIDE_TRANSITION}`
+        el.style.transform    = `translateY(${PEEK_PCT}%)`
+        el.style.width        = `${cardW}px`
+        el.style.left         = `${l}px`
+        el.style.setProperty('border-radius', 'var(--shape-card)')
       },
     }))
 
@@ -62,14 +86,12 @@ const MobileCaseStudy = forwardRef<MobileCaseStudyHandle, Props>(
     }, [onScrollEnd])
 
     return (
-      <div
-        ref={scrollRef}
-        className={styles.overlay}
-        onScroll={onScroll}
-      >
-        <div className={styles.handle} />
-        <CaseStudyPage cs={cs} isOverlay />
-        <div className={styles.scrollSpacer} />
+      <div ref={outerRef} className={styles.overlay}>
+        <div ref={scrollRef} className={styles.overlayScroll} onScroll={onScroll}>
+          <div className={styles.handle} />
+          <CaseStudyPage cs={cs} isOverlay />
+          <div className={styles.scrollSpacer} />
+        </div>
       </div>
     )
   }
