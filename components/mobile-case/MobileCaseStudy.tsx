@@ -5,10 +5,12 @@ import type { CaseStudy } from '@/data/cases'
 import CaseStudyPage from '@/components/case-study/CaseStudyPage'
 import styles from './MobileCaseStudy.module.css'
 
+export const PEEK_PCT = 82
+
 export interface MobileCaseStudyHandle {
   setDragOffset(percent: number): void
   snapOpen(): void
-  snapClosed(): void
+  snapPeek(): void
 }
 
 interface Props {
@@ -38,12 +40,14 @@ const MobileCaseStudy = forwardRef<MobileCaseStudyHandle, Props>(
         el.style.transform  = 'translateY(0)'
         setTimeout(() => { readyRef.current = true }, 350)
       },
-      snapClosed() {
+      snapPeek() {
         readyRef.current = false
+        firedRef.current = false
         const el = scrollRef.current
         if (!el) return
+        el.scrollTop = 0
         el.style.transition = 'transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)'
-        el.style.transform  = 'translateY(100%)'
+        el.style.transform  = `translateY(${PEEK_PCT}%)`
       },
     }))
 

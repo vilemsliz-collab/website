@@ -92,7 +92,6 @@
 
 .csRoleCard {
   flex: 1;
-  border: 1px solid var(--color-outline-variant);
   border-radius: var(--shape-md);
   padding: var(--space-8) var(--space-6);
   overflow: hidden;
@@ -166,7 +165,6 @@
 }
 .csStripCard {
   flex: 1;
-  border: 1px solid var(--color-outline-variant);
   border-radius: var(--shape-md);
   overflow: hidden;
   display: flex;
@@ -197,7 +195,6 @@
 .csPairImg {
   flex: 1;
   background: var(--color-background);
-  border: 1px solid var(--gray-100);
   border-radius: var(--shape-md);
   overflow: hidden;
   position: relative;

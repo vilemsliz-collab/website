@@ -76,13 +76,13 @@ export const PRESETS: Record<string, CarouselPreset> = {
     Y_OFFSET: -65,
   },
   mobile: {
-    R_MULT: 1.5, R_MAX: 1010, PERSPECTIVE: 200,
-    LAT: [-30, 18, -42, 35, -12], LON_SPREAD: 1.0,
+    R_MULT: 1.50, R_MAX: 1010, PERSPECTIVE: 200,
+    LAT: [-30, 18, -42, 35, -12], LON_SPREAD: 1.00,
     ROT_MULT: 0, ROLL_MAX: 0,
-    SCALE_ACTIVE: 0.79, SCALE_SPHERE: 0.83,
-    OPACITY_MULT: 0.46, OPACITY_BASE: 1,
+    SCALE_ACTIVE: 0.89, SCALE_SPHERE: 0.83,
+    OPACITY_MULT: 0.46, OPACITY_BASE: 1.00,
     FRICTION: 0.93, SPRING: 0.01,
-    Y_OFFSET: 0,
+    Y_OFFSET: -30,
   },
   desktop: {
     R_MULT: 0.60, R_MAX: 1010, PERSPECTIVE: 550,
