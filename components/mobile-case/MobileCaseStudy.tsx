@@ -5,7 +5,7 @@ import type { CaseStudy } from '@/data/cases'
 import CaseStudyPage from '@/components/case-study/CaseStudyPage'
 import styles from './MobileCaseStudy.module.css'
 
-export const PEEK_PCT = 68
+export const PEEK_PCT = 90
 
 export interface MobileCaseStudyHandle {
   setDragOffset(percent: number): void
