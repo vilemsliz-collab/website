@@ -212,7 +212,7 @@
   .csHeadline { font-size: 36px; }
   .csMeta { flex-direction: column; }
   .csCs { flex-direction: column; gap: var(--space-8); }
-  .csClaim { font-size: var(--type-headline-medium-size); line-height: var(--type-headline-medium-lh); }
+  .csClaim { font-size: var(--type-headline-small-size); line-height: var(--type-headline-small-lh); }
   .csStrip { height: auto; flex-wrap: wrap; }
   .csStripCard { flex: 1 1 calc(50% - 3px); height: 200px; }
   .csPair { height: auto; flex-direction: column; }
