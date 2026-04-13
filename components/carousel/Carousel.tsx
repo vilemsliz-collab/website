@@ -12,7 +12,7 @@ import {
 import { CASES } from '@/data/cases'
 import styles from './Carousel.module.css'
 import DevPanel, { type GlassConfig } from './DevPanel'
-import MobileCaseStudy, { type MobileCaseStudyHandle, PEEK_PCT } from '@/components/mobile-case/MobileCaseStudy'
+import MobileCaseStudy, { type MobileCaseStudyHandle } from '@/components/mobile-case/MobileCaseStudy'
 
 const CarouselCanvas = dynamic(() => import('./CarouselCanvas'), { ssr: false })
 
@@ -101,7 +101,8 @@ export default function Carousel() {
   const caseModeRef      = useRef(false)
   const dismissingRef    = useRef(false)
   const touchStartY      = useRef<number | null>(null)
-  const dragStartPctRef  = useRef(PEEK_PCT)
+  const dragStartPctRef  = useRef(90)
+  const peekPctRef       = useRef(90)
 
   // ── React state (only for things that need re-render) ──
   const [caseOpenState, setCaseOpenState] = useState(false)
@@ -192,6 +193,14 @@ export default function Carousel() {
     splitRafId.current = requestAnimationFrame(frame)
   }, [])
 
+  function computePeekPct() {
+    const cardW    = Math.min(window.innerWidth * 0.92, 364)
+    const cardH    = cardW * (555 / 364)
+    const cardBottom = window.innerHeight / 2 + cfg.current.Y_OFFSET + (cardH * cfg.current.SCALE_ACTIVE / 2)
+    const peekTop  = cardBottom + 16
+    return Math.min(96, Math.max(60, (peekTop / window.innerHeight) * 100))
+  }
+
   const enterMobileCase = useCallback((idx: number) => {
     mobileCaseIdxRef.current = idx
     caseModeRef.current = true
@@ -208,7 +217,11 @@ export default function Carousel() {
     mobileCaseIdxRef.current = nextIdx
     pendingCaseIdx.current = null
     setMobileCaseState({ idx: nextIdx })
-    setTimeout(() => mobileCaseRef.current?.snapPeek(), 50)
+    setTimeout(() => {
+      const pct = computePeekPct()
+      peekPctRef.current = pct
+      mobileCaseRef.current?.snapPeek(pct)
+    }, 50)
   }, [])
 
   const openCasePanel = useCallback((cardIdx: number) => {
@@ -360,7 +373,7 @@ export default function Carousel() {
 
         if (!verticalDragRef.current && deltaY > 8 && deltaY > deltaX * 1.5) {
           verticalDragRef.current = true
-          dragStartPctRef.current = PEEK_PCT  // always starting from peek
+          dragStartPctRef.current = peekPctRef.current  // always starting from peek
           pendingCaseIdx.current  = mobileCaseIdxRef.current
         }
 
@@ -378,7 +391,7 @@ export default function Carousel() {
           }
           if (dismissingRef.current) {
             e.preventDefault()
-            const pct = Math.min(PEEK_PCT, Math.max(0, (-deltaY / window.innerHeight) * 100))
+            const pct = Math.min(peekPctRef.current, Math.max(0, (-deltaY / window.innerHeight) * 100))
             mobileCaseRef.current.setDragOffset(pct)
           }
         }
@@ -392,7 +405,9 @@ export default function Carousel() {
         const deltaY = (touchStartY.current ?? 0) - endY  // negative = dragged down
         if (-deltaY > window.innerHeight * 0.15) {
           caseModeRef.current = false
-          mobileCaseRef.current?.snapPeek()
+          const pct = computePeekPct()
+          peekPctRef.current = pct
+          mobileCaseRef.current?.snapPeek(pct)
         } else {
           mobileCaseRef.current?.snapOpen()
         }
@@ -411,7 +426,9 @@ export default function Carousel() {
           caseModeRef.current = true
           requestAnimationFrame(() => mobileCaseRef.current?.snapOpen())
         } else {
-          mobileCaseRef.current?.snapPeek()
+          const pct = computePeekPct()
+          peekPctRef.current = pct
+          mobileCaseRef.current?.snapPeek(pct)
         }
         stageTouch.current  = null
         swipeStartX.current = null
@@ -512,7 +529,11 @@ export default function Carousel() {
     if (navigator.maxTouchPoints > 0) {
       mobileCaseIdxRef.current = 0
       setMobileCaseState({ idx: 0 })
-      setTimeout(() => mobileCaseRef.current?.snapPeek(), 50)
+      setTimeout(() => {
+        const pct = computePeekPct()
+        peekPctRef.current = pct
+        mobileCaseRef.current?.snapPeek(pct)
+      }, 50)
     }
 
     return () => {
