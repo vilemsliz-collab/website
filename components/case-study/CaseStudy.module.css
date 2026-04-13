@@ -1,5 +1,5 @@
 /* ── Back link ── */
-.backLink {
+.caseStudyBackLink {
   position: fixed;
   top: 20px; left: 24px;
   font-family: var(--font-mono, 'IBM Plex Mono', monospace);
@@ -11,20 +11,19 @@
   z-index: 100;
   transition: color 0.15s;
 }
-.backLink:hover { color: var(--color-on-background); }
+.caseStudyBackLink:hover { color: var(--color-on-background); }
 
 /* ── Page wrapper ── */
-.page {
+.caseStudyPage {
   display: flex;
   flex-direction: column;
   gap: var(--space-16);
   padding: var(--space-16) var(--space-16) var(--space-24);
 }
 
-.textInset { padding-left: var(--space-5); padding-right: var(--space-5); }
-.muted     { color: var(--color-on-surface-variant); }
+.caseStudyTextInset { padding-left: var(--space-5); padding-right: var(--space-5); }
 
-.body {
+.caseStudyBody {
   font-size: 16px;
   line-height: var(--type-body-large-lh);
   letter-spacing: var(--type-body-large-ls);
@@ -33,20 +32,8 @@
   color: var(--color-on-surface-variant);
 }
 
-/* ── Headline ── */
-.headline {
-  font-family: var(--font-brand);
-  font-size: 64px;
-  line-height: 1.05;
-  letter-spacing: -0.25px;
-  font-weight: 400;
-  font-variation-settings: 'wght' 400;
-}
-.headlineDark  { color: var(--color-on-background); }
-.headlineMuted { color: var(--color-on-surface-variant); }
-
 /* ── Hero image ── */
-.heroImage {
+.caseStudyHeroImage {
   width: 100%;
   aspect-ratio: 16 / 9;
   border-radius: var(--shape-md);
@@ -56,13 +43,13 @@
 }
 
 /* ── Stat + Role row ── */
-.metaRow {
+.caseStudyMetaRow {
   display: flex;
   gap: var(--space-2);
   align-items: stretch;
 }
 
-.statBlock {
+.caseStudyStatBlock {
   flex: 1;
   background: var(--gray-900);
   border: none;
@@ -75,8 +62,8 @@
   justify-content: center;
 }
 
-.claims { position: relative; overflow: hidden; }
-.claim {
+.caseStudyClaims { position: relative; overflow: hidden; }
+.caseStudyClaim {
   font-family: var(--font-brand);
   font-size: var(--type-headline-large-size);
   line-height: var(--type-headline-large-lh);
@@ -86,22 +73,22 @@
   color: var(--gray-300);
   margin: 0;
 }
-.claim strong {
+.caseStudyClaim strong {
   color: var(--white);
   font-weight: 400;
   font-variation-settings: 'wght' 400;
 }
-.claimWord {
+.caseStudyClaimWord {
   display: inline-block;
-  animation: claimWordIn 0.65s cubic-bezier(0.25, 0, 0, 1) backwards;
+  animation: caseStudyClaimWordIn 0.65s cubic-bezier(0.25, 0, 0, 1) backwards;
   animation-delay: calc(var(--i) * 70ms);
 }
-@keyframes claimWordIn {
+@keyframes caseStudyClaimWordIn {
   from { opacity: 0; filter: blur(6px); transform: translateY(8px); }
   to   { opacity: 1; filter: blur(0px); transform: translateY(0); }
 }
 
-.roleBlock {
+.caseStudyRoleBlock {
   flex: 1;
   border-radius: var(--shape-md);
   padding: var(--space-8) var(--space-6);
@@ -111,7 +98,7 @@
   gap: var(--space-5);
 }
 
-.roleLabel {
+.caseStudyRoleLabel {
   font-family: var(--font-brand);
   color: var(--gray-800);
   font-size: var(--type-headline-small-size);
@@ -121,12 +108,12 @@
 }
 
 /* ── Media block ── */
-.mediaBlock {
+.caseStudyMediaBlock {
   display: flex;
   flex-direction: column;
   gap: var(--space-8);
 }
-.mediaFrame {
+.caseStudyMediaFrame {
   width: 100%;
   aspect-ratio: 1072 / 675;
   background: var(--color-surface);
@@ -134,17 +121,17 @@
   overflow: hidden;
   position: relative;
 }
-.mediaFrame img,
-.mediaFrame video {
+.caseStudyMediaFrame img,
+.caseStudyMediaFrame video {
   width: 100%; height: 100%; object-fit: cover; display: block;
 }
-.mediaCaption {
+.caseStudyMediaCaption {
   max-width: 686px;
   padding: 0 var(--space-5);
 }
 
 /* ── Strip carousel ── */
-.stripReel {
+.caseStudyStripReel {
   display: flex;
   flex-direction: row;
   overflow-x: auto;
@@ -154,11 +141,11 @@
   gap: 6px;
   cursor: grab;
 }
-.stripReel:active { cursor: grabbing; }
-.stripReel::-webkit-scrollbar { display: none; }
+.caseStudyStripReel:active { cursor: grabbing; }
+.caseStudyStripReel::-webkit-scrollbar { display: none; }
 
 /* math: (100% - 1.5 × 6px) / 2.5 ≈ 40% - 3.6px */
-.stripSlide {
+.caseStudyStripSlide {
   flex: 0 0 calc(40% - 4px);
   min-height: calc(var(--card-height) / 2);
   border: 1px solid var(--color-outline-variant);
@@ -168,28 +155,28 @@
   flex-direction: column;
   padding: 4px;
 }
-.stripSlideImage {
+.caseStudyStripSlideImage {
   flex: 1;
   background: var(--color-background);
   border-radius: var(--shape-sm);
   overflow: hidden;
   position: relative;
 }
-.stripSlideImage img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.stripSlideCaption { flex-shrink: 0; padding: var(--space-3); }
+.caseStudyStripSlideImage img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.caseStudyStripSlideCaption { flex-shrink: 0; padding: var(--space-3); }
 
 /* ── Portrait pairs ── */
-.pairsSection {
+.caseStudyPairsSection {
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
 }
-.pairRow {
+.caseStudyPairRow {
   display: flex;
   gap: var(--space-3);
   height: var(--card-height);
 }
-.pairSlot {
+.caseStudyPairSlot {
   flex: 1;
   background: var(--color-background);
   border: 1px solid var(--gray-100);
@@ -197,17 +184,16 @@
   overflow: hidden;
   position: relative;
 }
-.pairSlot img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.caseStudyPairSlot img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
 
 /* ── Responsive ── */
 @media (max-width: 768px) {
-  .page { gap: var(--space-12); padding: var(--space-10) var(--space-5) var(--space-20); }
-  .textInset { padding-left: 0; padding-right: 0; }
-  .headline { font-size: 36px; }
-  .metaRow { flex-direction: column; }
-  .claim { font-size: var(--type-headline-small-size); line-height: var(--type-headline-small-lh); }
-  .stripSlide { flex: 0 0 calc(66% - 4px); min-height: 200px; }
-  .pairRow { height: auto; flex-direction: column; }
-  .pairSlot { height: 280px; }
+  .caseStudyPage        { gap: var(--space-12); padding: var(--space-10) var(--space-5) var(--space-20); }
+  .caseStudyTextInset   { padding-left: 0; padding-right: 0; }
+  .caseStudyMetaRow     { flex-direction: column; }
+  .caseStudyClaim       { font-size: var(--type-headline-small-size); line-height: var(--type-headline-small-lh); }
+  .caseStudyStripSlide  { flex: 0 0 calc(66% - 4px); min-height: 200px; }
+  .caseStudyPairRow     { height: auto; flex-direction: column; }
+  .caseStudyPairSlot    { height: 280px; }
 }
