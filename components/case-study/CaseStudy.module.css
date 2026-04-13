@@ -1,5 +1,5 @@
 /* ── Back link ── */
-.back {
+.backLink {
   position: fixed;
   top: 20px; left: 24px;
   font-family: var(--font-mono, 'IBM Plex Mono', monospace);
@@ -11,20 +11,20 @@
   z-index: 100;
   transition: color 0.15s;
 }
-.back:hover { color: var(--color-on-background); }
+.backLink:hover { color: var(--color-on-background); }
 
 /* ── Page wrapper ── */
-.csPage {
+.page {
   display: flex;
   flex-direction: column;
   gap: var(--space-16);
   padding: var(--space-16) var(--space-16) var(--space-24);
 }
 
-.csTextInset { padding-left: var(--space-5); padding-right: var(--space-5); }
-.csMuted     { color: var(--color-on-surface-variant); }
+.textInset { padding-left: var(--space-5); padding-right: var(--space-5); }
+.muted     { color: var(--color-on-surface-variant); }
 
-.csBody {
+.body {
   font-size: 16px;
   line-height: var(--type-body-large-lh);
   letter-spacing: var(--type-body-large-ls);
@@ -33,8 +33,8 @@
   color: var(--color-on-surface-variant);
 }
 
-/* ── Hero ── */
-.csHeadline {
+/* ── Headline ── */
+.headline {
   font-family: var(--font-brand);
   font-size: 64px;
   line-height: 1.05;
@@ -42,11 +42,11 @@
   font-weight: 400;
   font-variation-settings: 'wght' 400;
 }
-.csHeadlineDark  { color: var(--color-on-background); }
-.csHeadlineMuted { color: var(--color-on-surface-variant); }
+.headlineDark  { color: var(--color-on-background); }
+.headlineMuted { color: var(--color-on-surface-variant); }
 
 /* ── Hero image ── */
-.csHero {
+.heroImage {
   width: 100%;
   aspect-ratio: 16 / 9;
   border-radius: var(--shape-md);
@@ -56,13 +56,13 @@
 }
 
 /* ── Stat + Role row ── */
-.csMeta {
+.metaRow {
   display: flex;
   gap: var(--space-2);
   align-items: stretch;
 }
 
-.csStatCard {
+.statBlock {
   flex: 1;
   background: var(--gray-900);
   border: none;
@@ -75,8 +75,8 @@
   justify-content: center;
 }
 
-.csClaims { position: relative; overflow: hidden; }
-.csClaim {
+.claims { position: relative; overflow: hidden; }
+.claim {
   font-family: var(--font-brand);
   font-size: var(--type-headline-large-size);
   line-height: var(--type-headline-large-lh);
@@ -86,22 +86,22 @@
   color: var(--gray-300);
   margin: 0;
 }
-.csClaim strong {
+.claim strong {
   color: var(--white);
   font-weight: 400;
   font-variation-settings: 'wght' 400;
 }
-.csClaimWord {
+.claimWord {
   display: inline-block;
-  animation: csWordIn 0.65s cubic-bezier(0.25, 0, 0, 1) backwards;
+  animation: claimWordIn 0.65s cubic-bezier(0.25, 0, 0, 1) backwards;
   animation-delay: calc(var(--i) * 70ms);
 }
-@keyframes csWordIn {
+@keyframes claimWordIn {
   from { opacity: 0; filter: blur(6px); transform: translateY(8px); }
   to   { opacity: 1; filter: blur(0px); transform: translateY(0); }
 }
 
-.csRoleCard {
+.roleBlock {
   flex: 1;
   border-radius: var(--shape-md);
   padding: var(--space-8) var(--space-6);
@@ -111,7 +111,7 @@
   gap: var(--space-5);
 }
 
-.csRoleLabel {
+.roleLabel {
   font-family: var(--font-brand);
   color: var(--gray-800);
   font-size: var(--type-headline-small-size);
@@ -121,12 +121,12 @@
 }
 
 /* ── Media block ── */
-.csMediaBlock {
+.mediaBlock {
   display: flex;
   flex-direction: column;
   gap: var(--space-8);
 }
-.csMediaFrame {
+.mediaFrame {
   width: 100%;
   aspect-ratio: 1072 / 675;
   background: var(--color-surface);
@@ -134,17 +134,17 @@
   overflow: hidden;
   position: relative;
 }
-.csMediaFrame img,
-.csMediaFrame video {
+.mediaFrame img,
+.mediaFrame video {
   width: 100%; height: 100%; object-fit: cover; display: block;
 }
-.csMediaCaption {
+.mediaCaption {
   max-width: 686px;
   padding: 0 var(--space-5);
 }
 
 /* ── Strip carousel ── */
-.csStripGroup {
+.stripReel {
   display: flex;
   flex-direction: row;
   overflow-x: auto;
@@ -154,11 +154,11 @@
   gap: 6px;
   cursor: grab;
 }
-.csStripGroup:active { cursor: grabbing; }
-.csStripGroup::-webkit-scrollbar { display: none; }
+.stripReel:active { cursor: grabbing; }
+.stripReel::-webkit-scrollbar { display: none; }
 
 /* math: (100% - 1.5 × 6px) / 2.5 ≈ 40% - 3.6px */
-.csStripCard {
+.stripSlide {
   flex: 0 0 calc(40% - 4px);
   min-height: calc(var(--card-height) / 2);
   border: 1px solid var(--color-outline-variant);
@@ -168,28 +168,28 @@
   flex-direction: column;
   padding: 4px;
 }
-.csStripImg {
+.stripSlideImage {
   flex: 1;
   background: var(--color-background);
   border-radius: var(--shape-sm);
   overflow: hidden;
   position: relative;
 }
-.csStripImg img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.csStripCaption { flex-shrink: 0; padding: var(--space-3); }
+.stripSlideImage img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.stripSlideCaption { flex-shrink: 0; padding: var(--space-3); }
 
 /* ── Portrait pairs ── */
-.csPairsGroup {
+.pairsSection {
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
 }
-.csPair {
+.pairRow {
   display: flex;
   gap: var(--space-3);
   height: var(--card-height);
 }
-.csPairImg {
+.pairSlot {
   flex: 1;
   background: var(--color-background);
   border: 1px solid var(--gray-100);
@@ -197,17 +197,17 @@
   overflow: hidden;
   position: relative;
 }
-.csPairImg img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.pairSlot img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
 
 /* ── Responsive ── */
 @media (max-width: 768px) {
-  .csPage { gap: var(--space-12); padding: var(--space-10) var(--space-5) var(--space-20); }
-  .csTextInset { padding-left: 0; padding-right: 0; }
-  .csHeadline { font-size: 36px; }
-  .csMeta { flex-direction: column; }
-  .csClaim { font-size: var(--type-headline-small-size); line-height: var(--type-headline-small-lh); }
-  .csStripCard { flex: 0 0 calc(66% - 4px); min-height: 200px; }
-  .csPair { height: auto; flex-direction: column; }
-  .csPairImg { height: 280px; }
+  .page { gap: var(--space-12); padding: var(--space-10) var(--space-5) var(--space-20); }
+  .textInset { padding-left: 0; padding-right: 0; }
+  .headline { font-size: 36px; }
+  .metaRow { flex-direction: column; }
+  .claim { font-size: var(--type-headline-small-size); line-height: var(--type-headline-small-lh); }
+  .stripSlide { flex: 0 0 calc(66% - 4px); min-height: 200px; }
+  .pairRow { height: auto; flex-direction: column; }
+  .pairSlot { height: 280px; }
 }

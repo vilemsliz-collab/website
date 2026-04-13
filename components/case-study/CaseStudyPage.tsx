@@ -22,10 +22,10 @@ function RotatingClaims({ claims }: { claims: CaseStudy['claims'] }) {
   ]
 
   return (
-    <div className={styles.csClaims}>
-      <p key={cur} className={styles.csClaim}>
+    <div className={styles.claims}>
+      <p key={cur} className={styles.claim}>
         {words.map((item, i) => (
-          <span key={i} className={styles.csClaimWord} style={{ '--i': i } as React.CSSProperties}>
+          <span key={i} className={styles.claimWord} style={{ '--i': i } as React.CSSProperties}>
             {item.bold ? <strong>{item.w}</strong> : item.w}&nbsp;
           </span>
         ))}
@@ -44,8 +44,6 @@ export default function CaseStudyPage({ cs, isOverlay }: Props) {
   useEffect(() => { setIsIframe(window.self !== window.top) }, [])
 
   const [cardTop, setCardTop] = useState<number | null>(null)
-  // Read the CSS var the carousel parent wrote before setting iframe src — runs
-  // synchronously before first paint so there is no layout shift on open.
   useLayoutEffect(() => {
     if (window.self === window.top) return
     try {
@@ -53,7 +51,6 @@ export default function CaseStudyPage({ cs, isOverlay }: Props) {
       if (v) setCardTop(parseFloat(v))
     } catch {}
   }, [])
-  // postMessage listener for subsequent content switches (back-frame swaps)
   useEffect(() => {
     const handle = (e: MessageEvent) => {
       if (e.data?.type === 'card-top-y') setCardTop(e.data.value as number)
@@ -65,14 +62,14 @@ export default function CaseStudyPage({ cs, isOverlay }: Props) {
   return (
     <>
       {!isIframe && !isOverlay && (
-        <a className={styles.back} href="/portfolio">← portfolio</a>
+        <a className={styles.backLink} href="/portfolio">← portfolio</a>
       )}
 
-      <div className={styles.csPage} style={isOverlay ? { paddingTop: 'var(--space-4)' } : (isIframe && cardTop !== null ? { paddingTop: `${cardTop}px` } : undefined)}>
+      <div className={styles.page} style={isOverlay ? { paddingTop: 'var(--space-4)' } : (isIframe && cardTop !== null ? { paddingTop: `${cardTop}px` } : undefined)}>
 
         {/* ── 1. Hero image ── */}
         {cs.heroImg && (
-          <div className={styles.csHero}>
+          <div className={styles.heroImage}>
             <Image
               src={cs.heroImg}
               alt=""
@@ -85,19 +82,19 @@ export default function CaseStudyPage({ cs, isOverlay }: Props) {
         )}
 
         {/* ── 2. Stat + Role ── */}
-        <div className={styles.csMeta}>
-          <div className={styles.csStatCard}>
+        <div className={styles.metaRow}>
+          <div className={styles.statBlock}>
             <RotatingClaims claims={cs.claims} />
           </div>
-          <div className={styles.csRoleCard}>
-            <span className={styles.csRoleLabel}>My role</span>
-            <p className={styles.csBody}>{cs.roleBody}</p>
+          <div className={styles.roleBlock}>
+            <span className={styles.roleLabel}>My role</span>
+            <p className={styles.body}>{cs.roleBody}</p>
           </div>
         </div>
 
-        {/* ── 4. Full-width media ── */}
-        <div className={styles.csMediaBlock}>
-          <div className={styles.csMediaFrame}>
+        {/* ── 3. Full-width media ── */}
+        <div className={styles.mediaBlock}>
+          <div className={styles.mediaFrame}>
             {cs.mediaImg && (
               <Image
                 src={cs.mediaImg}
@@ -108,16 +105,16 @@ export default function CaseStudyPage({ cs, isOverlay }: Props) {
               />
             )}
           </div>
-          <p className={`${styles.csBody} ${styles.csMediaCaption} ${styles.csTextInset}`}>
+          <p className={`${styles.body} ${styles.mediaCaption} ${styles.textInset}`}>
             {cs.mediaCaption}
           </p>
         </div>
 
-        {/* ── 5. Strip carousel ── */}
-        <div className={styles.csStripGroup}>
+        {/* ── 4. Strip carousel ── */}
+        <div className={styles.stripReel}>
           {cs.strip.map((item, i) => (
-            <div key={i} className={styles.csStripCard}>
-              <div className={styles.csStripImg}>
+            <div key={i} className={styles.stripSlide}>
+              <div className={styles.stripSlideImage}>
                 {item.img && (
                   <Image
                     src={item.img}
@@ -128,17 +125,17 @@ export default function CaseStudyPage({ cs, isOverlay }: Props) {
                   />
                 )}
               </div>
-              <p className={`${styles.csBody} ${styles.csStripCaption}`}>{item.caption}</p>
+              <p className={`${styles.body} ${styles.stripSlideCaption}`}>{item.caption}</p>
             </div>
           ))}
         </div>
 
-        {/* ── 6. Portrait pairs ── */}
-        <div className={styles.csPairsGroup}>
+        {/* ── 5. Portrait pairs ── */}
+        <div className={styles.pairsSection}>
           {cs.pairs.map((pair, pi) => (
-            <div key={pi} className={styles.csPair}>
+            <div key={pi} className={styles.pairRow}>
               {pair.map((img, ii) => (
-                <div key={ii} className={styles.csPairImg}>
+                <div key={ii} className={styles.pairSlot}>
                   <Image
                     src={img}
                     alt=""
@@ -150,8 +147,8 @@ export default function CaseStudyPage({ cs, isOverlay }: Props) {
               ))}
               {pair.length === 0 && (
                 <>
-                  <div className={styles.csPairImg} />
-                  <div className={styles.csPairImg} />
+                  <div className={styles.pairSlot} />
+                  <div className={styles.pairSlot} />
                 </>
               )}
             </div>
