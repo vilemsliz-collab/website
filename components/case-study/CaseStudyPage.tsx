@@ -68,7 +68,7 @@ export default function CaseStudyPage({ cs, isOverlay }: Props) {
         <a className={styles.back} href="/portfolio">← portfolio</a>
       )}
 
-      <div className={styles.csPage} style={isIframe && cardTop !== null ? { paddingTop: `${cardTop}px` } : undefined}>
+      <div className={styles.csPage} style={isOverlay ? { paddingTop: 'var(--space-4)' } : (isIframe && cardTop !== null ? { paddingTop: `${cardTop}px` } : undefined)}>
 
         {/* ── 1. Stat + Role ── */}
         <div className={styles.csMeta}>
