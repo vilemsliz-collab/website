@@ -70,7 +70,17 @@ export default function CaseStudyPage({ cs, isOverlay }: Props) {
 
       <div className={styles.csPage} style={isOverlay ? { paddingTop: 'var(--space-4)' } : (isIframe && cardTop !== null ? { paddingTop: `${cardTop}px` } : undefined)}>
 
-        {/* ── 1. Stat + Role ── */}
+        {/* ── 1. Challenge / Solution labels ── */}
+        <div className={`${styles.csCs} ${styles.csTextInset}`}>
+          <div className={styles.csCsCol}>
+            <span className={styles.csCsLabel}>Challenge</span>
+          </div>
+          <div className={styles.csCsCol}>
+            <span className={styles.csCsLabel}>Solution</span>
+          </div>
+        </div>
+
+        {/* ── 2. Stat + Role ── */}
         <div className={styles.csMeta}>
           <div className={styles.csStatCard}>
             <RotatingClaims claims={cs.claims} />
@@ -78,18 +88,6 @@ export default function CaseStudyPage({ cs, isOverlay }: Props) {
           <div className={styles.csRoleCard}>
             <span className={styles.csRoleLabel}>My role</span>
             <p className={styles.csBody}>{cs.roleBody}</p>
-          </div>
-        </div>
-
-        {/* ── 3. Challenge / Solution ── */}
-        <div className={`${styles.csCs} ${styles.csTextInset}`}>
-          <div className={styles.csCsCol}>
-            <span className={styles.csCsLabel}>Challenge</span>
-            <p className={styles.csBody}>{cs.challenge}</p>
-          </div>
-          <div className={styles.csCsCol}>
-            <span className={styles.csCsLabel}>Solution</span>
-            <p className={styles.csBody}>{cs.solution}</p>
           </div>
         </div>
 
