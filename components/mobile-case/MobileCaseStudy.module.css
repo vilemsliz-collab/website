@@ -42,3 +42,37 @@
   height: var(--space-24);
   flex-shrink: 0;
 }
+
+/* ── Card hero ── */
+.cardHero {
+  width: 100%;
+  aspect-ratio: 364 / 555;
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
+  margin-top: var(--space-3);
+  opacity: 0;
+  transform: translateY(24px);
+  will-change: opacity, transform;
+}
+
+.cardHeroGrad {
+  position: absolute; inset: 0; z-index: 1;
+  background: linear-gradient(to bottom, rgba(0,0,0,0) 55%, rgba(0,0,0,0.55));
+}
+
+.cardHeroText {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  padding: var(--space-6);
+  z-index: 2;
+}
+
+.cardHeroLine {
+  font-family: var(--font-brand);
+  font-size: var(--type-headline-medium-size);
+  line-height: var(--type-headline-medium-lh);
+  font-weight: 400;
+  font-variation-settings: 'wght' 400;
+  color: #fff;
+  margin: 0;
+}

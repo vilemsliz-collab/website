@@ -4,7 +4,7 @@ import { useRef, useEffect, useCallback, useState } from 'react'
 import dynamic from 'next/dynamic'
 import {
   PRESETS, CARDS, REVEAL, INPUT, TILT, GHOST,
-  type CarouselCFG, type CarouselPreset,
+  type CarouselCFG, type CarouselPreset, type CardData,
 } from '@/lib/carouselConfig'
 import {
   clamp, buildRollBase,
@@ -649,6 +649,7 @@ export default function Carousel() {
           <MobileCaseStudy
             ref={mobileCaseRef}
             cs={cs}
+            card={CARDS[mobileCaseState.idx]}
             onScrollEnd={exitMobileCase}
           />
         ) : null
