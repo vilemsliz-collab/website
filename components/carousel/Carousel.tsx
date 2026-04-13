@@ -557,6 +557,24 @@ export default function Carousel() {
     }
   }, [loadPreset, kick, switchCaseContent])
 
+  // ── Active card change ──
+  const handleActiveChange = useCallback((i: number) => {
+    // Desktop: switch case panel content when panel is open
+    if (!isMobile() && caseOpen.current) {
+      switchCaseContent(CARDS[i].href)
+    }
+    // Mobile: update overlay to show new card's case study
+    if (isMobile()) {
+      mobileCaseIdxRef.current = i
+      setMobileCaseState({ idx: i })
+      if (!caseModeRef.current) {
+        const pct = computePeekPct()
+        peekPctRef.current = pct
+        requestAnimationFrame(() => mobileCaseRef.current?.snapPeek(pct))
+      }
+    }
+  }, [switchCaseContent])
+
   // ── Card click ──
   const handleCardClick = useCallback((i: number) => {
     if (isMobile()) return  // mobile: case study via swipe up only
@@ -592,7 +610,7 @@ export default function Carousel() {
           caseOpen={caseOpen}
           shakeVel={shakeVel}
           carouselWidthRef={carouselWidthRef}
-          onActiveChange={() => {}}
+          onActiveChange={handleActiveChange}
           onCardClick={handleCardClick}
         />
       </div>
