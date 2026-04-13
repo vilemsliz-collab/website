@@ -10,7 +10,7 @@
   border: 1px solid var(--color-surface-variant);
   z-index: 110;
   overflow: hidden;
-  transform: translateY(90%);
+  transform: translateY(100%);
   transition: transform 0.55s cubic-bezier(0.4, 0, 0.2, 1),
               width 0.45s cubic-bezier(0.4, 0, 0.2, 1),
               left 0.45s cubic-bezier(0.4, 0, 0.2, 1),

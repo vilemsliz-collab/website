@@ -85,8 +85,8 @@ const MobileCaseStudy = forwardRef<MobileCaseStudyHandle, Props>(
       },
       snapPeek(pct: number) {
         peekPctRef.current = pct
-        // Derive card bottom from peek pct: peekTop = cardBottom + 16, peekTop = pct/100 * vh
-        cardBottomRef.current = (pct / 100) * window.innerHeight - 16
+        // No hero pinning when fully hidden (pct = 100)
+        cardBottomRef.current = pct >= 100 ? null : (pct / 100) * window.innerHeight - 16
         readyRef.current = false
         firedRef.current = false
         const el   = outerRef.current

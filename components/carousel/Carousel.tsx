@@ -100,8 +100,8 @@ export default function Carousel() {
   const caseModeRef      = useRef(false)
   const dismissingRef    = useRef(false)
   const touchStartY      = useRef<number | null>(null)
-  const dragStartPctRef  = useRef(90)
-  const peekPctRef       = useRef(90)
+  const dragStartPctRef  = useRef(100)
+  const peekPctRef       = useRef(100)
 
   // ── React state (only for things that need re-render) ──
   const [caseOpenState, setCaseOpenState] = useState(false)
@@ -216,11 +216,7 @@ export default function Carousel() {
     mobileCaseIdxRef.current = nextIdx
     pendingCaseIdx.current = null
     setMobileCaseState({ idx: nextIdx })
-    setTimeout(() => {
-      const pct = computePeekPct()
-      peekPctRef.current = pct
-      mobileCaseRef.current?.snapPeek(pct)
-    }, 50)
+    setTimeout(() => { mobileCaseRef.current?.snapPeek(100) }, 50)
   }, [])
 
   const openCasePanel = useCallback((cardIdx: number) => {
@@ -404,9 +400,7 @@ export default function Carousel() {
         const deltaY = (touchStartY.current ?? 0) - endY  // negative = dragged down
         if (-deltaY > window.innerHeight * 0.15) {
           caseModeRef.current = false
-          const pct = computePeekPct()
-          peekPctRef.current = pct
-          mobileCaseRef.current?.snapPeek(pct)
+          mobileCaseRef.current?.snapPeek(100)
         } else {
           mobileCaseRef.current?.snapOpen()
         }
@@ -416,7 +410,7 @@ export default function Carousel() {
         return
       }
 
-      // Mobile vertical drag — snap open or back to peek
+      // Mobile vertical drag — snap open or back to hidden
       if (window.innerWidth < 768 && verticalDragRef.current) {
         verticalDragRef.current = false
         const endY   = e.changedTouches[0]?.clientY ?? (touchStartY.current ?? 0)
@@ -425,9 +419,7 @@ export default function Carousel() {
           caseModeRef.current = true
           requestAnimationFrame(() => mobileCaseRef.current?.snapOpen())
         } else {
-          const pct = computePeekPct()
-          peekPctRef.current = pct
-          mobileCaseRef.current?.snapPeek(pct)
+          mobileCaseRef.current?.snapPeek(100)
         }
         stageTouch.current  = null
         swipeStartX.current = null
@@ -524,15 +516,10 @@ export default function Carousel() {
       activeIdx.current = 0
     })
 
-    // Mobile: mount overlay in peek state immediately
+    // Mobile: mount overlay hidden — opens on swipe-up gesture
     if (navigator.maxTouchPoints > 0) {
       mobileCaseIdxRef.current = 0
       setMobileCaseState({ idx: 0 })
-      setTimeout(() => {
-        const pct = computePeekPct()
-        peekPctRef.current = pct
-        mobileCaseRef.current?.snapPeek(pct)
-      }, 50)
     }
 
     return () => {
@@ -563,15 +550,10 @@ export default function Carousel() {
     if (!isMobile() && caseOpen.current) {
       switchCaseContent(CARDS[i].href)
     }
-    // Mobile: update overlay to show new card's case study
+    // Mobile: update overlay content; keep it hidden unless already open
     if (isMobile()) {
       mobileCaseIdxRef.current = i
       setMobileCaseState({ idx: i })
-      if (!caseModeRef.current) {
-        const pct = computePeekPct()
-        peekPctRef.current = pct
-        requestAnimationFrame(() => mobileCaseRef.current?.snapPeek(pct))
-      }
     }
   }, [switchCaseContent])
 
