@@ -51,7 +51,7 @@ function CaseStudyMetaRow({ claims, roleBody }: { claims: CaseStudy['claims']; r
   )
 }
 
-function CaseStudyMediaBlock({ img, caption }: { img?: string; caption: string }) {
+function CaseStudyMediaBlock({ img, children }: { img?: string; children?: React.ReactNode }) {
   return (
     <div className={styles.caseStudyMediaBlock}>
       <div className={styles.caseStudyMediaFrame}>
@@ -59,9 +59,7 @@ function CaseStudyMediaBlock({ img, caption }: { img?: string; caption: string }
           <Image src={img} alt="" fill sizes="100vw" style={{ objectFit: 'cover' }} />
         )}
       </div>
-      <p className={`${styles.caseStudyBody} ${styles.caseStudyMediaCaption} ${styles.caseStudyTextInset}`}>
-        {caption}
-      </p>
+      {children}
     </div>
   )
 }
@@ -152,8 +150,9 @@ export default function CaseStudyPage({ cs, isOverlay }: Props) {
         }
       >
         {cs.heroImg && <CaseStudyHeroImage src={cs.heroImg} />}
-        <CaseStudyMediaBlock img={cs.mediaImg} caption={cs.mediaCaption} />
-        <CaseStudyMetaRow claims={cs.claims} roleBody={cs.roleBody} />
+        <CaseStudyMediaBlock img={cs.mediaImg}>
+          <CaseStudyMetaRow claims={cs.claims} roleBody={cs.roleBody} />
+        </CaseStudyMediaBlock>
         <CaseStudyStripReel items={cs.strip} />
         <CaseStudyPairsSection pairs={cs.pairs} />
       </div>
