@@ -67,6 +67,7 @@ export default function Carousel() {
   const shakeVel    = useRef(0)
   const stageTouch  = useRef<number | null>(null)
   const stageMouse  = useRef<number | null>(null)
+  const hasDraggedRef = useRef(false)
   const swipeStartX = useRef<number | null>(null)
   const splitRafId  = useRef<number | null>(null)
   const gyroHandler = useRef<((e: Event) => void) | null>(null)
@@ -271,17 +272,22 @@ export default function Carousel() {
     if (!rafId.current) rafId.current = requestAnimationFrame(loop)
   }, [])  // eslint-disable-line react-hooks/exhaustive-deps
 
-  function loop() {
-    velY.current *= cfg.current.FRICTION
-    posY.current += velY.current
+  let lastLoopTime = 0
+  function loop(now: number) {
+    const dt = lastLoopTime ? Math.min((now - lastLoopTime) / 16.667, 4) : 1
+    lastLoopTime = now
+
+    velY.current *= Math.pow(cfg.current.FRICTION, dt)
+    posY.current += velY.current * dt
 
     const target = Math.round(posY.current)
     if (Math.abs(velY.current) < 0.02) {
       const spring = (target - posY.current) * cfg.current.SPRING
-      posY.current += spring
+      posY.current += spring * dt
       if (Math.abs(velY.current) < 0.003 && Math.abs(posY.current - target) < 0.002) {
         posY.current = ((target % N) + N) % N
         velY.current = 0
+        lastLoopTime = 0
         rafId.current = null
         return
       }
@@ -292,13 +298,16 @@ export default function Carousel() {
   // ── Tilt loop (spring physics only — R3F useFrame reads tiltRx/tiltRy each frame) ──
   useEffect(() => {
     let tiltRafId: number
-    function tiltLoop() {
-      tiltVx.current += (tiltTx.current - tiltRx.current) * tiltCfg.current.stiffness
-      tiltVy.current += (tiltTy.current - tiltRy.current) * tiltCfg.current.stiffness
-      tiltVx.current *= tiltCfg.current.damping
-      tiltVy.current *= tiltCfg.current.damping
-      tiltRx.current += tiltVx.current
-      tiltRy.current += tiltVy.current
+    let lastTiltTime = 0
+    function tiltLoop(now: number) {
+      const dt = lastTiltTime ? Math.min((now - lastTiltTime) / 16.667, 4) : 1
+      lastTiltTime = now
+      tiltVx.current += (tiltTx.current - tiltRx.current) * tiltCfg.current.stiffness * dt
+      tiltVy.current += (tiltTy.current - tiltRy.current) * tiltCfg.current.stiffness * dt
+      tiltVx.current *= Math.pow(tiltCfg.current.damping, dt)
+      tiltVy.current *= Math.pow(tiltCfg.current.damping, dt)
+      tiltRx.current += tiltVx.current * dt
+      tiltRy.current += tiltVy.current * dt
       tiltRafId = requestAnimationFrame(tiltLoop)
     }
     tiltRafId = requestAnimationFrame(tiltLoop)
@@ -328,13 +337,14 @@ export default function Carousel() {
       if (stageMouse.current !== null && !rafId.current) {
         const dragK = 1 / (window.innerWidth * inputRef.current.touchSens)
         const dPos  = -(e.clientX - stageMouse.current) * dragK
+        if (Math.abs(e.clientX - stageMouse.current) > 4) hasDraggedRef.current = true
         velY.current   = velY.current * 0.5 + dPos * 0.5
         posY.current  += dPos
         stageMouse.current = e.clientX
       }
     }
     function onMouseLeave() { if (!isMobile()) { tiltTx.current = 0; tiltTy.current = baseTiltY.current } }
-    function onMouseDown(e: MouseEvent) { stageMouse.current = e.clientX }
+    function onMouseDown(e: MouseEvent) { stageMouse.current = e.clientX; hasDraggedRef.current = false }
     function onMouseUp() { if (stageMouse.current !== null) kick(); stageMouse.current = null }
 
     // Touch
@@ -544,6 +554,11 @@ export default function Carousel() {
     }
   }, [loadPreset, kick, switchCaseContent])
 
+  // ── Stage background click → close case panel ──
+  const handleStageClick = useCallback(() => {
+    if (!hasDraggedRef.current && caseOpen.current && !isMobile()) closeCasePanel()
+  }, [closeCasePanel])
+
   // ── Active card change ──
   const handleActiveChange = useCallback((i: number) => {
     // Desktop: switch case panel content when panel is open
@@ -578,7 +593,7 @@ export default function Carousel() {
     <div className={`${styles.root} ${caseOpenState ? styles.caseOpen : ''} ${ctrlOpen ? styles.ctrlOpen : ''}`}>
 
       {/* ── DOM Carousel ── */}
-      <div className={styles.carouselStage}>
+      <div className={styles.carouselStage} onClick={handleStageClick}>
         <CarouselDOMScene
           posY={posY}
           cfg={cfg}
@@ -599,11 +614,6 @@ export default function Carousel() {
 
       {/* ── Case panel ── */}
       <div ref={casePanelRef} className={styles.casePanel}>
-        <button
-          className={styles.casePanelClose}
-          aria-label="Close case study"
-          onClick={closeCasePanel}
-        >✕</button>
         <iframe
           ref={frameARef}
           id="case-frame-a"

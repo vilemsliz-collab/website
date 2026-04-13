@@ -18,7 +18,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-8);
-  padding: var(--space-4) var(--space-8) var(--space-12);
+  padding: var(--space-8);
 }
 
 .caseStudyTextInset { padding-left: var(--space-5); padding-right: var(--space-5); }
@@ -54,7 +54,7 @@
   background: var(--gray-900);
   border: none;
   border-radius: var(--shape-md);
-  padding: var(--space-7);
+  padding: var(--space-2);
   overflow: hidden;
   position: relative;
   display: flex;

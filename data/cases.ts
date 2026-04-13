@@ -52,6 +52,8 @@ export const CASES: CaseStudy[] = [
     strip: [
       { caption: 'Three teams, one design system.' },
       { caption: 'Three teams, one design system.' },
+      { caption: 'Three teams, one design system.' },
+      { caption: 'Three teams, one design system.' },
     ],
     pairs: [[], []],
   },

@@ -78,8 +78,12 @@ export default function CarouselDOMScene({
     let wPos = window.innerWidth
     let wVel = 0
     let shakePos = 0
+    let lastFrameTime = 0
 
-    function frame() {
+    function frame(now: number) {
+      const dt = lastFrameTime ? Math.min((now - lastFrameTime) / 16.667, 4) : 1
+      lastFrameTime = now
+
       const stage = stageRef.current
       if (!stage) { rafRef.current = requestAnimationFrame(frame); return }
 
@@ -89,9 +93,9 @@ export default function CarouselDOMScene({
       // 1. Width spring + camera offset (mirrors CarouselScene.Physics)
       const mobileCase = caseOpen.current && W < 768
       const targetW    = mobileCase ? W : (caseOpen.current ? W * 0.30 : W)
-      wVel  += (targetW - wPos) * 0.02
-      wVel  *= 0.85
-      wPos  += wVel
+      wVel  += (targetW - wPos) * 0.02 * dt
+      wVel  *= Math.pow(0.85, dt)
+      wPos  += wVel * dt
       carouselWidthRef.current = wPos
       // camX: subtract from tx so vanishing point stays centred in the carousel strip
       // (equivalent to Three.js cam.position.x = width/2 - wPos/2)
@@ -101,9 +105,9 @@ export default function CarouselDOMScene({
       stage.style.perspective = `${P}px`
 
       // 3. Shake spring
-      shakeVel.current += -shakePos * 0.12
-      shakeVel.current *= 0.80
-      shakePos         += shakeVel.current
+      shakeVel.current += -shakePos * 0.12 * dt
+      shakeVel.current *= Math.pow(0.80, dt)
+      shakePos         += shakeVel.current * dt
 
       // 4. Card dimensions (match CSS min(92vw,364px) × (555/364))
       const cardW = Math.min(W * 0.92, 364)
@@ -180,7 +184,7 @@ export default function CarouselDOMScene({
           key={card.id}
           ref={el => { groupRefs.current[i] = el }}
           className={styles.cardGroup}
-          onClick={() => onCardClick(i)}
+          onClick={(e) => { e.stopPropagation(); onCardClick(i) }}
         >
           {/* Ghost clones — behind mesh, same 3D position, different tilt angle */}
           {Array.from({ length: 4 }, (_, gi) => (
