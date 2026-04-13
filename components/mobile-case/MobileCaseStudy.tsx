@@ -22,12 +22,13 @@ interface Props {
 
 const MobileCaseStudy = forwardRef<MobileCaseStudyHandle, Props>(
   function MobileCaseStudy({ cs, card, onScrollEnd }, ref) {
-    const outerRef   = useRef<HTMLDivElement>(null)  // visual layer: transform, blur, border-radius
-    const scrollRef  = useRef<HTMLDivElement>(null)  // scroll layer: scrollTop reads/writes
-    const heroRef    = useRef<HTMLDivElement>(null)  // card hero element
-    const readyRef   = useRef(false)
-    const firedRef   = useRef(false)
-    const peekPctRef = useRef(90)  // updated on each snapPeek call, used by setDragOffset
+    const outerRef      = useRef<HTMLDivElement>(null)  // visual layer
+    const scrollRef     = useRef<HTMLDivElement>(null)  // scroll layer
+    const heroRef       = useRef<HTMLDivElement>(null)  // card hero element
+    const readyRef      = useRef(false)
+    const firedRef      = useRef(false)
+    const peekPctRef    = useRef(90)
+    const cardBottomRef = useRef<number | null>(null)   // carousel card bottom screen Y
 
     const EASE = '0.45s cubic-bezier(0.4, 0, 0.2, 1)'
     const SIDE_TRANSITION = `width ${EASE}, left ${EASE}, border-radius ${EASE}`
@@ -37,7 +38,8 @@ const MobileCaseStudy = forwardRef<MobileCaseStudyHandle, Props>(
         return scrollRef.current?.scrollTop ?? 0
       },
       setDragOffset(percent: number) {
-        const el = outerRef.current
+        const el   = outerRef.current
+        const hero = heroRef.current
         if (!el) return
         const progress = 1 - percent / peekPctRef.current
         const cardW = Math.min(window.innerWidth * 0.92, 364)
@@ -50,15 +52,21 @@ const MobileCaseStudy = forwardRef<MobileCaseStudyHandle, Props>(
         el.style.left         = `${l}px`
         el.style.borderRadius = `${r}px ${r}px 0 0`
 
-        // Hero: invisible at peek, materialises after 30% drag progress
-        if (heroRef.current) {
-          const hp = Math.max(0, (progress - 0.3) / 0.7)
-          heroRef.current.style.opacity   = String(hp)
-          heroRef.current.style.transform = `translateY(${(1 - hp) * 24}px)`
+        // Pin hero below the carousel card — tracks at card bottom during drag
+        if (hero && cardBottomRef.current !== null) {
+          const overlayTopPx   = window.innerHeight * percent / 100
+          const heroNaturalTop = hero.offsetTop   // stable layout position from overlay top
+          const targetY        = cardBottomRef.current - overlayTopPx - heroNaturalTop
+          const heroTranslateY = Math.max(0, targetY)
+          const hr             = Math.round(32 - 16 * progress)  // 32px → 16px
+          hero.style.opacity      = String(Math.min(1, progress * 4))  // quick fade-in
+          hero.style.transform    = `translateY(${heroTranslateY}px)`
+          hero.style.borderRadius = `${hr}px`
         }
       },
       snapOpen() {
-        const el = outerRef.current
+        const el   = outerRef.current
+        const hero = heroRef.current
         if (!el) return
         if (scrollRef.current) scrollRef.current.scrollTop = 0
         firedRef.current = false
@@ -67,18 +75,22 @@ const MobileCaseStudy = forwardRef<MobileCaseStudyHandle, Props>(
         el.style.width        = '100vw'
         el.style.left         = '0px'
         el.style.borderRadius = '24px 24px 0 0'
-        if (heroRef.current) {
-          heroRef.current.style.transition = 'opacity 0.35s ease, transform 0.35s cubic-bezier(0.4,0,0.2,1)'
-          heroRef.current.style.opacity    = '1'
-          heroRef.current.style.transform  = 'translateY(0)'
+        if (hero) {
+          hero.style.transition   = 'opacity 0.35s ease, transform 0.55s cubic-bezier(0.4,0,0.2,1), border-radius 0.35s ease'
+          hero.style.opacity      = '1'
+          hero.style.transform    = 'translateY(0)'
+          hero.style.borderRadius = '16px'
         }
         setTimeout(() => { readyRef.current = true }, 350)
       },
       snapPeek(pct: number) {
         peekPctRef.current = pct
+        // Derive card bottom from peek pct: peekTop = cardBottom + 16, peekTop = pct/100 * vh
+        cardBottomRef.current = (pct / 100) * window.innerHeight - 16
         readyRef.current = false
         firedRef.current = false
-        const el = outerRef.current
+        const el   = outerRef.current
+        const hero = heroRef.current
         if (!el) return
         if (scrollRef.current) scrollRef.current.scrollTop = 0
         const cardW = Math.min(window.innerWidth * 0.92, 364)
@@ -88,10 +100,11 @@ const MobileCaseStudy = forwardRef<MobileCaseStudyHandle, Props>(
         el.style.width        = `${cardW}px`
         el.style.left         = `${l}px`
         el.style.setProperty('border-radius', 'var(--shape-card)')
-        if (heroRef.current) {
-          heroRef.current.style.transition = 'none'
-          heroRef.current.style.opacity    = '0'
-          heroRef.current.style.transform  = 'translateY(24px)'
+        if (hero) {
+          hero.style.transition   = 'none'
+          hero.style.opacity      = '0'
+          hero.style.transform    = 'translateY(0)'
+          hero.style.borderRadius = '32px'
         }
       },
     }))
