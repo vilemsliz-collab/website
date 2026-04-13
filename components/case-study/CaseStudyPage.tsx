@@ -70,16 +70,6 @@ export default function CaseStudyPage({ cs, isOverlay }: Props) {
 
       <div className={styles.csPage} style={isOverlay ? { paddingTop: 'var(--space-4)' } : (isIframe && cardTop !== null ? { paddingTop: `${cardTop}px` } : undefined)}>
 
-        {/* ── 1. Challenge / Solution labels ── */}
-        <div className={`${styles.csCs} ${styles.csTextInset}`}>
-          <div className={styles.csCsCol}>
-            <span className={styles.csCsLabel}>Challenge</span>
-          </div>
-          <div className={styles.csCsCol}>
-            <span className={styles.csCsLabel}>Solution</span>
-          </div>
-        </div>
-
         {/* ── 2. Stat + Role ── */}
         <div className={styles.csMeta}>
           <div className={styles.csStatCard}>
@@ -109,37 +99,25 @@ export default function CaseStudyPage({ cs, isOverlay }: Props) {
           </p>
         </div>
 
-        {/* ── 5. Strip (chunked into rows by stripCols) ── */}
-        {(() => {
-          const cols = cs.stripCols ?? 4
-          const rows = Array.from({ length: Math.ceil(cs.strip.length / cols) }, (_, gi) =>
-            cs.strip.slice(gi * cols, gi * cols + cols)
-          )
-          return (
-            <div className={styles.csStripGroup}>
-              {rows.map((row, gi) => (
-                <div key={gi} className={styles.csStrip}>
-                  {row.map((item, i) => (
-                    <div key={i} className={styles.csStripCard}>
-                      <div className={styles.csStripImg}>
-                        {item.img && (
-                          <Image
-                            src={item.img}
-                            alt=""
-                            fill
-                            sizes="(max-width: 768px) calc(50vw - 3px), 25vw"
-                            style={{ objectFit: 'cover' }}
-                          />
-                        )}
-                      </div>
-                      <p className={`${styles.csBody} ${styles.csStripCaption}`}>{item.caption}</p>
-                    </div>
-                  ))}
-                </div>
-              ))}
+        {/* ── 5. Strip carousel ── */}
+        <div className={styles.csStripGroup}>
+          {cs.strip.map((item, i) => (
+            <div key={i} className={styles.csStripCard}>
+              <div className={styles.csStripImg}>
+                {item.img && (
+                  <Image
+                    src={item.img}
+                    alt=""
+                    fill
+                    sizes="(max-width: 768px) 70vw, 42vw"
+                    style={{ objectFit: 'cover' }}
+                  />
+                )}
+              </div>
+              <p className={`${styles.csBody} ${styles.csStripCaption}`}>{item.caption}</p>
             </div>
-          )
-        })()}
+          ))}
+        </div>
 
         {/* ── 6. Portrait pairs ── */}
         <div className={styles.csPairsGroup}>
