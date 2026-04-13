@@ -1,20 +1,18 @@
 'use client'
 
 import { useRef, useEffect, useCallback, useState } from 'react'
-import dynamic from 'next/dynamic'
 import {
-  PRESETS, CARDS, REVEAL, INPUT, TILT, GHOST,
-  type CarouselCFG, type CarouselPreset, type CardData,
+  PRESETS, CARDS, REVEAL, INPUT, TILT, GHOST, LIGHT,
+  type CarouselCFG, type CarouselPreset,
 } from '@/lib/carouselConfig'
 import {
-  clamp, buildRollBase,
+  buildRollBase,
 } from '@/lib/carouselPhysics'
 import { CASES } from '@/data/cases'
 import styles from './Carousel.module.css'
 import DevPanel, { type GlassConfig } from './DevPanel'
 import MobileCaseStudy, { type MobileCaseStudyHandle } from '@/components/mobile-case/MobileCaseStudy'
-
-const CarouselCanvas = dynamic(() => import('./CarouselCanvas'), { ssr: false })
+import CarouselDOMScene from './CarouselDOMScene'
 
 const N = CARDS.length
 
@@ -79,6 +77,7 @@ export default function Carousel() {
   const inputRef  = useRef({ ...INPUT })
   const tiltCfg   = useRef({ ...TILT })
   const ghostCfg  = useRef({ ...GHOST })
+  const lightCfg  = useRef({ ...LIGHT })
   const glassCfg  = useRef<GlassConfig>({ blur: 40, opacity: 0.60, color: 255 })
 
   const applyGlass = useCallback(() => {
@@ -578,9 +577,9 @@ export default function Carousel() {
   return (
     <div className={`${styles.root} ${caseOpenState ? styles.caseOpen : ''} ${ctrlOpen ? styles.ctrlOpen : ''}`}>
 
-      {/* ── WebGL Carousel ── */}
+      {/* ── DOM Carousel ── */}
       <div className={styles.carouselStage}>
-        <CarouselCanvas
+        <CarouselDOMScene
           posY={posY}
           cfg={cfg}
           rollBase={rollBase}
@@ -589,13 +588,12 @@ export default function Carousel() {
           activeIdx={activeIdx}
           ghostCfg={ghostCfg}
           tiltCfg={tiltCfg}
+          lightCfg={lightCfg}
           caseOpen={caseOpen}
           shakeVel={shakeVel}
           carouselWidthRef={carouselWidthRef}
           onActiveChange={() => {}}
-          onCaseSwitch={switchCaseContent}
           onCardClick={handleCardClick}
-          onEmptyClick={() => { if (caseOpen.current) closeCasePanel() }}
         />
       </div>
 
@@ -636,6 +634,7 @@ export default function Carousel() {
         inputRef={inputRef}
         tiltCfg={tiltCfg}
         ghostCfg={ghostCfg}
+        lightCfg={lightCfg}
         glassCfg={glassCfg}
         onCfgChange={() => {}}
         onGhostRebuild={() => {}}

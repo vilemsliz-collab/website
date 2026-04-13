@@ -1,7 +1,7 @@
 'use client'
 
 import { useRef, type MutableRefObject } from 'react'
-import { PRESETS, type CarouselCFG, type RevealConfig, type InputConfig, type TiltConfig, type GhostConfig } from '@/lib/carouselConfig'
+import { PRESETS, type CarouselCFG, type RevealConfig, type InputConfig, type TiltConfig, type GhostConfig, type LightConfig } from '@/lib/carouselConfig'
 import styles from './DevPanel.module.css'
 
 interface DevRowProps {
@@ -51,6 +51,7 @@ interface DevPanelProps {
   inputRef: MutableRefObject<InputConfig>
   tiltCfg: MutableRefObject<TiltConfig>
   ghostCfg: MutableRefObject<GhostConfig>
+  lightCfg: MutableRefObject<LightConfig>
   glassCfg: MutableRefObject<GlassConfig>
   onCfgChange: () => void
   onGhostRebuild: () => void
@@ -58,7 +59,7 @@ interface DevPanelProps {
 }
 
 export default function DevPanel({
-  open, onToggle, cfg, revealRef, inputRef, tiltCfg, ghostCfg, glassCfg, onCfgChange, onGhostRebuild, onGlassChange,
+  open, onToggle, cfg, revealRef, inputRef, tiltCfg, ghostCfg, lightCfg, glassCfg, onCfgChange, onGhostRebuild, onGlassChange,
 }: DevPanelProps) {
   function copyToClipboard(text: string, btn: HTMLButtonElement) {
     navigator.clipboard.writeText(text).then(() => {
@@ -124,6 +125,18 @@ export default function DevPanel({
             <DevRow label="stiffness" min={0.01} max={0.5}  step={0.01} value={tiltCfg.current.stiffness} fmt={v => v.toFixed(2)} onChange={v => { tiltCfg.current.stiffness = v }} />
             <DevRow label="damping"   min={0.5}  max={0.99} step={0.01} value={tiltCfg.current.damping}   fmt={v => v.toFixed(2)} onChange={v => { tiltCfg.current.damping = v }} />
             <button className={styles.devCopy} onClick={e => copyToClipboard(`max: ${tiltCfg.current.max}, stiffness: ${tiltCfg.current.stiffness.toFixed(2)}, damping: ${tiltCfg.current.damping.toFixed(2)}`, e.currentTarget)}>copy</button>
+          </div>
+
+          {/* ── Highlight ── */}
+          <div className={styles.devSection}>
+            <div className={styles.devSectionTitle}>Highlight</div>
+            <DevRow label="intensity" min={0}   max={1}   step={0.01} value={lightCfg.current.intensity} fmt={v => v.toFixed(2)}         onChange={v => { lightCfg.current.intensity = v }} />
+            <DevRow label="size"      min={10}  max={200} step={1}    value={lightCfg.current.size}      fmt={v => Math.round(v) + '%'}  onChange={v => { lightCfg.current.size = v }} />
+            <DevRow label="blur"      min={0}   max={80}  step={1}    value={lightCfg.current.blur}      fmt={v => Math.round(v) + 'px'} onChange={v => { lightCfg.current.blur = v }} />
+            <DevRow label="travel"    min={0}   max={120} step={1}    value={lightCfg.current.travel}    fmt={v => Math.round(v) + ''}   onChange={v => { lightCfg.current.travel = v }} />
+            <DevRow label="diffuse"   min={0}   max={0.5} step={0.01} value={lightCfg.current.diffuse}   fmt={v => v.toFixed(2)}         onChange={v => { lightCfg.current.diffuse = v }} />
+            <DevRow label="shadow"    min={0}   max={0.5} step={0.01} value={lightCfg.current.shadow}    fmt={v => v.toFixed(2)}         onChange={v => { lightCfg.current.shadow = v }} />
+            <button className={styles.devCopy} onClick={e => copyToClipboard(`intensity: ${lightCfg.current.intensity.toFixed(2)}, size: ${Math.round(lightCfg.current.size)}, blur: ${Math.round(lightCfg.current.blur)}px, travel: ${Math.round(lightCfg.current.travel)}, diffuse: ${lightCfg.current.diffuse.toFixed(2)}, shadow: ${lightCfg.current.shadow.toFixed(2)}`, e.currentTarget)}>copy</button>
           </div>
 
           {/* ── Glass ── */}
