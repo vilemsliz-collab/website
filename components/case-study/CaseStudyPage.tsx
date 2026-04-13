@@ -152,8 +152,8 @@ export default function CaseStudyPage({ cs, isOverlay }: Props) {
         }
       >
         {cs.heroImg && <CaseStudyHeroImage src={cs.heroImg} />}
-        <CaseStudyMetaRow claims={cs.claims} roleBody={cs.roleBody} />
         <CaseStudyMediaBlock img={cs.mediaImg} caption={cs.mediaCaption} />
+        <CaseStudyMetaRow claims={cs.claims} roleBody={cs.roleBody} />
         <CaseStudyStripReel items={cs.strip} />
         <CaseStudyPairsSection pairs={cs.pairs} />
       </div>
