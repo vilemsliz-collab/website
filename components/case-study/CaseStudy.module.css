@@ -45,6 +45,16 @@
 .csHeadlineDark  { color: var(--color-on-background); }
 .csHeadlineMuted { color: var(--color-on-surface-variant); }
 
+/* ── Hero image ── */
+.csHero {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: var(--shape-md);
+  overflow: hidden;
+  position: relative;
+  background: var(--color-surface);
+}
+
 /* ── Stat + Role row ── */
 .csMeta {
   display: flex;

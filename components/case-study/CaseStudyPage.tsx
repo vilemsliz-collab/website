@@ -70,6 +70,20 @@ export default function CaseStudyPage({ cs, isOverlay }: Props) {
 
       <div className={styles.csPage} style={isOverlay ? { paddingTop: 'var(--space-4)' } : (isIframe && cardTop !== null ? { paddingTop: `${cardTop}px` } : undefined)}>
 
+        {/* ── 1. Hero image ── */}
+        {cs.heroImg && (
+          <div className={styles.csHero}>
+            <Image
+              src={cs.heroImg}
+              alt=""
+              fill
+              sizes="100vw"
+              style={{ objectFit: 'cover' }}
+              priority
+            />
+          </div>
+        )}
+
         {/* ── 2. Stat + Role ── */}
         <div className={styles.csMeta}>
           <div className={styles.csStatCard}>

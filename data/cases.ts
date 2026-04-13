@@ -25,6 +25,7 @@ export interface CaseStudy {
   roleBody: string
   challenge: string
   solution: string
+  heroImg?: string
   mediaImg?: string
   mediaCaption: string
   strip: CaseStripItem[]
