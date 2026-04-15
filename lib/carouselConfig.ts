@@ -99,7 +99,7 @@ export const PRESETS: Record<string, CarouselPreset> = {
 export const REVEAL: RevealConfig = { stagger: 58, dur: 682, blur: 8, y: 8 }
 export const INPUT: InputConfig   = { mouseKick: 0.07, touchSens: 0.02 }
 export const TILT: TiltConfig     = { max: 16, stiffness: 0.1, damping: 0.75 }
-export const GHOST: GhostConfig   = { layers: 4, opacity: 0.16, blur: 0, blend: 'normal', variant: 'behind' }
+export const GHOST: GhostConfig   = { layers: 0, opacity: 0.16, blur: 0, blend: 'normal', variant: 'behind' }
 export const LIGHT: LightConfig   = { intensity: 0.6, size: 85, travel: 68, diffuse: 0.10, shadow: 0.18, blur: 24 }
 
 export const CARDS: CardData[] = [

@@ -110,7 +110,7 @@ export default function CarouselDOMScene({
       shakePos         += shakeVel.current * dt
 
       // 4. Card dimensions (match CSS min(92vw,364px) × (555/364))
-      const cardW = Math.min(W * 0.92, 364)
+      const cardW = Math.min(W * 0.92, window.innerHeight * 0.40)
       const cardH = cardW * (555 / 364)
 
       const transforms = computeCardTransforms(posY.current, N, cfg.current, wPos, rollBase.current)
@@ -168,6 +168,31 @@ export default function CarouselDOMScene({
           activeIdx.current = i
           onActiveChange(i)
         }
+
+        // ── Dynamic cursor state ──
+        // Compute fractional distance from active position for 3-level cursor scaling
+        let offI = i - posY.current
+        while (offI >  N / 2) offI -= N
+        while (offI < -N / 2) offI += N
+        const absOff = Math.abs(offI)
+        const cursorLevel = absOff < 0.5 ? 1 : absOff < 1.5 ? 2 : 3
+        const cursorScaleVal = cursorLevel === 1 ? '1' : cursorLevel === 2 ? '0.667' : '0.444'
+
+        if (t.isActive) {
+          if (caseOpen.current) {
+            group.dataset.cursor = 'card-close'
+            delete group.dataset.cursorLabel
+            group.dataset.cursorScale = cursorScaleVal
+          } else {
+            group.dataset.cursor = 'card'
+            group.dataset.cursorLabel = 'open'
+            group.dataset.cursorScale = cursorScaleVal
+          }
+        } else {
+          group.dataset.cursor = 'card'
+          group.dataset.cursorLabel = 'open'
+          group.dataset.cursorScale = cursorScaleVal
+        }
       })
 
       rafRef.current = requestAnimationFrame(frame)
@@ -178,12 +203,13 @@ export default function CarouselDOMScene({
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
-    <div ref={stageRef} className={styles.stage3d}>
+    <div ref={stageRef} className={styles.stage3d} data-cursor-scroll-h>
       {CARDS.map((card, i) => (
         <div
           key={card.id}
           ref={el => { groupRefs.current[i] = el }}
           className={styles.cardGroup}
+          data-dark
           onClick={(e) => { e.stopPropagation(); onCardClick(i) }}
         >
           {/* Ghost clones — behind mesh, same 3D position, different tilt angle */}

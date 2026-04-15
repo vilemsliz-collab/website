@@ -15,11 +15,23 @@
 
 /* ── Page wrapper ── */
 .caseStudyPage {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: var(--space-8);
   padding: var(--space-8);
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
+
+/* ── Top close zone: transparent strip over the top padding, relays card-close cursor ── */
+.caseStudyCloseZone {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: var(--space-8);
+  z-index: 10;
+}
+.caseStudyPage::-webkit-scrollbar { display: none; }
 
 .caseStudyTextInset { padding-left: var(--space-5); padding-right: var(--space-5); }
 

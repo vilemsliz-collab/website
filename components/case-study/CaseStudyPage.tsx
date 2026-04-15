@@ -66,7 +66,7 @@ function CaseStudyMediaBlock({ img, children }: { img?: string; children?: React
 
 function CaseStudyStripReel({ items }: { items: CaseStripItem[] }) {
   return (
-    <div className={styles.caseStudyStripReel}>
+    <div className={styles.caseStudyStripReel} data-cursor="drag-h">
       {items.map((item, i) => (
         <div key={i} className={styles.caseStudyStripSlide}>
           <div className={styles.caseStudyStripSlideImage}>
@@ -118,7 +118,11 @@ interface Props {
 
 export default function CaseStudyPage({ cs, isOverlay }: Props) {
   const [isIframe, setIsIframe] = useState(false)
-  useEffect(() => { setIsIframe(window.self !== window.top) }, [])
+  useEffect(() => {
+    const inIframe = window.self !== window.top
+    setIsIframe(inIframe)
+    if (inIframe) document.documentElement.style.scrollbarWidth = 'none'
+  }, [])
 
   const [cardTop, setCardTop] = useState<number | null>(null)
   useLayoutEffect(() => {
@@ -136,19 +140,49 @@ export default function CaseStudyPage({ cs, isOverlay }: Props) {
     return () => window.removeEventListener('message', handle)
   }, [])
 
+  // Relay cursor events to parent so the custom cursor works across the iframe boundary
+  useEffect(() => {
+    if (window.self === window.top) return
+    const relayMove = (e: MouseEvent) => {
+      const cursorEl = (e.target as HTMLElement | null)?.closest('[data-cursor]') as HTMLElement | null
+      const darkEl   = (e.target as HTMLElement | null)?.closest('[data-dark]')
+      window.parent.postMessage({
+        type:        'cursor-move',
+        x:           e.clientX,
+        y:           e.clientY,
+        cursorState: cursorEl?.dataset.cursor ?? null,
+        cursorLabel: cursorEl?.dataset.cursorLabel ?? null,
+        dark:        !!darkEl,
+      }, '*')
+    }
+    const relayWheel = (e: WheelEvent) => {
+      window.parent.postMessage({ type: 'cursor-wheel', deltaX: e.deltaX, deltaY: e.deltaY }, '*')
+    }
+    window.addEventListener('mousemove', relayMove)
+    window.addEventListener('wheel', relayWheel, { passive: true })
+    return () => {
+      window.removeEventListener('mousemove', relayMove)
+      window.removeEventListener('wheel', relayWheel)
+    }
+  }, [])
+
   return (
     <>
       {!isIframe && !isOverlay && (
-        <a className={styles.caseStudyBackLink} href="/portfolio">← portfolio</a>
+        <a className={styles.caseStudyBackLink} href="/portfolio" data-cursor="link" data-cursor-label="Portfolio">← portfolio</a>
       )}
 
       <div
         className={styles.caseStudyPage}
-        style={isOverlay
-          ? { paddingTop: 'var(--space-4)' }
-          : (isIframe && cardTop !== null ? { paddingTop: `${cardTop}px` } : undefined)
-        }
+        style={undefined}
       >
+        {isIframe && (
+          <div
+            className={styles.caseStudyCloseZone}
+            data-cursor="case-close"
+            onClick={() => window.parent.postMessage({ type: 'case-close' }, '*')}
+          />
+        )}
         {cs.heroImg && <CaseStudyHeroImage src={cs.heroImg} />}
         <CaseStudyMediaBlock img={cs.mediaImg}>
           <CaseStudyMetaRow claims={cs.claims} roleBody={cs.roleBody} />

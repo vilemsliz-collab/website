@@ -10,9 +10,11 @@ import {
 } from '@/lib/carouselPhysics'
 import { CASES } from '@/data/cases'
 import styles from './Carousel.module.css'
+import CustomCursor from '@/components/cursor/CustomCursor'
 import DevPanel, { type GlassConfig } from './DevPanel'
 import MobileCaseStudy, { type MobileCaseStudyHandle } from '@/components/mobile-case/MobileCaseStudy'
 import CarouselDOMScene from './CarouselDOMScene'
+import ScrollHint from './ScrollHint'
 
 const N = CARDS.length
 
@@ -104,6 +106,30 @@ export default function Carousel() {
   const dragStartPctRef  = useRef(100)
   const peekPctRef       = useRef(100)
 
+  // ── Scroll hint idle timer ──
+  const scrollHintTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const [scrollHintVisible, setScrollHintVisible] = useState(false)
+
+  const startScrollHintTimer = useCallback(() => {
+    if (scrollHintTimer.current) clearTimeout(scrollHintTimer.current)
+    setScrollHintVisible(false)
+    scrollHintTimer.current = setTimeout(() => setScrollHintVisible(true), 5000)
+  }, [])
+
+  const dismissScrollHint = useCallback(() => {
+    setScrollHintVisible(false)
+    if (scrollHintTimer.current) {
+      clearTimeout(scrollHintTimer.current)
+      scrollHintTimer.current = null
+    }
+  }, [])
+
+  // Start timer on mount
+  useEffect(() => {
+    startScrollHintTimer()
+    return () => { if (scrollHintTimer.current) clearTimeout(scrollHintTimer.current) }
+  }, [startScrollHintTimer])
+
   // ── React state (only for things that need re-render) ──
   const [caseOpenState, setCaseOpenState] = useState(false)
   const [ctrlOpen, setCtrlOpen] = useState(false)
@@ -130,7 +156,8 @@ export default function Carousel() {
     back.addEventListener('load', () => {
       // Send position to back frame before it slides in so content renders at the
       // correct offset and doesn't shift after the slide-in completes.
-      const topY = window.innerHeight / 2 + cfg.current.Y_OFFSET - (555 * cfg.current.SCALE_ACTIVE / 2) - 20
+      const cardH = Math.min(window.innerWidth * 0.92, window.innerHeight * 0.40) * (555 / 364)
+      const topY = window.innerHeight / 2 + cfg.current.Y_OFFSET - (cardH * cfg.current.SCALE_ACTIVE / 2) - 20
       back.contentWindow?.postMessage({ type: 'card-top-y', value: topY }, '*')
       document.documentElement.style.setProperty('--card-top-y', `${topY}px`)
       requestAnimationFrame(() => {
@@ -194,7 +221,7 @@ export default function Carousel() {
   }, [])
 
   function computePeekPct() {
-    const cardW    = Math.min(window.innerWidth * 0.92, 364)
+    const cardW    = Math.min(window.innerWidth * 0.92, window.innerHeight * 0.40)
     const cardH    = cardW * (555 / 364)
     const cardBottom = window.innerHeight / 2 + cfg.current.Y_OFFSET + (cardH * cfg.current.SCALE_ACTIVE / 2)
     const peekTop  = cardBottom + 16
@@ -226,9 +253,10 @@ export default function Carousel() {
     if (!front) return
     // Write target top-Y to a CSS var on the parent doc BEFORE setting src so the
     // iframe can read it synchronously via useLayoutEffect on mount (no layout shift).
+    const splitCardH = Math.min(window.innerWidth * 0.92, window.innerHeight * 0.40) * (555 / 364)
     const targetTopY = window.innerHeight / 2
       + (PRESETS.split.Y_OFFSET as number)
-      - (555 * (PRESETS.split.SCALE_ACTIVE as number) / 2)
+      - (splitCardH * (PRESETS.split.SCALE_ACTIVE as number) / 2)
       - 20  // panel sits 20px from viewport top; iframe y=0 starts there
     document.documentElement.style.setProperty('--card-top-y', `${targetTopY}px`)
     front.style.transition = 'none'
@@ -344,11 +372,12 @@ export default function Carousel() {
       }
     }
     function onMouseLeave() { if (!isMobile()) { tiltTx.current = 0; tiltTy.current = baseTiltY.current } }
-    function onMouseDown(e: MouseEvent) { stageMouse.current = e.clientX; hasDraggedRef.current = false }
+    function onMouseDown(e: MouseEvent) { stageMouse.current = e.clientX; hasDraggedRef.current = false; dismissScrollHint() }
     function onMouseUp() { if (stageMouse.current !== null) kick(); stageMouse.current = null }
 
     // Touch
     function onTouchStart(e: TouchEvent) {
+      dismissScrollHint()
       touchStartY.current  = e.touches[0].clientY
       dismissingRef.current = false
       // Don't capture carousel touch state while case study is fully open
@@ -471,6 +500,7 @@ export default function Carousel() {
     // Wheel
     function onWheel(e: WheelEvent) {
       e.preventDefault()
+      dismissScrollHint()
       // Scroll down → open case study (desktop DevTools testing + mobile wheel)
       if (isMobile() && e.deltaY > 40 && !caseModeRef.current) {
         caseModeRef.current = true
@@ -499,6 +529,7 @@ export default function Carousel() {
     // Overscroll from case study iframe → gentle shake of active card
     function onIframeScroll(e: MessageEvent) {
       if (!caseOpen.current) return
+      if (e.data?.type === 'case-close') { closeCasePanel(); return }
       if (e.data?.type !== 'carousel-overscroll') return
       const d = e.data.delta as number
       if (!d) return
@@ -552,7 +583,7 @@ export default function Carousel() {
       }
       if (permBtn.current) { permBtn.current.remove(); permBtn.current = null }
     }
-  }, [loadPreset, kick, switchCaseContent])
+  }, [loadPreset, kick, switchCaseContent, dismissScrollHint])
 
   // ── Stage background click → close case panel ──
   const handleStageClick = useCallback(() => {
@@ -561,6 +592,7 @@ export default function Carousel() {
 
   // ── Active card change ──
   const handleActiveChange = useCallback((i: number) => {
+    startScrollHintTimer()
     // Desktop: switch case panel content when panel is open
     if (!isMobile() && caseOpen.current) {
       switchCaseContent(CARDS[i].href)
@@ -570,7 +602,7 @@ export default function Carousel() {
       mobileCaseIdxRef.current = i
       setMobileCaseState({ idx: i })
     }
-  }, [switchCaseContent])
+  }, [switchCaseContent, startScrollHintTimer])
 
   // ── Card click ──
   const handleCardClick = useCallback((i: number) => {
@@ -591,9 +623,11 @@ export default function Carousel() {
 
   return (
     <div className={`${styles.root} ${caseOpenState ? styles.caseOpen : ''} ${ctrlOpen ? styles.ctrlOpen : ''}`}>
+      <CustomCursor />
 
       {/* ── DOM Carousel ── */}
       <div className={styles.carouselStage} onClick={handleStageClick}>
+        <ScrollHint visible={scrollHintVisible} />
         <CarouselDOMScene
           posY={posY}
           cfg={cfg}
@@ -611,6 +645,9 @@ export default function Carousel() {
           onCardClick={handleCardClick}
         />
       </div>
+
+      {/* ── Case panel cursor blocker — prevents card-close cursor leaking into panel zone ── */}
+      {caseOpenState && <div className={styles.casePanelBlocker} aria-hidden />}
 
       {/* ── Case panel ── */}
       <div ref={casePanelRef} className={styles.casePanel}>
@@ -630,9 +667,9 @@ export default function Carousel() {
 
       {/* ── Site nav ── */}
       <nav className={styles.siteNav}>
-        <a href="/portfolio" className={styles.navActive}>Portfolio</a>
-        <a href="/card">Card</a>
-        <a href="/design-system">Design System</a>
+        <a href="/portfolio" className={styles.navActive} data-cursor="link" data-cursor-label="Portfolio">Portfolio</a>
+        <a href="/card" data-cursor="link" data-cursor-label="Card + Cursor">Card + Cursor</a>
+        <a href="/design-system" data-cursor="link" data-cursor-label="Design System">Design System</a>
       </nav>
 
       {/* ── Dev panel ── */}

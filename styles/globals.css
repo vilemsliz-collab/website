@@ -1,8 +1,8 @@
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; cursor: none !important; }
 
 html, body {
-  width: 100%; height: 100%;
-  background: var(--color-background);
+  width: 100%; min-height: 100%;
+  background: radial-gradient(ellipse 82% 50% at 50% 50%, #ffffff 60%, #eff0f5 88%, #e5e7f0 100%) fixed;
   font-family: var(--font-brand);
   font-variation-settings: 'wght' 400, 'GRAD' var(--fvs-grad), 'ROND' var(--fvs-rond), 'opsz' var(--fvs-opsz);
   -webkit-font-smoothing: antialiased;
@@ -152,7 +152,7 @@ html, body {
   --inline-lg: var(--space-6);  /* 24px */
 
   /* ── Card layout ── */
-  --card-width:       364px;
+  --card-width:       min(92vw, 40vh);
   --card-height:      555px;
   --card-aspect-w:    364;
   --card-aspect-h:    555;

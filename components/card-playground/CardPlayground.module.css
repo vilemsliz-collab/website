@@ -115,88 +115,233 @@
   transform: translateY(0);
 }
 
-/* ── Controls ── */
-.controls {
-  width: min(92vw, 364px);
-  background: rgba(255,255,255,0.7);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-radius: 12px;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  font-family: var(--font-mono, monospace);
-  font-size: 11px;
-  color: #666;
-}
-
+/* ── Controls (inside dark ctrl panel) ── */
 .ctrlSection {
-  font-family: var(--font-mono, monospace);
-  font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
-  color: #aaa; margin-top: 16px; margin-bottom: 4px;
+  font-family: var(--font-mono, 'IBM Plex Mono', monospace);
+  font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase;
+  color: #555; margin-top: 18px; margin-bottom: 8px;
+  padding-bottom: 5px; border-bottom: 1px solid #1e1e22;
 }
 .ctrlSection:first-child { margin-top: 0; }
 
 .ctrlRow {
-  display: flex; align-items: center; gap: 10px;
+  display: grid;
+  grid-template-columns: 72px 1fr 44px;
+  align-items: center;
+  gap: 6px; margin-bottom: 8px;
 }
-.ctrlLabel { width: 80px; flex-shrink: 0; letter-spacing: 0.05em; }
-.ctrlVal   { width: 36px; text-align: right; flex-shrink: 0; color: #333; }
+.ctrlLabel {
+  font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase;
+  color: #666; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  font-family: var(--font-mono, 'IBM Plex Mono', monospace);
+}
+.ctrlVal {
+  font-size: 10px; text-align: right; color: #c8ff00;
+  font-family: var(--font-mono, 'IBM Plex Mono', monospace);
+}
 
 .ctrlRow input[type=range] {
-  flex: 1; height: 3px; appearance: none; -webkit-appearance: none;
-  background: rgba(0,0,0,0.12); border-radius: 2px; outline: none; cursor: pointer;
-}
-.ctrlRow input[type=range]::-webkit-slider-thumb {
-  -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%;
-  background: rgba(255,255,255,0.9); border: 1px solid rgba(0,0,0,0.2);
-  box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+  width: 100%; height: 3px; accent-color: #c8ff00; cursor: pointer;
 }
 
-.ctrlBtnRow { display: flex; gap: 4px; }
+.ctrlBtnRow { display: flex; gap: 6px; margin-bottom: 8px; }
 .variantBtn {
   flex: 1; padding: 7px 0;
-  border: 1px solid rgba(0,0,0,0.15); border-radius: 6px;
-  background: #fff; color: #999;
-  font-family: var(--font-mono, monospace); font-size: 11px;
+  border: 1px solid #2a2a30; border-radius: 6px;
+  background: #111115; color: #666;
+  font-family: var(--font-mono, 'IBM Plex Mono', monospace); font-size: 10px;
   cursor: pointer; transition: all 0.15s;
 }
-.variantBtnActive { background: #1c1b1f !important; color: #fff !important; border-color: #1c1b1f !important; }
+.variantBtn:hover { border-color: #555; color: #ddd; }
+.variantBtnActive { background: #c8ff00 !important; color: #0a0a0c !important; border-color: #c8ff00 !important; }
 
 .ctrlSelect {
   flex: 1; height: 28px;
-  border: 1px solid rgba(0,0,0,0.15); border-radius: 6px;
-  background: #fff; color: #333;
-  font-family: var(--font-mono, monospace); font-size: 11px;
+  border: 1px solid #2a2a30; border-radius: 6px;
+  background: #111115; color: #888;
+  font-family: var(--font-mono, 'IBM Plex Mono', monospace); font-size: 10px;
   padding: 0 6px; cursor: pointer; outline: none;
   appearance: none; -webkit-appearance: none;
 }
 
 .replayBtn {
-  margin-top: 4px; flex: 1;
-  width: 100%; padding: 10px;
-  border: 1px solid rgba(0,0,0,0.15); border-radius: 8px;
-  background: #1c1b1f; color: #fff;
-  font-family: var(--font-mono, monospace); font-size: 12px;
-  letter-spacing: 0.08em; cursor: pointer; transition: opacity 0.15s;
+  flex: 1; padding: 8px 0;
+  border: 1px solid #2a2a30; border-radius: 6px;
+  background: #111115; color: #888;
+  font-family: var(--font-mono, 'IBM Plex Mono', monospace); font-size: 10px;
+  letter-spacing: 0.08em; cursor: pointer; transition: all 0.15s;
 }
-.replayBtn:hover { opacity: 0.8; }
+.replayBtn:hover { border-color: #555; color: #ddd; }
 .copyBtn {
-  background: #fff !important; color: #333 !important;
-  border-color: rgba(0,0,0,0.15) !important;
+  border-color: #2a2a30 !important;
 }
 
-.btnRow { display: flex; gap: 8px; margin-top: 4px; }
+.btnRow { display: flex; gap: 6px; margin-top: 6px; }
 
 /* ── Page layout ── */
 .page {
   min-height: 100dvh;
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  gap: 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 80px 20px 60px;
   background: #e8e8e8;
-  padding: 60px 20px;
+  gap: 0;
 }
+
+/* ── Ctrl toggle ── */
+.ctrlToggle {
+  position: fixed;
+  bottom: 62px; right: 16px;
+  min-width: 56px; height: 36px;
+  padding: 0 12px;
+  background: #0a0a0c;
+  border: 1px solid #2a2a30;
+  border-radius: 20px;
+  font-family: var(--font-mono, 'IBM Plex Mono', monospace);
+  font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase;
+  cursor: pointer; color: #888;
+  z-index: 300;
+  display: flex; align-items: center; justify-content: center;
+  transition: color 0.15s, border-color 0.15s;
+}
+.ctrlToggle:hover    { color: #ddd; border-color: #555; }
+.ctrlToggleOpen      { color: #ddd; border-color: #555; }
+
+/* ── Ctrl panel ── */
+.ctrlPanel {
+  position: fixed;
+  top: 0; right: 0; bottom: 0; width: 260px;
+  background: rgba(10,10,12,0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  z-index: 200;
+  transform: translateX(100%);
+  transition: transform 0.28s ease;
+  display: flex; flex-direction: column;
+  overflow: hidden;
+}
+.ctrlPanelOpen { transform: translateX(0); }
+
+.ctrlPanelInner {
+  flex: 1; overflow-y: auto;
+  padding: 52px 16px 16px;
+  scrollbar-width: thin; scrollbar-color: #333 transparent;
+}
+
+/* ── Sandbox zones ── */
+.sandboxScrollHint {
+  margin-top: var(--space-6);
+  width: min(92vw, 200px);
+  height: 80px;
+  border: 1px dashed var(--gray-300);
+  border-radius: var(--shape-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: var(--space-12);
+}
+
+.sandboxScrollHint span {
+  font-family: var(--font-mono, monospace);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gray-400);
+}
+
+/* ── Hero section: fills viewport, card centered ── */
+.pageHero {
+  min-height: 100dvh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+}
+
+/* ── State debug grid ── */
+.stateGrid {
+  width: min(92vw, 900px);
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+  margin-top: var(--space-8);
+  margin-bottom: var(--space-12);
+}
+
+.stateBox {
+  background: #ffffff;
+  border: 1px solid var(--gray-200);
+  border-radius: 10px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.stateBoxTitle {
+  font-family: var(--font-mono, 'IBM Plex Mono', monospace);
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--gray-400);
+  padding: 10px 12px 8px;
+  border-bottom: 1px solid var(--gray-100);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.stateBoxCopyBtn {
+  font-family: var(--font-mono, 'IBM Plex Mono', monospace);
+  font-size: 8px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gray-300);
+  background: none;
+  border: 1px solid var(--gray-200);
+  border-radius: 4px;
+  padding: 2px 6px;
+  cursor: pointer;
+  line-height: 1.4;
+  transition: color 0.15s, border-color 0.15s;
+  flex-shrink: 0;
+}
+.stateBoxCopyBtn:hover { color: var(--gray-600); border-color: var(--gray-400); }
+.stateBoxCopyBtnDone   { color: var(--gray-600) !important; border-color: var(--gray-400) !important; }
+
+.stateBoxZone {
+  min-height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--gray-50);
+  cursor: none;
+}
+
+.stateBoxZoneLabel {
+  font-family: var(--font-mono, 'IBM Plex Mono', monospace);
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gray-300);
+  pointer-events: none;
+  user-select: none;
+}
+
+.stateBoxControls {
+  padding: 10px 12px 12px;
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+}
+
+.stateBoxControls .ctrlLabel { color: var(--gray-500); }
+.stateBoxControls .ctrlVal   { color: var(--gray-700); }
+.stateBoxControls input[type=range] { accent-color: var(--gray-700); }
 
 /* ── Site nav ── */
 .siteNav {

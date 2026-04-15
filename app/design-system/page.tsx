@@ -82,7 +82,7 @@ export default function DesignSystemPage() {
     <div className={styles.page}>
       <nav className={styles.siteNav}>
         <a href="/portfolio">Portfolio</a>
-        <a href="/card">Card</a>
+        <a href="/card">Card + Cursor</a>
         <a href="/design-system" className={styles.navActive}>Design System</a>
       </nav>
 

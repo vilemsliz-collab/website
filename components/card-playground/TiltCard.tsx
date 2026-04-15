@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useEffect, useCallback } from 'react'
+import { useRef, useEffect, useCallback, type MutableRefObject } from 'react'
 import Image from 'next/image'
 import { perspAngle, clamp } from '@/lib/carouselPhysics'
 import CanvasVignetteBlur from './CanvasVignetteBlur'
@@ -21,11 +21,12 @@ interface Props {
   reveal: RevealConfig
   vignette: { blur: number; start: number }
   onRevealTrigger?: (fn: () => void) => void
+  tiltRef?: MutableRefObject<{ rx: number; ry: number }>
 }
 
 const isMobile = () => navigator.maxTouchPoints > 0
 
-export default function TiltCard({ imgSrc, line1, line2, tilt, ghost, light, reveal, vignette, onRevealTrigger }: Props) {
+export default function TiltCard({ imgSrc, line1, line2, tilt, ghost, light, reveal, vignette, onRevealTrigger, tiltRef }: Props) {
   const cardRef      = useRef<HTMLDivElement>(null)
   const shineRef     = useRef<HTMLDivElement>(null)
   const line1Ref     = useRef<HTMLParagraphElement>(null)
@@ -139,6 +140,11 @@ export default function TiltCard({ imgSrc, line1, line2, tilt, ghost, light, rev
       if (cardRef.current) {
         cardRef.current.style.transform = `rotateX(${tiltRx.current.toFixed(3)}deg) rotateY(${tiltRy.current.toFixed(3)}deg)`
       }
+      // Expose live tilt to parent (cursor system reads this)
+      if (tiltRef) {
+        tiltRef.current.rx = tiltRx.current
+        tiltRef.current.ry = tiltRy.current
+      }
       drawGhosts()
       updateShine()
       rafId = requestAnimationFrame(tiltLoop)
@@ -206,7 +212,7 @@ export default function TiltCard({ imgSrc, line1, line2, tilt, ghost, light, rev
   }, [onRevealTrigger, triggerReveal])
 
   return (
-    <div ref={cardWrapRef} className={styles.cardWrap}>
+    <div ref={cardWrapRef} className={styles.cardWrap} data-resistance>
       <div ref={cardRef} className={styles.card}>
         <Image
           ref={imgRef}
@@ -221,9 +227,9 @@ export default function TiltCard({ imgSrc, line1, line2, tilt, ghost, light, rev
         <CanvasVignetteBlur imgRef={imgRef} blur={vignette.blur} start={vignette.start} />
         <div className={styles.cardOverlay} />
         <div ref={shineRef} className={styles.cardShine} />
-        <div className={styles.cardContent}>
-          <p ref={line1Ref} className={`type-label-medium ${styles.cardLine}`} />
-          <p ref={line2Ref} className={`type-headline-medium ${styles.cardLine}`} />
+        <div className={styles.cardContent} data-resistance>
+          <p ref={line1Ref} className={`type-label-medium ${styles.cardLine}`} data-cursor="text" />
+          <p ref={line2Ref} className={`type-headline-medium ${styles.cardLine}`} data-cursor="text" />
           <button className={`${styles.cardBtn} ${styles.word}`} aria-label="View project">›</button>
         </div>
       </div>

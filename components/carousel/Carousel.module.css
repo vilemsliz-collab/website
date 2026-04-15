@@ -70,6 +70,14 @@
   }
 }
 
+/* ── Case panel cursor blocker ── */
+.casePanelBlocker {
+  position: fixed;
+  top: 0; bottom: 0;
+  left: calc(30vw + 20px); right: 0;
+  z-index: 25;
+}
+
 /* ── Card wrap ── */
 .cardWrap {
   position: absolute;

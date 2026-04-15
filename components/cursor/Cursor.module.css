@@ -1,0 +1,87 @@
+/* ── Wrapper: zero-size fixed anchor at cursor position ── */
+.wrapper {
+  position: fixed;
+  left: 0; top: 0;
+  width: 0; height: 0;
+  pointer-events: none;
+  z-index: 9999;
+  will-change: transform;
+}
+
+/* ── Cursor body: centered on wrapper origin, clips shader canvas ── */
+.body {
+  position: absolute;
+  /* translate(-50%,-50%) + blob transform applied via JS */
+  overflow: hidden;
+  will-change: transform, width, height;
+  /* border-radius applied via JS as min(w,h)/2 for pill/ellipse support */
+}
+
+/* ── Backdrop: background distortion layer (sits under shader canvas) ── */
+.backdrop {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  /* backdrop-filter applied via JS — SVG feDisplacementMap liquid warp */
+}
+
+/* ── WebGL shader canvas — fills body ── */
+.canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* ── Border ring — sits on top of canvas ── */
+.border {
+  position: absolute;
+  inset: 0;
+  border: 1px solid var(--gray-500);
+  border-radius: inherit;
+  pointer-events: none;
+  transition: border-color 0.2s ease;
+}
+
+/* Dark bg: border inverts to white */
+.borderInverted {
+  border-color: var(--white);
+}
+
+/* ── Content slot: label / icon centered inside body ── */
+.content {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  user-select: none;
+  color: var(--gray-900);
+  font-family: var(--font-brand);
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.contentInverted {
+  color: var(--white);
+}
+
+/* ── Scroll rings: spawned inside cursor body, clipped by overflow:hidden ── */
+.scrollRing {
+  position: absolute;
+  border: 1px solid var(--gray-500);
+  border-radius: 50%;
+  pointer-events: none;
+  animation: scrollRingExpand 0.65s cubic-bezier(0.1, 0, 0.35, 1) forwards;
+}
+
+@keyframes scrollRingExpand {
+  from { transform: translate(-50%, -50%) scale(1);                       opacity: 0.6;  }
+  65%  {                                                                   opacity: 0.45; }
+  to   { transform: translate(-50%, -50%) scale(var(--ring-scale, 3.2));  opacity: 0;    }
+}
+

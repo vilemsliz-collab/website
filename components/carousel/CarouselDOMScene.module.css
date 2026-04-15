@@ -10,7 +10,7 @@
   position: absolute;
   left: 50%;
   top: 50%;
-  width: min(92vw, 364px);
+  width: min(92vw, 40vh);
   aspect-ratio: 364 / 555;
   /* No transform-style: preserve-3d — children use normal CSS stacking so ghost
      clones (earlier in DOM) always stay behind cardMesh (later in DOM). Tilt
@@ -20,7 +20,7 @@
 }
 
 .cardGroup[data-active='true'] {
-  cursor: default;
+  cursor: none;
 }
 
 /* ── Tilt + opacity layer ── */
@@ -50,6 +50,8 @@
   object-fit: cover;
   display: block;
   z-index: 1;
+  -webkit-user-drag: none;
+  user-select: none;
 }
 
 /* ── Gradient overlay ── */
@@ -117,6 +119,8 @@
   height: 100%;
   object-fit: cover;
   display: block;
+  -webkit-user-drag: none;
+  user-select: none;
 }
 
 .ghostGrad {
