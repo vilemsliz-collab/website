@@ -91,6 +91,62 @@
   margin: 0;
 }
 
+/* ── About Me card overrides ── */
+.cardAbout {
+  background: #ffffff;
+  color: #000000;
+}
+
+.cardNameWrap {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  padding: var(--space-6) var(--space-6) 0;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.cardName {
+  font-family: var(--font-brand);
+  font-size: clamp(56px, 14vw, 88px);
+  font-weight: 700;
+  line-height: 1.05;
+  color: #000000;
+  margin: 0;
+  pointer-events: auto;
+}
+
+
+.cardAbout .cardText {
+  color: #000000;
+}
+
+.cardAbout .cardLine {
+  color: #000000;
+}
+
+/* ── Website card (dark inverted) ── */
+.cardWebsite {
+  background: radial-gradient(ellipse 82% 50% at 50% 50%, #1e1f2a 0%, #14151e 60%, #0d0e18 100%);
+  color: #ffffff;
+}
+
+.cardWebsiteText {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  padding: var(--space-6) var(--space-6) 0;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.cardWebsiteLine {
+  font-family: var(--font-brand);
+  font-size: clamp(52px, 13vw, 82px);
+  font-weight: 700;
+  line-height: 1.05;
+  color: #ffffff;
+  margin: 0;
+}
+
 /* ── Specular highlight ── */
 .cardShine {
   position: absolute;
@@ -98,6 +154,29 @@
   z-index: 4;
   pointer-events: none;
   border-radius: inherit;
+}
+
+/* ── Top-positioned headline for project cards ── */
+.cardTopText {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  padding: var(--space-6) var(--space-6) 0;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.cardTopText .cardLine {
+  font-size: 38px;
+  line-height: 1.05;
+}
+
+/* ── Top dark gradient for headline readability on image cards ── */
+.cardTopOverlay {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.52) 0%, rgba(0, 0, 0, 0) 42%);
+  pointer-events: none;
 }
 
 /* ── Ghost clones ── */

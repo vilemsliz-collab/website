@@ -11,6 +11,7 @@ import {
 } from '@/lib/carouselConfig'
 import { computeCardTransforms, perspAngle } from '@/lib/carouselPhysics'
 import styles from './CarouselDOMScene.module.css'
+import OrbBackground from './OrbBackground'
 
 const N = CARDS.length
 
@@ -66,12 +67,55 @@ export default function CarouselDOMScene({
   ghostCfg, tiltCfg, lightCfg, caseOpen, shakeVel, carouselWidthRef,
   onActiveChange, onCardClick,
 }: CarouselDOMSceneProps) {
-  const stageRef  = useRef<HTMLDivElement>(null)
-  const groupRefs = useRef<(HTMLDivElement | null)[]>(Array(N).fill(null))
-  const meshRefs  = useRef<(HTMLDivElement | null)[]>(Array(N).fill(null))
-  const ghostRefs = useRef<(HTMLDivElement | null)[][]>(Array.from({ length: N }, () => []))
-  const shineRefs = useRef<(HTMLDivElement | null)[]>(Array(N).fill(null))
-  const rafRef    = useRef<number | null>(null)
+  const stageRef      = useRef<HTMLDivElement>(null)
+  const groupRefs     = useRef<(HTMLDivElement | null)[]>(Array(N).fill(null))
+  const meshRefs      = useRef<(HTMLDivElement | null)[]>(Array(N).fill(null))
+  const ghostRefs     = useRef<(HTMLDivElement | null)[][]>(Array.from({ length: N }, () => []))
+  const shineRefs     = useRef<(HTMLDivElement | null)[]>(Array(N).fill(null))
+  const rafRef        = useRef<number | null>(null)
+  const labelRef      = useRef('about')
+  const hoverTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const seqRef        = useRef<'idle' | 'running'>('idle')
+  const seqTimers     = useRef<ReturnType<typeof setTimeout>[]>([])
+  const mousePos      = useRef({ x: 0, y: 0 })
+
+  function clearSeq() {
+    seqTimers.current.forEach(clearTimeout)
+    seqTimers.current = []
+  }
+
+  function pushLabel(s: string) {
+    labelRef.current = s
+    const group = groupRefs.current[0]
+    if (group) group.dataset.cursorLabel = s
+    // Force cursor to re-read the updated dataset label
+    const el = document.elementFromPoint(mousePos.current.x, mousePos.current.y)
+    el?.dispatchEvent(new MouseEvent('mousemove', {
+      bubbles: true, cancelable: true,
+      clientX: mousePos.current.x, clientY: mousePos.current.y,
+    }))
+  }
+
+  function sched(delay: number, fn: () => void) {
+    seqTimers.current.push(setTimeout(fn, delay))
+  }
+
+  function runSequence() {
+    if (seqRef.current === 'running') return
+    seqRef.current = 'running'
+    clearSeq()
+    const STEP = 80
+    let t = 0
+    const full = 'about', emoji = ':)'
+    for (let i = full.length - 1; i >= 0; i--) { const s = full.slice(0, i); sched(t, () => pushLabel(s)); t += STEP }
+    t += 300
+    for (let i = 1; i <= emoji.length; i++) { const s = emoji.slice(0, i); sched(t, () => pushLabel(s)); t += STEP }
+    t += 1500
+    for (let i = emoji.length - 1; i >= 0; i--) { const s = emoji.slice(0, i); sched(t, () => pushLabel(s)); t += STEP }
+    t += 200
+    for (let i = 1; i <= full.length; i++) { const s = full.slice(0, i); sched(t, () => pushLabel(s)); t += STEP }
+    sched(t, () => { seqRef.current = 'idle' })
+  }
 
   // ── rAF loop: replaces R3F useFrame ──────────────────────────────────────────
   useEffect(() => {
@@ -120,6 +164,7 @@ export default function CarouselDOMScene({
       transforms.forEach((t, i) => {
         const group = groupRefs.current[i]
         const mesh  = meshRefs.current[i]
+        const card  = CARDS[i]
         if (!group || !mesh) return
 
         // ── Sphere 3D position (validated sign table — see plan) ──
@@ -185,12 +230,12 @@ export default function CarouselDOMScene({
             group.dataset.cursorScale = cursorScaleVal
           } else {
             group.dataset.cursor = 'card'
-            group.dataset.cursorLabel = 'open'
+            group.dataset.cursorLabel = card.isAbout ? labelRef.current : 'open'
             group.dataset.cursorScale = cursorScaleVal
           }
         } else {
           group.dataset.cursor = 'card'
-          group.dataset.cursorLabel = 'open'
+          group.dataset.cursorLabel = card.isAbout ? labelRef.current : 'open'
           group.dataset.cursorScale = cursorScaleVal
         }
       })
@@ -198,8 +243,16 @@ export default function CarouselDOMScene({
       rafRef.current = requestAnimationFrame(frame)
     }
 
+    function trackMouse(e: MouseEvent) { mousePos.current.x = e.clientX; mousePos.current.y = e.clientY }
+    document.addEventListener('mousemove', trackMouse)
+
     rafRef.current = requestAnimationFrame(frame)
-    return () => { if (rafRef.current !== null) cancelAnimationFrame(rafRef.current) }
+    return () => {
+      if (rafRef.current !== null) cancelAnimationFrame(rafRef.current)
+      if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current)
+      document.removeEventListener('mousemove', trackMouse)
+      clearSeq()
+    }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
@@ -211,6 +264,13 @@ export default function CarouselDOMScene({
           className={styles.cardGroup}
           data-dark
           onClick={(e) => { e.stopPropagation(); onCardClick(i) }}
+          onMouseEnter={card.isAbout ? () => {
+            if (seqRef.current === 'running') return
+            hoverTimerRef.current = setTimeout(runSequence, 4000)
+          } : undefined}
+          onMouseLeave={card.isAbout ? () => {
+            if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current)
+          } : undefined}
         >
           {/* Ghost clones — behind mesh, same 3D position, different tilt angle */}
           {Array.from({ length: 4 }, (_, gi) => (
@@ -221,56 +281,84 @@ export default function CarouselDOMScene({
               style={{ backgroundColor: card.bg }}
               aria-hidden
             >
-              {card.video
-                ? (
-                  <video src={card.video} autoPlay muted loop playsInline className={styles.ghostImg} />
-                ) : card.img ? (
-                  // Plain img intentional for ghost clones — decorative, always cached from main card
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={card.img} alt="" className={styles.ghostImg} />
-                ) : null
-              }
-              <div className={styles.ghostGrad} />
+              {!card.isAbout && !card.isWebsite && (
+                <>
+                  {card.video
+                    ? (
+                      <video src={card.video} autoPlay muted loop playsInline className={styles.ghostImg} />
+                    ) : card.img ? (
+                      // Plain img intentional for ghost clones — decorative, always cached from main card
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={card.img} alt="" className={styles.ghostImg} />
+                    ) : null
+                  }
+                  <div className={styles.ghostGrad} />
+                </>
+              )}
             </div>
           ))}
 
           {/* Main card */}
           <div
             ref={el => { meshRefs.current[i] = el }}
-            className={styles.cardMesh}
-            style={{ backgroundColor: card.bg }}
+            className={`${styles.cardMesh}${card.isAbout ? ` ${styles.cardAbout}` : card.isWebsite ? ` ${styles.cardWebsite}` : ''}`}
+            style={(card.isAbout || card.isWebsite) ? undefined : { backgroundColor: card.bg }}
           >
-            {/* [RESERVED] WebGL shader slot — replace this div with <canvas> to attach a renderer */}
-            <div className={styles.cardCanvas} aria-hidden />
+            {card.isAbout
+              ? <OrbBackground />
+              : <div className={styles.cardCanvas} aria-hidden />
+            }
 
-            {card.video ? (
-              <video
-                src={card.video}
-                autoPlay
-                muted
-                loop
-                playsInline
-                className={styles.cardMedia}
-              />
-            ) : card.img ? (
-              <Image
-                src={card.img}
-                alt=""
-                fill
-                sizes="(max-width: 768px) 92vw, 364px"
-                style={{ objectFit: 'cover' }}
-                className={styles.cardMedia}
-                priority={i === 0}
-              />
-            ) : null}
+            {!card.isAbout && !card.isWebsite && (
+              <>
+                {card.video ? (
+                  <video
+                    src={card.video}
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                    className={styles.cardMedia}
+                  />
+                ) : card.img ? (
+                  <Image
+                    src={card.img}
+                    alt=""
+                    fill
+                    sizes="(max-width: 768px) 92vw, 364px"
+                    style={{ objectFit: 'cover' }}
+                    className={styles.cardMedia}
+                    priority={i === 0}
+                  />
+                ) : null}
+              </>
+            )}
 
-            <div className={styles.cardOverlay} />
-
-            <div className={styles.cardText}>
-              <p className={styles.cardRole}>{card.role}</p>
-              <p className={styles.cardLine}>{card.lines[0]}</p>
-              <p className={styles.cardLine}>{card.lines[1]}</p>
-            </div>
+            {card.isAbout ? (
+              <>
+                <div className={styles.cardNameWrap}>
+                  <p className={styles.cardName}>{card.name}</p>
+                </div>
+                <div className={styles.cardText}>
+                  <p className={styles.cardLine}>{card.lines[0]}</p>
+                  <p className={styles.cardLine}>{card.lines[1]}</p>
+                </div>
+              </>
+            ) : card.isWebsite ? (
+              <>
+                <OrbBackground dark />
+                <div className={styles.cardWebsiteText}>
+                  <p className={styles.cardWebsiteLine}>{card.name}</p>
+                  <p className={styles.cardWebsiteLine}>{card.lines[0]}</p>
+                  <p className={styles.cardWebsiteLine}>{card.lines[1]}</p>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className={styles.cardTopOverlay} />
+                <div className={styles.cardTopText} />
+              </>
+            )}
 
             <div
               ref={el => { shineRefs.current[i] = el }}

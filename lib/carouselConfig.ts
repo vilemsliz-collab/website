@@ -64,12 +64,15 @@ export interface CardData {
   ac: string
   video?: string
   img?: string
+  isAbout?: boolean
+  isWebsite?: boolean
+  name?: string
 }
 
 export const PRESETS: Record<string, CarouselPreset> = {
   split: {
     R_MULT: 1.50, R_MAX: 1010, PERSPECTIVE: 590,
-    LAT: [-25, 15, -38, 30, -10], LON_SPREAD: 1.00,
+    LAT: [-25, 15, -38, 30, -10, 22], LON_SPREAD: 1.00,
     ROT_MULT: 0, ROLL_MAX: 0,
     SCALE_ACTIVE: 1.06, SCALE_SPHERE: 0.86,
     OPACITY_MULT: 0.46, OPACITY_BASE: 1.00,
@@ -78,7 +81,7 @@ export const PRESETS: Record<string, CarouselPreset> = {
   },
   mobile: {
     R_MULT: 1.50, R_MAX: 1010, PERSPECTIVE: 200,
-    LAT: [-30, 18, -42, 35, -12], LON_SPREAD: 1.00,
+    LAT: [-30, 18, -42, 35, -12, 25], LON_SPREAD: 1.00,
     ROT_MULT: 0, ROLL_MAX: 0,
     SCALE_ACTIVE: 0.94, SCALE_SPHERE: 0.83,
     OPACITY_MULT: 0.46, OPACITY_BASE: 1.00,
@@ -87,7 +90,7 @@ export const PRESETS: Record<string, CarouselPreset> = {
   },
   desktop: {
     R_MULT: 0.60, R_MAX: 1010, PERSPECTIVE: 550,
-    LAT: [-25, 15, -38, 30, -10], LON_SPREAD: 0.80,
+    LAT: [-25, 15, -38, 30, -10, 22], LON_SPREAD: 0.80,
     ROT_MULT: 0, ROLL_MAX: 0,
     SCALE_ACTIVE: 1.20, SCALE_SPHERE: 0.75,
     OPACITY_MULT: 0.46, OPACITY_BASE: 1,
@@ -103,9 +106,10 @@ export const GHOST: GhostConfig   = { layers: 0, opacity: 0.16, blur: 0, blend: 
 export const LIGHT: LightConfig   = { intensity: 0.6, size: 85, travel: 68, diffuse: 0.10, shadow: 0.18, blur: 24 }
 
 export const CARDS: CardData[] = [
-  { id: '001', lines: ['Typographic motion,', 'ink meets screen.'],    role: 'Motion Designer',       href: '/cases/001', bg: '#12131a', ac: '#c8ff00', video: '/assets/portfolio-reel.mp4', img: '/cases/case-001-thumb.png' },
-  { id: '002', lines: ['Generative systems,', 'designed in code.'],    role: 'Creative Technologist', href: '/cases/002', bg: '#080e1c', ac: '#4dd0e1', img: '/cases/case-002.png' },
-  { id: '003', lines: ['Audio reactive,', 'visual frequency.'],        role: 'Interaction Designer',  href: '/cases/003', bg: '#1e0a0a', ac: '#ff5252', img: '/cases/case-003.png' },
+  { id: 'about', name: 'Vilém', lines: ['Brand XP', 'Expressive UI'], role: '', href: '/about', bg: '#ffffff', ac: '#000000', isAbout: true },
+  { id: '002', lines: ['Generative systems,', 'designed in code.'],    role: 'Creative Technologist', href: '/cases/002', bg: '#0d1a0d', ac: '#4dd0e1', img: '/cases/case-002-new.png' },
+  { id: '003', lines: ['Audio reactive,', 'visual frequency.'],        role: 'Interaction Designer',  href: '/cases/003', bg: '#0d1a0d', ac: '#4dd0e1', img: '/cases/case-003-new.png' },
   { id: '004', lines: ['Procedural terrain,', 'rendered at runtime.'], role: 'Generative Artist',     href: '/cases/004', bg: '#071207', ac: '#66ff99', img: '/cases/case-004.png' },
-  { id: '005', lines: ['Fluid simulation,', 'physics made visual.'],   role: 'Visual Engineer',       href: '/cases/005', bg: '#141414', ac: '#e0e0e0', img: '/cases/case-005.png' },
+  { id: '001', lines: ['Typographic motion,', 'ink meets screen.'],    role: 'Motion Designer',       href: '/cases/001', bg: '#12131a', ac: '#c8ff00', video: '/assets/portfolio-reel.mp4', img: '/cases/case-001-thumb.png' },
+  { id: 'website', name: 'How I', lines: ['built this', 'website'], role: '', href: '/cases/website', bg: '#12131a', ac: '#ffffff', isWebsite: true },
 ]
