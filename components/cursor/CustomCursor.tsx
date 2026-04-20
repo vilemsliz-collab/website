@@ -20,6 +20,10 @@ export interface CursorConfig {
   scrollRingScale:    number  // 3.2  — ring final scale
   scrollRingDuration: number  // 0.65 — ring animation seconds
   scrollNarrowW:      number  // 20   — cursor narrow dimension during scroll
+  // Pill + scroll: axis elongation pulse on wheel events
+  scrollKickAmp:      number  // 26   — how much each wheel event bumps the kick
+  scrollKickDecay:    number  // 0.08 — per-frame decay factor toward 0
+  pillScrollElong:    number  // 0.14 — max pill elongation from scrollKick (0..1)
 }
 
 export const DEFAULT_CURSOR_CONFIG: CursorConfig = {
@@ -35,6 +39,9 @@ export const DEFAULT_CURSOR_CONFIG: CursorConfig = {
   scrollRingScale:    4.5,
   scrollRingDuration: 0.65,
   scrollNarrowW:      24,
+  scrollKickAmp:      26,
+  scrollKickDecay:    0.08,
+  pillScrollElong:    0.1,
 }
 
 const DEFAULT_W = 48
@@ -128,6 +135,10 @@ export default function CustomCursor({ tiltRef, configRef }: CursorProps) {
     let blobAngle  = 0, blobElong = 0
     let invertCur  = 0, invertTarg = 0
     let curBDScale = 0   // springs toward backdropScale or backdropScaleCard
+    // Pill+scroll: transient wheel impulse decaying each frame.
+    // Drives pill-axis elongation when hovering a button.
+    let scrollKick = 0
+    let scrollAxisX = 0, scrollAxisY = 1  // unit vector of last wheel direction
 
     // Current state
     let cursorState: CursorState = 'default'
@@ -137,6 +148,11 @@ export default function CustomCursor({ tiltRef, configRef }: CursorProps) {
     let cursorLabel: string | undefined
     let baseW = DEFAULT_W, baseH = DEFAULT_H  // unscaled target from current state
     let hoveredCursorEl: HTMLElement | null = null
+    // Snapshot of data-cursor-scale captured on hover-in. Carousel cards rewrite
+    // their cursor-scale every frame as scroll physics runs; reading it live
+    // would shrink/grow the cursor mid-scroll. Locking at hover-in keeps the
+    // cursor sized to the card's role at the moment the user pointed at it.
+    let lockedCursorScale = 1
     const applyState = (state: CursorState, label?: string) => {
       if (cursorState === state && cursorLabel === label) return
       cursorState = state
@@ -171,18 +187,36 @@ export default function CustomCursor({ tiltRef, configRef }: CursorProps) {
 
     const spawnScrollRing = () => {
       const cfg = configRef?.current ?? DEFAULT_CURSOR_CONFIG
+      const isPill = cursorState === 'card' || cursorState === 'card-close' || cursorState === 'case-close' || cursorState === 'link'
+      // Pill rings start at the pill's minor axis and grow to ≈ the major axis,
+      // sweeping across the button. Default state uses the configured narrow size.
+      const startSize = isPill
+        ? Math.max(12, Math.min(Math.round(curW), Math.round(curH)))
+        : cfg.scrollNarrowW
+      const endSize = isPill
+        ? Math.max(startSize * 1.2, Math.max(Math.round(curW), Math.round(curH)))
+        : startSize * cfg.scrollRingScale
+
       const r = document.createElement('div')
       r.className = styles.scrollRing
-      const sz = cfg.scrollNarrowW
-      // Square ring — cursor body overflow:hidden clips it into the right axis naturally
-      r.style.width  = `${sz}px`
-      r.style.height = `${sz}px`
-      r.style.left = '50%'
-      r.style.top  = '50%'
-      r.style.animationDuration = `${cfg.scrollRingDuration}s`
-      r.style.setProperty('--ring-scale', String(cfg.scrollRingScale))
+      if (isPill) r.classList.add(styles.scrollRingInverted)
+      r.style.width  = `${startSize}px`
+      r.style.height = `${startSize}px`
+      r.style.left   = '50%'
+      r.style.top    = '50%'
       body.appendChild(r)
-      r.addEventListener('animationend', () => r.remove(), { once: true })
+
+      // Rings pick up blur as they expand from center toward the edge,
+      // so the stroke softens into the outer boundary.
+      const anim = r.animate(
+        [
+          { width: `${startSize}px`, height: `${startSize}px`, opacity: 0.6,  filter: 'blur(0px)' },
+          { width: `${endSize}px`,   height: `${endSize}px`,   opacity: 0.45, filter: 'blur(1.2px)', offset: 0.65 },
+          { width: `${endSize}px`,   height: `${endSize}px`,   opacity: 0,    filter: 'blur(3px)' },
+        ],
+        { duration: cfg.scrollRingDuration * 1000, easing: 'cubic-bezier(0.1, 0, 0.35, 1)', fill: 'forwards' }
+      )
+      anim.onfinish = () => r.remove()
     }
 
     // ── rAF loop ───────────────────────────────────────────────────────────────
@@ -204,9 +238,7 @@ export default function CustomCursor({ tiltRef, configRef }: CursorProps) {
       prevRX = renderX; prevRY = renderY
 
       // 2. Live scale + shape spring
-      const liveScale = hoveredCursorEl?.dataset.cursorScale
-        ? parseFloat(hoveredCursorEl.dataset.cursorScale)
-        : 1
+      const liveScale = lockedCursorScale
       targW = Math.round(baseW * liveScale)
       targH = Math.round(baseH * liveScale)
       curW += (targW - curW) * cfg.shapeK * dt
@@ -226,6 +258,9 @@ export default function CustomCursor({ tiltRef, configRef }: CursorProps) {
       const m00 = cos*cos*sx + sin*sin*sy,  m01 = cos*sin*sx - sin*cos*sy
       const m10 = sin*cos*sx - cos*sin*sy,  m11 = sin*sin*sx + cos*cos*sy
       const blob = `matrix(${m00.toFixed(4)},${m10.toFixed(4)},${m01.toFixed(4)},${m11.toFixed(4)},0,0)`
+
+      // 3b. Scroll-kick decay (pill+scroll wave impulse)
+      scrollKick = Math.max(0, scrollKick - scrollKick * cfg.scrollKickDecay * dt)
 
       // 4. Wrapper position
       wrapper.style.transform = `translate(${renderX.toFixed(1)}px,${renderY.toFixed(1)}px)`
@@ -255,12 +290,34 @@ export default function CustomCursor({ tiltRef, configRef }: CursorProps) {
         body.style.borderRadius = corners.join('px ') + 'px'
       }
 
-      const onCard = cursorState === 'card' || cursorState === 'card-close' || cursorState === 'link'
-      // Card state: clean static pill — no blob deformation
+      const onCard = cursorState === 'card' || cursorState === 'card-close' || cursorState === 'case-close' || cursorState === 'link'
+      // Card state: clean static pill, with a small scroll-axis elongation
+      // driven by the transient scrollKick (subtle "prolonging" during scroll).
+      // Content gets the inverse matrix so typography stays undistorted while
+      // the pill shell stretches.
       if (onCard) {
-        body.style.transform = 'translate(-50%,-50%)'
+        if (scrollKick > 0.001) {
+          const axCos = scrollAxisX, axSin = scrollAxisY
+          const pillSx = 1 + scrollKick * cfg.pillScrollElong
+          const pillSy = 1 - scrollKick * cfg.pillScrollElong * 0.4
+          const pm00 = axCos*axCos*pillSx + axSin*axSin*pillSy
+          const pm01 = axCos*axSin*pillSx - axSin*axCos*pillSy
+          const pm10 = axSin*axCos*pillSx - axCos*axSin*pillSy
+          const pm11 = axSin*axSin*pillSx + axCos*axCos*pillSy
+          body.style.transform = `translate(-50%,-50%) matrix(${pm00.toFixed(4)},${pm10.toFixed(4)},${pm01.toFixed(4)},${pm11.toFixed(4)},0,0)`
+          const invSx = 1 / pillSx, invSy = 1 / pillSy
+          const im00 = axCos*axCos*invSx + axSin*axSin*invSy
+          const im01 = axCos*axSin*invSx - axSin*axCos*invSy
+          const im10 = axSin*axCos*invSx - axCos*axSin*invSy
+          const im11 = axSin*axSin*invSx + axCos*axCos*invSy
+          content.style.transform = `matrix(${im00.toFixed(4)},${im10.toFixed(4)},${im01.toFixed(4)},${im11.toFixed(4)},0,0)`
+        } else {
+          body.style.transform = 'translate(-50%,-50%)'
+          content.style.transform = ''
+        }
       } else {
         body.style.transform = `translate(-50%,-50%) ${blob}`
+        content.style.transform = ''
       }
 
       // 6. Invert spring + pill background for readability
@@ -288,7 +345,6 @@ export default function CustomCursor({ tiltRef, configRef }: CursorProps) {
         cld.setAttribute('scale', (curBDScale + blobElong * curBDScale * 3).toFixed(1))
       }
 
-
       rafId = requestAnimationFrame(frame)
     }
 
@@ -301,7 +357,12 @@ export default function CustomCursor({ tiltRef, configRef }: CursorProps) {
 
       // Cursor state from data-cursor hierarchy
       const cursorEl = (e.target as HTMLElement | null)?.closest('[data-cursor]') as HTMLElement | null
-      hoveredCursorEl = cursorEl
+      if (cursorEl !== hoveredCursorEl) {
+        hoveredCursorEl = cursorEl
+        lockedCursorScale = cursorEl?.dataset.cursorScale
+          ? parseFloat(cursorEl.dataset.cursorScale)
+          : 1
+      }
       if (cursorEl) {
         const state = cursorEl.dataset.cursor as CursorState
         const label = cursorEl.dataset.cursorLabel
@@ -332,6 +393,8 @@ export default function CustomCursor({ tiltRef, configRef }: CursorProps) {
       const isHorizontal = forceH || adx > ady
 
       const cfg = configRef?.current ?? DEFAULT_CURSOR_CONFIG
+      const isPillLive = cursorState === 'card' || cursorState === 'card-close' || cursorState === 'case-close' || cursorState === 'link'
+
       const minInterval = Math.max(45, cfg.scrollIntervalBase - delta * 0.9)
       const nowMs = performance.now()
       if (nowMs - lastRingTime > minInterval) {
@@ -339,14 +402,27 @@ export default function CustomCursor({ tiltRef, configRef }: CursorProps) {
         spawnScrollRing()
       }
 
-      if (scrollTimer) clearTimeout(scrollTimer)
-      if (cursorState !== 'card' && cursorState !== 'card-close') {
-        cursorState = 'default'
-        applyState(isHorizontal
-          ? (e.deltaX > 0 ? 'scroll-right' : 'scroll-left')
-          : (e.deltaY > 0 ? 'scroll-down'  : 'scroll-up'))
-        scrollTimer = setTimeout(() => applyState('default'), 800)
+      if (isPillLive) {
+        // Pill+scroll: keep the pill visible, bump the elongation impulse along
+        // the scroll axis. Rings are spawned above, sized to the pill by spawnScrollRing.
+        const cap = 60
+        scrollKick = Math.min(1.2, scrollKick + Math.min(delta, cap) * cfg.scrollKickAmp / 1000)
+        if (isHorizontal) {
+          scrollAxisX = e.deltaX > 0 ? 1 : -1
+          scrollAxisY = 0
+        } else {
+          scrollAxisX = 0
+          scrollAxisY = e.deltaY > 0 ? 1 : -1
+        }
+        return
       }
+
+      if (scrollTimer) clearTimeout(scrollTimer)
+      cursorState = 'default'
+      applyState(isHorizontal
+        ? (e.deltaX > 0 ? 'scroll-right' : 'scroll-left')
+        : (e.deltaY > 0 ? 'scroll-down'  : 'scroll-up'))
+      scrollTimer = setTimeout(() => applyState('default'), 800)
     }
 
     // Relay from iframes (case study panel) — translate iframe-local coords to parent viewport

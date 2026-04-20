@@ -64,24 +64,25 @@
   font-weight: 400;
   letter-spacing: 0.02em;
   white-space: nowrap;
+  will-change: filter;
 }
 
 .contentInverted {
   color: var(--white);
 }
 
-/* ── Scroll rings: spawned inside cursor body, clipped by overflow:hidden ── */
+/* ── Scroll rings: spawned inside cursor body, clipped by overflow:hidden ──
+   Animation is driven from JS (Web Animations API) so width/height grow instead
+   of transform:scale — the 1px border stays crisp throughout the expansion. */
 .scrollRing {
   position: absolute;
   border: 1px solid var(--gray-500);
   border-radius: 50%;
   pointer-events: none;
-  animation: scrollRingExpand 0.65s cubic-bezier(0.1, 0, 0.35, 1) forwards;
+  transform: translate(-50%, -50%);
 }
 
-@keyframes scrollRingExpand {
-  from { transform: translate(-50%, -50%) scale(1);                       opacity: 0.6;  }
-  65%  {                                                                   opacity: 0.45; }
-  to   { transform: translate(-50%, -50%) scale(var(--ring-scale, 3.2));  opacity: 0;    }
+.scrollRingInverted {
+  border-color: var(--white);
 }
 
