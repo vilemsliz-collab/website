@@ -101,6 +101,32 @@ export default function Carousel() {
   // Apply glass values on mount so inline styles match config from the start
   useEffect(() => { applyGlass() }, [applyGlass])
 
+  // Lock document scroll + touch while the carousel is mounted; restore on
+  // unmount so the case study route can scroll natively on mobile.
+  useEffect(() => {
+    const html = document.documentElement
+    const body = document.body
+    const prev = {
+      htmlOverflow: html.style.overflow,
+      htmlTouch:    html.style.touchAction,
+      bodyOverflow: body.style.overflow,
+      bodyTouch:    body.style.touchAction,
+      bodySelect:   body.style.userSelect,
+    }
+    html.style.overflow   = 'hidden'
+    html.style.touchAction = 'none'
+    body.style.overflow   = 'hidden'
+    body.style.touchAction = 'none'
+    body.style.userSelect = 'none'
+    return () => {
+      html.style.overflow    = prev.htmlOverflow
+      html.style.touchAction = prev.htmlTouch
+      body.style.overflow    = prev.bodyOverflow
+      body.style.touchAction = prev.bodyTouch
+      body.style.userSelect  = prev.bodySelect
+    }
+  }, [])
+
   // ── Scroll hint idle timer ──
   const scrollHintTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const [scrollHintVisible, setScrollHintVisible] = useState(false)
