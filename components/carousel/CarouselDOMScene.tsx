@@ -192,14 +192,23 @@ export default function CarouselDOMScene({
       const prevPos = lastPosY.current
       const dPos = prevPos === null ? 0 : (posY.current - prevPos)
       lastPosY.current = posY.current
-      // Inertia: pill trails the swipe like a ball on a moving tray.
-      phys.vy += dPos * 18 * dt
+      // The carousel input is 1-D (horizontal swipe → scalar dPos). To produce
+      // multi-directional motion we project each impulse onto a slowly-rotating
+      // angle — consecutive swipes hit at different angles, and wall bounces
+      // then mix the two axes into genuine 2-D chaos.
+      const ang = now * 0.0008
+      phys.vx += dPos * 22 * Math.cos(ang) * dt
+      phys.vy += dPos * 22 * Math.sin(ang) * dt
+      // Light centering spring so the pill drifts back to the middle on idle,
+      // instead of sticking against whatever wall it last hit.
+      phys.vx += -phys.x * 0.004 * dt
+      phys.vy += -phys.y * 0.004 * dt
       // Ambient friction so the pill eventually settles
-      phys.vx *= Math.pow(0.93, dt)
-      phys.vy *= Math.pow(0.93, dt)
+      phys.vx *= Math.pow(0.94, dt)
+      phys.vy *= Math.pow(0.94, dt)
       phys.x  += phys.vx * dt
       phys.y  += phys.vy * dt
-      const REST = 0.55
+      const REST = 0.62
       if (phys.x >  maxX) { phys.x =  maxX; phys.vx = -Math.abs(phys.vx) * REST }
       if (phys.x < -maxX) { phys.x = -maxX; phys.vx =  Math.abs(phys.vx) * REST }
       if (phys.y >  maxY) { phys.y =  maxY; phys.vy = -Math.abs(phys.vy) * REST }
