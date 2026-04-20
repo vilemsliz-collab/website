@@ -18,6 +18,7 @@ const N = CARDS.length
 
 export interface CarouselDOMSceneProps {
   posY:             MutableRefObject<number>
+  velY:             MutableRefObject<number>
   cfg:              MutableRefObject<CarouselCFG>
   rollBase:         MutableRefObject<number[]>
   tiltRx:           MutableRefObject<number>
@@ -65,7 +66,7 @@ function applyShine(
 }
 
 export default function CarouselDOMScene({
-  posY, cfg, rollBase, tiltRx, tiltRy, activeIdx,
+  posY, velY, cfg, rollBase, tiltRx, tiltRy, activeIdx,
   ghostCfg, tiltCfg, lightCfg, caseOpen, shakeVel, carouselWidthRef, dimsRef,
   onActiveChange, onCardClick,
 }: CarouselDOMSceneProps) {
@@ -75,6 +76,9 @@ export default function CarouselDOMScene({
   const ghostRefs     = useRef<(HTMLDivElement | null)[][]>(Array.from({ length: N }, () => []))
   const shineRefs     = useRef<(HTMLDivElement | null)[]>(Array(N).fill(null))
   const pillRefs      = useRef<(HTMLDivElement | null)[]>(Array(N).fill(null))
+  // Pill physics: single shared state (only one card is active at a time).
+  // x/y are card-local offsets from center, vx/vy are per-frame-scaled velocities.
+  const pillPhys      = useRef({ x: 0, y: 0, vx: 0, vy: 0 })
   const rafRef        = useRef<number | null>(null)
   const labelRef      = useRef('about')
   const hoverTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -171,6 +175,29 @@ export default function CarouselDOMScene({
       const tiltScale  = Math.min(1, P / 590)
       const gc         = ghostCfg.current
 
+      // ── Pill physics (mobile, active card) ─────────────────────────────────
+      // Carousel vertical velocity injects inertia into the pill. The pill has
+      // its own velocity + friction and reflects off the card's inner edges.
+      // Bounds use the actual card size; pill is 132×72 per CSS.
+      const PILL_W = 132
+      const PILL_H = 72
+      const maxX = Math.max(0, (cardW - PILL_W) / 2 - 4)  // 4px edge margin
+      const maxY = Math.max(0, (cardH - PILL_H) / 2 - 4)
+      const phys = pillPhys.current
+      // Inertia: carousel scrolling down (velY<0) nudges the pill up (phys.vy negative).
+      // Sign chosen so the pill trails the swipe like a ball on a moving tray.
+      phys.vy += velY.current * 0.035 * dt
+      // Ambient friction so the pill eventually settles
+      phys.vx *= Math.pow(0.93, dt)
+      phys.vy *= Math.pow(0.93, dt)
+      phys.x  += phys.vx * dt
+      phys.y  += phys.vy * dt
+      const REST = 0.55
+      if (phys.x >  maxX) { phys.x =  maxX; phys.vx = -Math.abs(phys.vx) * REST }
+      if (phys.x < -maxX) { phys.x = -maxX; phys.vx =  Math.abs(phys.vx) * REST }
+      if (phys.y >  maxY) { phys.y =  maxY; phys.vy = -Math.abs(phys.vy) * REST }
+      if (phys.y < -maxY) { phys.y = -maxY; phys.vy =  Math.abs(phys.vy) * REST }
+
       transforms.forEach((t, i) => {
         const group = groupRefs.current[i]
         const mesh  = meshRefs.current[i]
@@ -187,9 +214,16 @@ export default function CarouselDOMScene({
         group.style.zIndex     = String(t.zIndex)
         group.dataset.active   = t.isActive ? 'true' : 'false'
 
-        // Mobile pill: only the active card shows it (fades via CSS transition)
+        // Mobile pill: only the active card shows it (fades via CSS transition).
+        // Transform is written per frame from pillPhys so the pill glides as the
+        // carousel scrolls and bounces inside card-local bounds.
         const pill = pillRefs.current[i]
-        if (pill) pill.style.opacity = t.isActive ? '1' : '0'
+        if (pill) {
+          pill.style.opacity = t.isActive ? '1' : '0'
+          if (t.isActive) {
+            pill.style.transform = `translate(-50%,-50%) translate(${phys.x.toFixed(1)}px,${phys.y.toFixed(1)}px)`
+          }
+        }
 
         // ── Tilt + shake + opacity (on mesh, NOT group) ──
         // perspective() in the transform gives per-card tilt perspective without
