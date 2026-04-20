@@ -1,7 +1,8 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { IBM_Plex_Mono } from 'next/font/google'
 import '@/styles/globals.css'
 import LenisProvider from '@/components/LenisProvider'
+import CursorLiquidFilter from '@/components/cursor/CursorLiquidFilter'
 import { Agentation } from 'agentation'
 
 const ibmPlexMono = IBM_Plex_Mono({
@@ -15,6 +16,13 @@ const ibmPlexMono = IBM_Plex_Mono({
 export const metadata: Metadata = {
   title: 'Portfolio — Lab',
   description: 'Design portfolio',
+}
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  viewportFit: 'cover',
+  themeColor: '#ffffff',
 }
 
 export default function RootLayout({
@@ -33,6 +41,7 @@ export default function RootLayout({
         />
       </head>
       <body>
+        <CursorLiquidFilter />
         <LenisProvider>{children}</LenisProvider>
         {process.env.NODE_ENV === 'development' && <Agentation />}
       </body>

@@ -156,7 +156,11 @@
   border-radius: inherit;
 }
 
-/* ── Mobile "open" pill (phase 1: static, mirrors desktop cursor inverted pill) ── */
+/* ── Mobile "open" pill (matches desktop cursor card-state pill exactly) ──
+   Dimensions come from getStateTarget('card') in CustomCursor.tsx: h=72,
+   width driven by label length. "open" = 4 chars → ~132px. Same font,
+   border, backdrop-filter as the inverted desktop pill. JS toggles opacity
+   per frame so only the active card shows it. */
 .mobileOpenBtn {
   position: absolute;
   top: 50%;
@@ -164,22 +168,25 @@
   transform: translate(-50%, -50%);
   z-index: 5;
   pointer-events: none;
-  height: 44px;
-  padding: 0 22px;
+  overflow: hidden;
+  height: 72px;
+  padding: 0 28px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid rgba(255, 255, 255, 0.9);
-  border-radius: 22px;
-  background: rgba(0, 0, 0, 0.3);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid #ffffff;
+  border-radius: 36px;
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: url('#cursor-liquid');
+  -webkit-backdrop-filter: url('#cursor-liquid');
   color: #ffffff;
   font-family: var(--font-brand);
-  font-size: 16px;
-  letter-spacing: 0.02em;
+  font-size: 32px;
   line-height: 1;
+  letter-spacing: 0.02em;
   user-select: none;
+  opacity: 0;
+  transition: opacity 0.18s ease;
 }
 
 /* ── Top-positioned headline for project cards ── */

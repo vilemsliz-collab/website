@@ -74,6 +74,7 @@ export default function CarouselDOMScene({
   const meshRefs      = useRef<(HTMLDivElement | null)[]>(Array(N).fill(null))
   const ghostRefs     = useRef<(HTMLDivElement | null)[][]>(Array.from({ length: N }, () => []))
   const shineRefs     = useRef<(HTMLDivElement | null)[]>(Array(N).fill(null))
+  const pillRefs      = useRef<(HTMLDivElement | null)[]>(Array(N).fill(null))
   const rafRef        = useRef<number | null>(null)
   const labelRef      = useRef('about')
   const hoverTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -185,6 +186,10 @@ export default function CarouselDOMScene({
         ].join(' ')
         group.style.zIndex     = String(t.zIndex)
         group.dataset.active   = t.isActive ? 'true' : 'false'
+
+        // Mobile pill: only the active card shows it (fades via CSS transition)
+        const pill = pillRefs.current[i]
+        if (pill) pill.style.opacity = t.isActive ? '1' : '0'
 
         // ── Tilt + shake + opacity (on mesh, NOT group) ──
         // perspective() in the transform gives per-card tilt perspective without
@@ -375,7 +380,10 @@ export default function CarouselDOMScene({
             />
 
             {showMobileBtn && (
-              <div className={styles.mobileOpenBtn}>open</div>
+              <div
+                ref={el => { pillRefs.current[i] = el }}
+                className={styles.mobileOpenBtn}
+              >open</div>
             )}
           </div>
         </div>

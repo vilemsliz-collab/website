@@ -93,6 +93,10 @@ export default function CustomCursor({ tiltRef, configRef }: CursorProps) {
   const contentRef  = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
+    // No custom cursor on touch devices — they already have no pointer,
+    // and the mobile carousel renders its own static pill per card.
+    if (typeof navigator !== 'undefined' && navigator.maxTouchPoints > 0) return
+
     const wrapper  = wrapperRef.current
     const body     = bodyRef.current
     const backdrop = backdropRef.current
@@ -102,24 +106,10 @@ export default function CustomCursor({ tiltRef, configRef }: CursorProps) {
 
     document.body.style.cursor = 'none'
 
-    // ── SVG backdrop-filter: liquid displacement ───────────────────────────────
-    const svgNS = 'http://www.w3.org/2000/svg'
-    const svgEl = document.createElementNS(svgNS, 'svg')
-    svgEl.setAttribute('style', 'position:absolute;width:0;height:0;overflow:hidden')
-    svgEl.setAttribute('aria-hidden', 'true')
-    svgEl.innerHTML = `<defs>
-      <filter id="cursor-liquid" color-interpolation-filters="sRGB"
-              x="-30%" y="-30%" width="160%" height="160%">
-        <feTurbulence id="clt" type="turbulence"
-                      baseFrequency="0.018 0.024" numOctaves="2"
-                      seed="0" result="noise" stitchTiles="stitch"/>
-        <feDisplacementMap id="cld" in="SourceGraphic" in2="noise"
-                           scale="6" xChannelSelector="R" yChannelSelector="G"/>
-      </filter>
-    </defs>`
-    document.body.appendChild(svgEl)
-    const clt = svgEl.querySelector('#clt') as SVGFETurbulenceElement     | null
-    const cld = svgEl.querySelector('#cld') as SVGFEDisplacementMapElement | null
+    // The `#cursor-liquid` filter is owned by <CursorLiquidFilter /> in the root
+    // layout so it stays available on pages that don't render this cursor (mobile).
+    const clt = document.getElementById('clt') as unknown as SVGFETurbulenceElement     | null
+    const cld = document.getElementById('cld') as unknown as SVGFEDisplacementMapElement | null
     backdrop.style.backdropFilter         = "url('#cursor-liquid')"
     ;(backdrop.style as CSSStyleDeclaration & { webkitBackdropFilter: string }).webkitBackdropFilter = "url('#cursor-liquid')"
 
@@ -457,7 +447,6 @@ export default function CustomCursor({ tiltRef, configRef }: CursorProps) {
       window.removeEventListener('wheel', onWheel)
       window.removeEventListener('message', onIframeCursorMove)
       if (scrollTimer) clearTimeout(scrollTimer)
-      svgEl.remove()
       document.body.style.cursor = ''
     }
   }, [tiltRef])
