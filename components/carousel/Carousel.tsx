@@ -523,7 +523,6 @@ export default function Carousel() {
         <ScrollHint visible={scrollHintVisible} />
         <CarouselDOMScene
           posY={posY}
-          velY={velY}
           cfg={cfg}
           rollBase={rollBase}
           tiltRx={tiltRx}

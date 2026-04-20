@@ -18,7 +18,6 @@ const N = CARDS.length
 
 export interface CarouselDOMSceneProps {
   posY:             MutableRefObject<number>
-  velY:             MutableRefObject<number>
   cfg:              MutableRefObject<CarouselCFG>
   rollBase:         MutableRefObject<number[]>
   tiltRx:           MutableRefObject<number>
@@ -66,7 +65,7 @@ function applyShine(
 }
 
 export default function CarouselDOMScene({
-  posY, velY, cfg, rollBase, tiltRx, tiltRy, activeIdx,
+  posY, cfg, rollBase, tiltRx, tiltRy, activeIdx,
   ghostCfg, tiltCfg, lightCfg, caseOpen, shakeVel, carouselWidthRef, dimsRef,
   onActiveChange, onCardClick,
 }: CarouselDOMSceneProps) {
@@ -79,6 +78,10 @@ export default function CarouselDOMScene({
   // Pill physics: single shared state (only one card is active at a time).
   // x/y are card-local offsets from center, vx/vy are per-frame-scaled velocities.
   const pillPhys      = useRef({ x: 0, y: 0, vx: 0, vy: 0 })
+  // Tracks last-frame posY so we can derive carousel velocity from its delta.
+  // Mobile path doesn't populate velY during touchmove (swipe-end model),
+  // so we can't rely on velY.current for pill inertia.
+  const lastPosY      = useRef<number | null>(null)
   const rafRef        = useRef<number | null>(null)
   const labelRef      = useRef('about')
   const hoverTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -184,9 +187,13 @@ export default function CarouselDOMScene({
       const maxX = Math.max(0, (cardW - PILL_W) / 2 - 4)  // 4px edge margin
       const maxY = Math.max(0, (cardH - PILL_H) / 2 - 4)
       const phys = pillPhys.current
-      // Inertia: carousel scrolling down (velY<0) nudges the pill up (phys.vy negative).
-      // Sign chosen so the pill trails the swipe like a ball on a moving tray.
-      phys.vy += velY.current * 0.035 * dt
+      // Derive carousel velocity from posY delta so mobile (swipe-end model)
+      // and desktop (continuous drag) both feed the pill the same way.
+      const prevPos = lastPosY.current
+      const dPos = prevPos === null ? 0 : (posY.current - prevPos)
+      lastPosY.current = posY.current
+      // Inertia: pill trails the swipe like a ball on a moving tray.
+      phys.vy += dPos * 18 * dt
       // Ambient friction so the pill eventually settles
       phys.vx *= Math.pow(0.93, dt)
       phys.vy *= Math.pow(0.93, dt)
