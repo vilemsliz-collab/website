@@ -10,8 +10,8 @@
   position: absolute;
   left: 50%;
   top: 50%;
-  width: min(92vw, 40vh);
-  aspect-ratio: 364 / 555;
+  width: var(--card-width);
+  height: var(--card-height);
   /* No transform-style: preserve-3d — children use normal CSS stacking so ghost
      clones (earlier in DOM) always stay behind cardMesh (later in DOM). Tilt
      perspective is applied per-element via perspective() in the transform string. */

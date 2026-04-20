@@ -10,6 +10,7 @@ import {
   type LightConfig,
 } from '@/lib/carouselConfig'
 import { computeCardTransforms, perspAngle } from '@/lib/carouselPhysics'
+import { computeStageWidth, type CardDimensions } from '@/lib/cardDimensions'
 import styles from './CarouselDOMScene.module.css'
 import OrbBackground from './OrbBackground'
 
@@ -28,6 +29,7 @@ export interface CarouselDOMSceneProps {
   caseOpen:         MutableRefObject<boolean>
   shakeVel:         MutableRefObject<number>
   carouselWidthRef: MutableRefObject<number>
+  dimsRef:          MutableRefObject<CardDimensions>
   onActiveChange:   (idx: number) => void
   onCardClick:      (i: number) => void
 }
@@ -64,7 +66,7 @@ function applyShine(
 
 export default function CarouselDOMScene({
   posY, cfg, rollBase, tiltRx, tiltRy, activeIdx,
-  ghostCfg, tiltCfg, lightCfg, caseOpen, shakeVel, carouselWidthRef,
+  ghostCfg, tiltCfg, lightCfg, caseOpen, shakeVel, carouselWidthRef, dimsRef,
   onActiveChange, onCardClick,
 }: CarouselDOMSceneProps) {
   const stageRef      = useRef<HTMLDivElement>(null)
@@ -119,7 +121,7 @@ export default function CarouselDOMScene({
 
   // ── rAF loop: replaces R3F useFrame ──────────────────────────────────────────
   useEffect(() => {
-    let wPos = window.innerWidth
+    let wPos = dimsRef.current.viewportW
     let wVel = 0
     let shakePos = 0
     let lastFrameTime = 0
@@ -132,11 +134,13 @@ export default function CarouselDOMScene({
       if (!stage) { rafRef.current = requestAnimationFrame(frame); return }
 
       const P = cfg.current.PERSPECTIVE
-      const W = window.innerWidth
+      const d = dimsRef.current
+      const W = d.viewportW
 
-      // 1. Width spring + camera offset (mirrors CarouselScene.Physics)
-      const mobileCase = caseOpen.current && W < 768
-      const targetW    = mobileCase ? W : (caseOpen.current ? W * 0.30 : W)
+      // 1. Width spring + camera offset — mobileCase keeps carousel full-width
+      // (no split panel on mobile post-refactor).
+      const mobileCase = caseOpen.current && d.isMobile
+      const targetW    = computeStageWidth(d, caseOpen.current)
       wVel  += (targetW - wPos) * 0.02 * dt
       wVel  *= Math.pow(0.85, dt)
       wPos  += wVel * dt
@@ -153,9 +157,9 @@ export default function CarouselDOMScene({
       shakeVel.current *= Math.pow(0.80, dt)
       shakePos         += shakeVel.current * dt
 
-      // 4. Card dimensions (match CSS min(92vw,364px) × (555/364))
-      const cardW = Math.min(W * 0.92, window.innerHeight * 0.40)
-      const cardH = cardW * (555 / 364)
+      // 4. Card dimensions — single source of truth (CSS + JS read the same refs)
+      const cardW = d.cardW
+      const cardH = d.cardH
 
       const transforms = computeCardTransforms(posY.current, N, cfg.current, wPos, rollBase.current)
       const tiltScale  = Math.min(1, P / 590)

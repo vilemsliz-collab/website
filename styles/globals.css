@@ -2,7 +2,7 @@
 
 html, body {
   width: 100%; min-height: 100%;
-  background: radial-gradient(ellipse 82% 50% at 50% 50%, #ffffff 60%, #eff0f5 88%, #e5e7f0 100%) fixed;
+  background: radial-gradient(ellipse 82% 50% at 50% 50%, #ffffff 60%, #e3e4ec 88%, #d6d8e6 100%) fixed;
   font-family: var(--font-brand);
   font-variation-settings: 'wght' 400, 'GRAD' var(--fvs-grad), 'ROND' var(--fvs-rond), 'opsz' var(--fvs-opsz);
   -webkit-font-smoothing: antialiased;
@@ -152,8 +152,12 @@ html, body {
   --inline-lg: var(--space-6);  /* 24px */
 
   /* ── Card layout ── */
+  /* --card-width / --card-height / --stage-width are written by
+     hooks/useCardDimensions.ts on mount + resize. Values below are SSR
+     fallbacks so the first paint has sane sizes before JS takes over. */
   --card-width:       min(92vw, 40vh);
-  --card-height:      555px;
+  --card-height:      calc(var(--card-width) * 555 / 364);
+  --stage-width:      100vw;
   --card-aspect-w:    364;
   --card-aspect-h:    555;
   --card-padding:     var(--inset-lg);   /* 24px */
