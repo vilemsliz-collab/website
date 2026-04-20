@@ -7,7 +7,8 @@
 /* ── Site nav ── */
 .siteNav {
   position: fixed;
-  top: 20px; left: 24px;
+  top: calc(20px + env(safe-area-inset-top));
+  left: calc(24px + env(safe-area-inset-left));
   display: flex; gap: 20px;
   font-family: var(--font-mono, 'IBM Plex Mono', monospace);
   font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;

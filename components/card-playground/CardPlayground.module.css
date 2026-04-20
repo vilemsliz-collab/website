@@ -193,7 +193,8 @@
 /* ── Ctrl toggle ── */
 .ctrlToggle {
   position: fixed;
-  bottom: 62px; right: 16px;
+  bottom: calc(62px + env(safe-area-inset-bottom));
+  right: calc(16px + env(safe-area-inset-right));
   min-width: 56px; height: 36px;
   padding: 0 12px;
   background: #0a0a0c;
@@ -226,7 +227,7 @@
 
 .ctrlPanelInner {
   flex: 1; overflow-y: auto;
-  padding: 52px 16px 16px;
+  padding: calc(52px + env(safe-area-inset-top)) 16px calc(16px + env(safe-area-inset-bottom));
   scrollbar-width: thin; scrollbar-color: #333 transparent;
 }
 
@@ -345,7 +346,9 @@
 
 /* ── Site nav ── */
 .siteNav {
-  position: fixed; top: 20px; left: 20px;
+  position: fixed;
+  top: calc(20px + env(safe-area-inset-top));
+  left: calc(20px + env(safe-area-inset-left));
   display: flex; gap: 20px;
   font-family: var(--font-mono, monospace);
   font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;

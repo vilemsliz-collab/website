@@ -1,7 +1,8 @@
 /* ── Ctrl toggle ── */
 .ctrlToggle {
   position: fixed;
-  bottom: 62px; right: 16px;
+  bottom: calc(62px + env(safe-area-inset-bottom));
+  right: calc(16px + env(safe-area-inset-right));
   min-width: 56px; height: 36px;
   padding: 0 12px;
   background: #0a0a0c;
@@ -37,7 +38,7 @@
 
 .ctrlPanelInner {
   flex: 1; overflow-y: auto;
-  padding: 52px 16px 16px;
+  padding: calc(52px + env(safe-area-inset-top)) 16px calc(16px + env(safe-area-inset-bottom));
   scrollbar-width: thin; scrollbar-color: #333 transparent;
 }
 
