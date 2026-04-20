@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useEffect, type MutableRefObject } from 'react'
+import { useRef, useEffect, useState, type MutableRefObject } from 'react'
 import Image from 'next/image'
 import {
   CARDS,
@@ -80,6 +80,11 @@ export default function CarouselDOMScene({
   const seqRef        = useRef<'idle' | 'running'>('idle')
   const seqTimers     = useRef<ReturnType<typeof setTimeout>[]>([])
   const mousePos      = useRef({ x: 0, y: 0 })
+  const [showMobileBtn, setShowMobileBtn] = useState(false)
+
+  useEffect(() => {
+    if (dimsRef.current.isMobile) setShowMobileBtn(true)
+  }, [dimsRef])
 
   function clearSeq() {
     seqTimers.current.forEach(clearTimeout)
@@ -368,6 +373,10 @@ export default function CarouselDOMScene({
               ref={el => { shineRefs.current[i] = el }}
               className={styles.cardShine}
             />
+
+            {showMobileBtn && (
+              <div className={styles.mobileOpenBtn}>open</div>
+            )}
           </div>
         </div>
       ))}

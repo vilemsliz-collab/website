@@ -156,6 +156,32 @@
   border-radius: inherit;
 }
 
+/* ── Mobile "open" pill (phase 1: static, mirrors desktop cursor inverted pill) ── */
+.mobileOpenBtn {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 5;
+  pointer-events: none;
+  height: 44px;
+  padding: 0 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  border-radius: 22px;
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: #ffffff;
+  font-family: var(--font-brand);
+  font-size: 16px;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  user-select: none;
+}
+
 /* ── Top-positioned headline for project cards ── */
 .cardTopText {
   position: absolute;
