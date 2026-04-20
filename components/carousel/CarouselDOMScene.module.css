@@ -161,12 +161,9 @@
    in CustomCursor.tsx: h=72, "open" ≈ 132px wide). JS toggles opacity per
    frame so only the active card shows it.
 
-   Shader: iOS Safari does NOT support `backdrop-filter: url(#id)` — it only
-   accepts blur/brightness/etc. We work around this by splitting the pill in
-   two: a filtered **shell** (border + bg) rendered with `filter: url()` that
-   ripples on iOS Safari too, and an unfiltered **label** on top so the text
-   stays crisp. Chromium-class browsers additionally apply `backdrop-filter`
-   to the shell for the real behind-the-pill warp. */
+   Two-layer structure (shell + label) left in place so the label stays crisp
+   regardless of any shell effect. Mobile uses a plain blur — the liquid
+   `#cursor-liquid` shader stays desktop-only. */
 .mobileOpenBtn {
   position: absolute;
   top: 50%;
@@ -189,9 +186,8 @@
   border: 1px solid #ffffff;
   border-radius: 36px;
   background: rgba(0, 0, 0, 0.35);
-  backdrop-filter: url('#cursor-liquid');
-  -webkit-backdrop-filter: url('#cursor-liquid');
-  filter: url('#cursor-liquid');
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   pointer-events: none;
 }
 
