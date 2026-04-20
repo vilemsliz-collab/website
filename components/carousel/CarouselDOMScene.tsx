@@ -383,7 +383,10 @@ export default function CarouselDOMScene({
               <div
                 ref={el => { pillRefs.current[i] = el }}
                 className={styles.mobileOpenBtn}
-              >open</div>
+              >
+                <span className={styles.mobileOpenBtnShell} aria-hidden />
+                <span className={styles.mobileOpenBtnLabel}>open</span>
+              </div>
             )}
           </div>
         </div>

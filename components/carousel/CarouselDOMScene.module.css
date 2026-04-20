@@ -156,11 +156,17 @@
   border-radius: inherit;
 }
 
-/* ── Mobile "open" pill (matches desktop cursor card-state pill exactly) ──
-   Dimensions come from getStateTarget('card') in CustomCursor.tsx: h=72,
-   width driven by label length. "open" = 4 chars → ~132px. Same font,
-   border, backdrop-filter as the inverted desktop pill. JS toggles opacity
-   per frame so only the active card shows it. */
+/* ── Mobile "open" pill ──────────────────────────────────────────────────────
+   Shape/size mirror the desktop card-state cursor pill (getStateTarget('card')
+   in CustomCursor.tsx: h=72, "open" ≈ 132px wide). JS toggles opacity per
+   frame so only the active card shows it.
+
+   Shader: iOS Safari does NOT support `backdrop-filter: url(#id)` — it only
+   accepts blur/brightness/etc. We work around this by splitting the pill in
+   two: a filtered **shell** (border + bg) rendered with `filter: url()` that
+   ripples on iOS Safari too, and an unfiltered **label** on top so the text
+   stays crisp. Chromium-class browsers additionally apply `backdrop-filter`
+   to the shell for the real behind-the-pill warp. */
 .mobileOpenBtn {
   position: absolute;
   top: 50%;
@@ -168,25 +174,35 @@
   transform: translate(-50%, -50%);
   z-index: 5;
   pointer-events: none;
-  overflow: hidden;
+  width: 132px;
   height: 72px;
-  padding: 0 28px;
   display: flex;
   align-items: center;
   justify-content: center;
+  opacity: 0;
+  transition: opacity 0.18s ease;
+}
+
+.mobileOpenBtnShell {
+  position: absolute;
+  inset: 0;
   border: 1px solid #ffffff;
   border-radius: 36px;
   background: rgba(0, 0, 0, 0.35);
   backdrop-filter: url('#cursor-liquid');
   -webkit-backdrop-filter: url('#cursor-liquid');
+  filter: url('#cursor-liquid');
+  pointer-events: none;
+}
+
+.mobileOpenBtnLabel {
+  position: relative;
   color: #ffffff;
   font-family: var(--font-brand);
   font-size: 32px;
   line-height: 1;
   letter-spacing: 0.02em;
   user-select: none;
-  opacity: 0;
-  transition: opacity 0.18s ease;
 }
 
 /* ── Top-positioned headline for project cards ── */

@@ -1,11 +1,15 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; cursor: none !important; }
 
 html, body {
-  width: 100%; min-height: 100%;
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
   background: radial-gradient(ellipse 82% 50% at 50% 50%, #ffffff 60%, #e3e4ec 88%, #d6d8e6 100%) fixed;
   font-family: var(--font-brand);
   font-variation-settings: 'wght' 400, 'GRAD' var(--fvs-grad), 'ROND' var(--fvs-rond), 'opsz' var(--fvs-opsz);
   -webkit-font-smoothing: antialiased;
+  /* iOS Safari: prevent rubber-band from exposing a blank gap outside the viewport */
+  overscroll-behavior: none;
 }
 
 :root {
