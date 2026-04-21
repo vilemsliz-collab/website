@@ -3,6 +3,10 @@
   position: fixed;
   inset: 0;
   /* perspective updated each frame via JS */
+  /* Background on the fixed stage guarantees coverage behind Safari chrome —
+     position:fixed inset:0 always matches the layout viewport with viewport-fit=cover,
+     bypassing any body height or background-attachment quirks on iOS. */
+  background: radial-gradient(ellipse 82% 50% at 50% 50%, #ffffff 60%, #e3e4ec 88%, #d6d8e6 100%);
 }
 
 /* ── Sphere 3D position layer ── */

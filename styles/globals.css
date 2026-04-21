@@ -1,10 +1,22 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; cursor: none !important; }
 
-html, body {
+html {
+  /* iOS Safari: anchor body percentage heights to the true layout viewport
+     (including behind Safari chrome when viewport-fit=cover is active) */
+  height: -webkit-fill-available;
+  height: 100%;
+}
+
+body {
   width: 100%;
   min-height: 100vh;
+  /* iOS Safari: -webkit-fill-available fills behind status bar + address bar */
+  min-height: -webkit-fill-available;
   min-height: 100dvh;
-  background: radial-gradient(ellipse 82% 50% at 50% 50%, #ffffff 60%, #e3e4ec 88%, #d6d8e6 100%) fixed;
+  /* background-attachment:fixed is broken on iOS Safari — it renders relative
+     to the safe-area viewport, not the layout viewport, causing a crop line
+     behind Safari chrome. Remove "fixed"; scroll is identical on non-scrolling pages. */
+  background: radial-gradient(ellipse 82% 50% at 50% 50%, #ffffff 60%, #e3e4ec 88%, #d6d8e6 100%);
   font-family: var(--font-brand);
   font-variation-settings: 'wght' 400, 'GRAD' var(--fvs-grad), 'ROND' var(--fvs-rond), 'opsz' var(--fvs-opsz);
   -webkit-font-smoothing: antialiased;
