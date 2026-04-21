@@ -82,6 +82,9 @@ export default function CarouselDOMScene({
   // Mobile path doesn't populate velY during touchmove (swipe-end model),
   // so we can't rely on velY.current for pill inertia.
   const lastPosY      = useRef<number | null>(null)
+  const tapTarget     = useRef<{ x: number; y: number } | null>(null)
+  const pillTransition = useRef<'idle' | 'out' | 'in'>('idle')
+  const pillTransTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const rafRef        = useRef<number | null>(null)
   const labelRef      = useRef('about')
   const hoverTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -145,6 +148,41 @@ export default function CarouselDOMScene({
     let wVel = 0
     let shakePos = 0
     let lastFrameTime = 0
+
+    function startPillTransition(oldIdx: number, newIdx: number) {
+      if (pillTransTimer.current) clearTimeout(pillTransTimer.current)
+      pillTransition.current = 'out'
+
+      const oldPill = pillRefs.current[oldIdx]
+      if (oldPill) {
+        oldPill.style.transition = 'opacity 0.15s ease, filter 0.15s ease'
+        oldPill.style.filter     = 'blur(14px)'
+        oldPill.style.opacity    = '0'
+      }
+
+      pillTransTimer.current = setTimeout(() => {
+        pillPhys.current.x  = 0; pillPhys.current.y  = 0
+        pillPhys.current.vx = 1.4; pillPhys.current.vy = 0.6
+        pillTransition.current = 'in'
+
+        const newPill = pillRefs.current[newIdx]
+        if (newPill) {
+          newPill.style.transition = 'none'
+          newPill.style.filter     = 'blur(14px)'
+          newPill.style.opacity    = '0'
+          void newPill.offsetHeight  // force reflow
+          newPill.style.transition = 'opacity 0.25s ease, filter 0.25s ease'
+          newPill.style.filter     = 'blur(0px)'
+          newPill.style.opacity    = '1'
+        }
+
+        pillTransTimer.current = setTimeout(() => {
+          pillTransition.current = 'idle'
+          const np = pillRefs.current[newIdx]
+          if (np) { np.style.transition = ''; np.style.filter = '' }
+        }, 260)
+      }, 160)
+    }
 
     function frame(now: number) {
       const dt = lastFrameTime ? Math.min((now - lastFrameTime) / 16.667, 4) : 1
@@ -213,6 +251,13 @@ export default function CarouselDOMScene({
       // swipe produces equal traversal fraction in both axes (no vertical dominance).
       phys.vx += dPos * 22
       phys.vy += dPos * 22 * (boundsX / Math.max(boundsY, 1))
+      // Tap-to-spring: redirect velocity toward the tapped position
+      if (tapTarget.current) {
+        const { x: tx, y: ty } = tapTarget.current
+        phys.vx = (tx - phys.x) * 0.38
+        phys.vy = (ty - phys.y) * 0.38
+        tapTarget.current = null
+      }
       // Propulsion: tiny continuous force in the direction of travel replaces the hard
       // speed floor. The floor caused stuck-at-wall oscillation (floor restored speed
       // to 0.7 → REST reduced to 0.574 → floor restored again → infinite loop).
@@ -251,12 +296,13 @@ export default function CarouselDOMScene({
         group.style.zIndex     = String(t.zIndex)
         group.dataset.active   = t.isActive ? 'true' : 'false'
 
-        // Mobile pill: only the active card shows it (fades via CSS transition).
-        // Transform is written per frame from pillPhys so the pill glides as the
-        // carousel scrolls and bounces inside card-local bounds.
+        // Mobile pill: opacity controlled by rAF when idle; CSS transitions control
+        // it during card-switch blur-out/in. Transform always updated for active card.
         const pill = pillRefs.current[i]
         if (pill) {
-          pill.style.opacity = t.isActive ? '1' : '0'
+          if (pillTransition.current === 'idle') {
+            pill.style.opacity = t.isActive ? '1' : '0'
+          }
           if (t.isActive) {
             pill.style.transform = `translate(-50%,-50%) translate(${phys.x.toFixed(1)}px,${phys.y.toFixed(1)}px)`
           }
@@ -295,6 +341,7 @@ export default function CarouselDOMScene({
 
         // ── Active tracking ──
         if (t.isActive && i !== activeIdx.current) {
+          startPillTransition(activeIdx.current, i)
           activeIdx.current = i
           onActiveChange(i)
         }
@@ -335,6 +382,7 @@ export default function CarouselDOMScene({
     return () => {
       if (rafRef.current !== null) cancelAnimationFrame(rafRef.current)
       if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current)
+      if (pillTransTimer.current) clearTimeout(pillTransTimer.current)
       document.removeEventListener('mousemove', trackMouse)
       clearSeq()
     }
@@ -348,7 +396,19 @@ export default function CarouselDOMScene({
           ref={el => { groupRefs.current[i] = el }}
           className={styles.cardGroup}
           data-dark
-          onClick={(e) => { e.stopPropagation(); onCardClick(i) }}
+          onClick={(e) => {
+            e.stopPropagation()
+            // Mobile: spring pill toward finger before navigating
+            if (i === activeIdx.current && showMobileBtn && e.clientX !== 0) {
+              const d = dimsRef.current
+              const scale = cfg.current.SCALE_ACTIVE
+              tapTarget.current = {
+                x: (e.clientX - d.viewportW / 2) / scale,
+                y: (e.clientY - d.viewportH / 2) / scale,
+              }
+            }
+            onCardClick(i)
+          }}
           onMouseEnter={card.isAbout ? () => {
             if (seqRef.current === 'running') return
             hoverTimerRef.current = setTimeout(runSequence, 4000)
