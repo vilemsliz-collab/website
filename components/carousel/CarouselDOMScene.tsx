@@ -188,9 +188,10 @@ export default function CarouselDOMScene({
       // ── Pill physics (mobile, active card) ─────────────────────────────────
       const PILL_W = 108   // padding-defined natural width (26px font + 30px L/R × 2)
       const PILL_H = 50    // padding-defined natural height (26px font + 12px T/B × 2)
-      // Card-local bounds: pill edge stops at card edge
-      const cardMaxX = Math.max(0, (cardW - PILL_W) / 2 - 6)
-      const cardMaxY = Math.max(0, (cardH - PILL_H) / 2 - 6)
+      // Card bounds: pill CENTER stops at card edge. Half pill overhangs and is
+      // clipped by cardMesh overflow:hidden — intentional, lets pill peek out.
+      const cardMaxX = Math.max(0, cardW / 2 - 6)
+      const cardMaxY = Math.max(0, cardH / 2 - 6)
       // Viewport-aware bounds: SCALE_ACTIVE=1.25 can make the card wider than the
       // phone screen, letting pill travel off-viewport. Divide by scale to convert
       // viewport half-size to card-local coordinates, then use whichever is tighter.
@@ -201,9 +202,12 @@ export default function CarouselDOMScene({
       const boundsY = Math.min(cardMaxY, vpMaxY)
 
       const phys = pillPhys.current
-      // posY delta — works on both swipe-end (mobile) and drag (desktop) models
+      // posY delta — works on both swipe-end (mobile) and drag (desktop) models.
+      // Clamp to ±0.21 to suppress modular wrap-around spikes: when posY resets
+      // from ~N to ~0 in one step the raw delta is ≈ −N, injecting ~130 px/frame.
       const prevPos = lastPosY.current
-      const dPos = prevPos === null ? 0 : (posY.current - prevPos)
+      const rawDPos = prevPos === null ? 0 : (posY.current - prevPos)
+      const dPos = Math.max(-0.21, Math.min(0.21, rawDPos))
       lastPosY.current = posY.current
       // Aspect-ratio-scaled impulse: vy injection scaled to boundsX/boundsY so each
       // swipe produces equal traversal fraction in both axes (no vertical dominance).
