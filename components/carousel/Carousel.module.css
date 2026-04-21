@@ -63,12 +63,13 @@
 }
 
 
-/* Mobile: floating panel with smaller insets */
+/* Mobile: floating panel with smaller insets; hide desktop-only chrome */
 @media (max-width: 767px) {
   .casePanel {
     top: 12px; bottom: 12px;
     left: 12px; right: 12px;
   }
+  .siteNav { display: none; }
 }
 
 /* ── Case panel cursor blocker ── */

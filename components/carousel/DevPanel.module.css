@@ -19,6 +19,11 @@
 .ctrlToggle:hover       { color: #ddd; border-color: #555; }
 .ctrlToggleOpen         { color: #ddd; border-color: #555; }
 
+@media (max-width: 767px) {
+  .ctrlToggle  { display: none; }
+  .ctrlPanel   { display: none; }
+}
+
 /* ── Ctrl panel ── */
 .ctrlPanel {
   position: fixed;
