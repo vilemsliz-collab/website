@@ -77,3 +77,7 @@
   animation: chevronPulse2 1.8s ease-in-out infinite;
   animation-delay: 0.22s;
 }
+
+@media (max-width: 767px) {
+  .wrapper { display: none; }
+}
