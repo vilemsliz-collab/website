@@ -94,6 +94,13 @@ export default function CarouselDOMScene({
     if (dimsRef.current.isMobile) setShowMobileBtn(true)
   }, [dimsRef])
 
+  useEffect(() => {
+    if (showMobileBtn) {
+      pillPhys.current.vx = 1.8
+      pillPhys.current.vy = 1.2
+    }
+  }, [showMobileBtn])
+
   function clearSeq() {
     seqTimers.current.forEach(clearTimeout)
     seqTimers.current = []
@@ -187,28 +194,30 @@ export default function CarouselDOMScene({
       const maxX = Math.max(0, (cardW - PILL_W) / 2 - 4)  // 4px edge margin
       const maxY = Math.max(0, (cardH - PILL_H) / 2 - 4)
       const phys = pillPhys.current
-      // Derive carousel velocity from posY delta so mobile (swipe-end model)
-      // and desktop (continuous drag) both feed the pill the same way.
+      // posY delta — works on both swipe-end (mobile) and drag (desktop) models.
+      // dPos is already per-frame, so no * dt (would double-count).
       const prevPos = lastPosY.current
       const dPos = prevPos === null ? 0 : (posY.current - prevPos)
       lastPosY.current = posY.current
-      // The carousel input is 1-D (horizontal swipe → scalar dPos). To produce
-      // multi-directional motion we project each impulse onto a slowly-rotating
-      // angle — consecutive swipes hit at different angles, and wall bounces
-      // then mix the two axes into genuine 2-D chaos.
-      const ang = now * 0.0008
-      phys.vx += dPos * 22 * Math.cos(ang) * dt
-      phys.vy += dPos * 22 * Math.sin(ang) * dt
-      // Light centering spring so the pill drifts back to the middle on idle,
-      // instead of sticking against whatever wall it last hit.
-      phys.vx += -phys.x * 0.004 * dt
-      phys.vy += -phys.y * 0.004 * dt
-      // Ambient friction so the pill eventually settles
-      phys.vx *= Math.pow(0.94, dt)
-      phys.vy *= Math.pow(0.94, dt)
+      // Inject into BOTH axes every swipe so input is never 1-D.
+      // x gets the horizontal swipe direction; y gets ¾ of that.
+      phys.vx += dPos * 20
+      phys.vy += dPos * 15
+      // DVD floor: pill always travels — restore minimum speed in current direction.
+      const speed = Math.hypot(phys.vx, phys.vy)
+      if (speed < 0.01) {
+        phys.vx = 1.8; phys.vy = 1.2   // bootstrap if completely stopped
+      } else if (speed < 0.7) {
+        const s = 0.7 / speed
+        phys.vx *= s; phys.vy *= s      // boost to floor, keep direction
+      }
+      // Light friction — pill coasts between swipes
+      phys.vx *= Math.pow(0.985, dt)
+      phys.vy *= Math.pow(0.985, dt)
       phys.x  += phys.vx * dt
       phys.y  += phys.vy * dt
-      const REST = 0.62
+      // Elastic wall bounces — springy feel without center attraction
+      const REST = 0.82
       if (phys.x >  maxX) { phys.x =  maxX; phys.vx = -Math.abs(phys.vx) * REST }
       if (phys.x < -maxX) { phys.x = -maxX; phys.vx =  Math.abs(phys.vx) * REST }
       if (phys.y >  maxY) { phys.y =  maxY; phys.vy = -Math.abs(phys.vy) * REST }
