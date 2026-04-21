@@ -449,17 +449,18 @@ export default function CarouselDOMScene({
               ref={el => { shineRefs.current[i] = el }}
               className={styles.cardShine}
             />
-
-            {showMobileBtn && (
-              <div
-                ref={el => { pillRefs.current[i] = el }}
-                className={styles.mobileOpenBtn}
-              >
-                <span className={styles.mobileOpenBtnShell} aria-hidden />
-                <span className={styles.mobileOpenBtnLabel}>open</span>
-              </div>
-            )}
           </div>
+
+          {/* Pill outside cardMesh so it can overlap card edges (cardGroup has no clip) */}
+          {showMobileBtn && (
+            <div
+              ref={el => { pillRefs.current[i] = el }}
+              className={styles.mobileOpenBtn}
+            >
+              <span className={styles.mobileOpenBtnShell} aria-hidden />
+              <span className={styles.mobileOpenBtnLabel}>open</span>
+            </div>
+          )}
         </div>
       ))}
     </div>
