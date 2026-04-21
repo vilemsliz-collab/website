@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useEffect, useState, type MutableRefObject } from 'react'
+import { useRef, useEffect, type MutableRefObject } from 'react'
 import Image from 'next/image'
 import {
   CARDS,
@@ -74,33 +74,12 @@ export default function CarouselDOMScene({
   const meshRefs      = useRef<(HTMLDivElement | null)[]>(Array(N).fill(null))
   const ghostRefs     = useRef<(HTMLDivElement | null)[][]>(Array.from({ length: N }, () => []))
   const shineRefs     = useRef<(HTMLDivElement | null)[]>(Array(N).fill(null))
-  const pillRefs      = useRef<(HTMLDivElement | null)[]>(Array(N).fill(null))
-  // Pill physics: single shared state (only one card is active at a time).
-  // x/y are card-local offsets from center, vx/vy are per-frame-scaled velocities.
-  const pillPhys      = useRef({ x: 0, y: 0, vx: 0, vy: 0 })
-  // Tracks last-frame posY so we can derive carousel velocity from its delta.
-  // Mobile path doesn't populate velY during touchmove (swipe-end model),
-  // so we can't rely on velY.current for pill inertia.
-  const lastPosY      = useRef<number | null>(null)
-  const tapTarget     = useRef<{ x: number; y: number } | null>(null)
   const rafRef        = useRef<number | null>(null)
   const labelRef      = useRef('about')
   const hoverTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const seqRef        = useRef<'idle' | 'running'>('idle')
   const seqTimers     = useRef<ReturnType<typeof setTimeout>[]>([])
   const mousePos      = useRef({ x: 0, y: 0 })
-  const [showMobileBtn, setShowMobileBtn] = useState(false)
-
-  useEffect(() => {
-    if (dimsRef.current.isMobile) setShowMobileBtn(true)
-  }, [dimsRef])
-
-  useEffect(() => {
-    if (showMobileBtn) {
-      pillPhys.current.vx = 1.4
-      pillPhys.current.vy = 0.6
-    }
-  }, [showMobileBtn])
 
   function clearSeq() {
     seqTimers.current.forEach(clearTimeout)
@@ -187,62 +166,6 @@ export default function CarouselDOMScene({
       const tiltScale  = Math.min(1, P / 590)
       const gc         = ghostCfg.current
 
-      // ── Pill physics (mobile, active card) ─────────────────────────────────
-      const PILL_W = 108   // padding-defined natural width (26px font + 30px L/R × 2)
-      const PILL_H = 50    // padding-defined natural height (26px font + 12px T/B × 2)
-      // Card bounds: pill CENTER stops at card edge. Half pill overhangs and is
-      // clipped by cardMesh overflow:hidden — intentional, lets pill peek out.
-      const cardMaxX = Math.max(0, cardW / 2 - 6)
-      const cardMaxY = Math.max(0, cardH / 2 - 6)
-      // Viewport-aware bounds: SCALE_ACTIVE=1.25 can make the card wider than the
-      // phone screen, letting pill travel off-viewport. Divide by scale to convert
-      // viewport half-size to card-local coordinates, then use whichever is tighter.
-      const activeScale = cfg.current.SCALE_ACTIVE
-      const vpMaxX = Math.max(0, d.viewportW / 2 / activeScale - PILL_W / 2 - 6)
-      const vpMaxY = Math.max(0, d.viewportH / 2 / activeScale - PILL_H / 2 - 6)
-      const boundsX = Math.min(cardMaxX, vpMaxX)
-      const boundsY = Math.min(cardMaxY, vpMaxY)
-
-      const phys = pillPhys.current
-
-      if (tapTarget.current !== null) {
-        // Tap-glide mode: smooth lerp to finger position with no physics interference.
-        // DVD physics are suspended so propulsion/bounces don't fight the glide.
-        const { x: tx, y: ty } = tapTarget.current
-        phys.x += (tx - phys.x) * 0.15
-        phys.y += (ty - phys.y) * 0.15
-        phys.vx = 0
-        phys.vy = 0
-        if (Math.hypot(tx - phys.x, ty - phys.y) < 0.5) {
-          tapTarget.current = null     // settled — resume DVD
-          phys.vx = 1.4; phys.vy = 0.6
-        }
-      } else {
-        // DVD mode: posY impulse + propulsion + friction + wall bounces.
-        // lastPosY only updated here so a tap doesn't spike posY delta on resume.
-        const prevPos = lastPosY.current
-        const rawDPos = prevPos === null ? 0 : (posY.current - prevPos)
-        const dPos = Math.max(-0.21, Math.min(0.21, rawDPos))
-        lastPosY.current = posY.current
-        phys.vx += dPos * 22
-        phys.vy += dPos * 22 * (boundsX / Math.max(boundsY, 1))
-        const speed = Math.hypot(phys.vx, phys.vy)
-        if (speed > 0.01) {
-          const propulse = 0.013
-          phys.vx += (phys.vx / speed) * propulse
-          phys.vy += (phys.vy / speed) * propulse
-        }
-        phys.vx *= Math.pow(0.985, dt)
-        phys.vy *= Math.pow(0.985, dt)
-        phys.x  += phys.vx * dt
-        phys.y  += phys.vy * dt
-        const REST = 0.85
-        if (phys.x >  boundsX) { phys.x =  boundsX; phys.vx = -Math.abs(phys.vx) * REST }
-        if (phys.x < -boundsX) { phys.x = -boundsX; phys.vx =  Math.abs(phys.vx) * REST }
-        if (phys.y >  boundsY) { phys.y =  boundsY; phys.vy = -Math.abs(phys.vy) * REST }
-        if (phys.y < -boundsY) { phys.y = -boundsY; phys.vy =  Math.abs(phys.vy) * REST }
-      }
-
       transforms.forEach((t, i) => {
         const group = groupRefs.current[i]
         const mesh  = meshRefs.current[i]
@@ -258,14 +181,6 @@ export default function CarouselDOMScene({
         ].join(' ')
         group.style.zIndex     = String(t.zIndex)
         group.dataset.active   = t.isActive ? 'true' : 'false'
-
-        const pill = pillRefs.current[i]
-        if (pill) {
-          pill.style.opacity = t.isActive ? '1' : '0'
-          if (t.isActive) {
-            pill.style.transform = `translate(-50%,-50%) translate(${phys.x.toFixed(1)}px,${phys.y.toFixed(1)}px)`
-          }
-        }
 
         // ── Tilt + shake + opacity (on mesh, NOT group) ──
         // perspective() in the transform gives per-card tilt perspective without
@@ -353,19 +268,7 @@ export default function CarouselDOMScene({
           ref={el => { groupRefs.current[i] = el }}
           className={styles.cardGroup}
           data-dark
-          onClick={(e) => {
-            e.stopPropagation()
-            // Mobile: spring pill toward finger before navigating
-            if (i === activeIdx.current && showMobileBtn && e.clientX !== 0) {
-              const d = dimsRef.current
-              const scale = cfg.current.SCALE_ACTIVE
-              tapTarget.current = {
-                x: (e.clientX - d.viewportW / 2) / scale,
-                y: (e.clientY - d.viewportH / 2) / scale,
-              }
-            }
-            onCardClick(i)
-          }}
+          onClick={(e) => { e.stopPropagation(); onCardClick(i) }}
           onMouseEnter={card.isAbout ? () => {
             if (seqRef.current === 'running') return
             hoverTimerRef.current = setTimeout(runSequence, 4000)
@@ -468,16 +371,6 @@ export default function CarouselDOMScene({
             />
           </div>
 
-          {/* Pill outside cardMesh so it can overlap card edges (cardGroup has no clip) */}
-          {showMobileBtn && (
-            <div
-              ref={el => { pillRefs.current[i] = el }}
-              className={styles.mobileOpenBtn}
-            >
-              <span className={styles.mobileOpenBtnShell} aria-hidden />
-              <span className={styles.mobileOpenBtnLabel}>open</span>
-            </div>
-          )}
         </div>
       ))}
     </div>

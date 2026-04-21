@@ -160,50 +160,6 @@
   border-radius: inherit;
 }
 
-/* ── Mobile "open" pill ──────────────────────────────────────────────────────
-   Shape/size mirror the desktop card-state cursor pill (getStateTarget('card')
-   in CustomCursor.tsx: h=72, "open" ≈ 132px wide). JS toggles opacity per
-   frame so only the active card shows it.
-
-   Two-layer structure (shell + label) left in place so the label stays crisp
-   regardless of any shell effect. Mobile uses a plain blur — the liquid
-   `#cursor-liquid` shader stays desktop-only. */
-.mobileOpenBtn {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 5;
-  pointer-events: none;
-  /* padding-defined sizing: T/B = 40% of L/R (12/30 = 40%) */
-  padding: 12px 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  transition: opacity 0.18s ease;
-}
-
-.mobileOpenBtnShell {
-  position: absolute;
-  inset: 0;
-  border: 1px solid #ffffff;
-  border-radius: 999px;
-  background: rgba(0, 0, 0, 0.35);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  pointer-events: none;
-}
-
-.mobileOpenBtnLabel {
-  position: relative;
-  color: #ffffff;
-  font-family: var(--font-brand);
-  font-size: 26px;
-  line-height: 1;
-  letter-spacing: 0.02em;
-  user-select: none;
-}
 
 /* ── Top-positioned headline for project cards ── */
 .cardTopText {
