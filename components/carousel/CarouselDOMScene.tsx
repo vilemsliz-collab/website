@@ -204,45 +204,44 @@ export default function CarouselDOMScene({
       const boundsY = Math.min(cardMaxY, vpMaxY)
 
       const phys = pillPhys.current
-      // posY delta — works on both swipe-end (mobile) and drag (desktop) models.
-      // Clamp to ±0.21 to suppress modular wrap-around spikes: when posY resets
-      // from ~N to ~0 in one step the raw delta is ≈ −N, injecting ~130 px/frame.
-      const prevPos = lastPosY.current
-      const rawDPos = prevPos === null ? 0 : (posY.current - prevPos)
-      const dPos = Math.max(-0.21, Math.min(0.21, rawDPos))
-      lastPosY.current = posY.current
-      // Aspect-ratio-scaled impulse: vy injection scaled to boundsX/boundsY so each
-      // swipe produces equal traversal fraction in both axes (no vertical dominance).
-      phys.vx += dPos * 22
-      phys.vy += dPos * 22 * (boundsX / Math.max(boundsY, 1))
-      // Tap-to-spring: redirect velocity toward the tapped position
-      if (tapTarget.current) {
+
+      if (tapTarget.current !== null) {
+        // Tap-glide mode: smooth lerp to finger position with no physics interference.
+        // DVD physics are suspended so propulsion/bounces don't fight the glide.
         const { x: tx, y: ty } = tapTarget.current
-        phys.vx = (tx - phys.x) * 0.38
-        phys.vy = (ty - phys.y) * 0.38
-        tapTarget.current = null
+        phys.x += (tx - phys.x) * 0.15
+        phys.y += (ty - phys.y) * 0.15
+        phys.vx = 0
+        phys.vy = 0
+        if (Math.hypot(tx - phys.x, ty - phys.y) < 0.5) {
+          tapTarget.current = null     // settled — resume DVD
+          phys.vx = 1.4; phys.vy = 0.6
+        }
+      } else {
+        // DVD mode: posY impulse + propulsion + friction + wall bounces.
+        // lastPosY only updated here so a tap doesn't spike posY delta on resume.
+        const prevPos = lastPosY.current
+        const rawDPos = prevPos === null ? 0 : (posY.current - prevPos)
+        const dPos = Math.max(-0.21, Math.min(0.21, rawDPos))
+        lastPosY.current = posY.current
+        phys.vx += dPos * 22
+        phys.vy += dPos * 22 * (boundsX / Math.max(boundsY, 1))
+        const speed = Math.hypot(phys.vx, phys.vy)
+        if (speed > 0.01) {
+          const propulse = 0.013
+          phys.vx += (phys.vx / speed) * propulse
+          phys.vy += (phys.vy / speed) * propulse
+        }
+        phys.vx *= Math.pow(0.985, dt)
+        phys.vy *= Math.pow(0.985, dt)
+        phys.x  += phys.vx * dt
+        phys.y  += phys.vy * dt
+        const REST = 0.85
+        if (phys.x >  boundsX) { phys.x =  boundsX; phys.vx = -Math.abs(phys.vx) * REST }
+        if (phys.x < -boundsX) { phys.x = -boundsX; phys.vx =  Math.abs(phys.vx) * REST }
+        if (phys.y >  boundsY) { phys.y =  boundsY; phys.vy = -Math.abs(phys.vy) * REST }
+        if (phys.y < -boundsY) { phys.y = -boundsY; phys.vy =  Math.abs(phys.vy) * REST }
       }
-      // Propulsion: tiny continuous force in the direction of travel replaces the hard
-      // speed floor. The floor caused stuck-at-wall oscillation (floor restored speed
-      // to 0.7 → REST reduced to 0.574 → floor restored again → infinite loop).
-      // Propulsion gently rebuilds speed after each bounce over many frames instead.
-      const speed = Math.hypot(phys.vx, phys.vy)
-      if (speed > 0.01) {
-        const propulse = 0.013
-        phys.vx += (phys.vx / speed) * propulse
-        phys.vy += (phys.vy / speed) * propulse
-      }
-      // Friction + integration
-      phys.vx *= Math.pow(0.985, dt)
-      phys.vy *= Math.pow(0.985, dt)
-      phys.x  += phys.vx * dt
-      phys.y  += phys.vy * dt
-      // Elastic wall bounces
-      const REST = 0.85
-      if (phys.x >  boundsX) { phys.x =  boundsX; phys.vx = -Math.abs(phys.vx) * REST }
-      if (phys.x < -boundsX) { phys.x = -boundsX; phys.vx =  Math.abs(phys.vx) * REST }
-      if (phys.y >  boundsY) { phys.y =  boundsY; phys.vy = -Math.abs(phys.vy) * REST }
-      if (phys.y < -boundsY) { phys.y = -boundsY; phys.vy =  Math.abs(phys.vy) * REST }
 
       transforms.forEach((t, i) => {
         const group = groupRefs.current[i]
