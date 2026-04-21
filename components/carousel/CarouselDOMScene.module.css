@@ -171,8 +171,8 @@
   transform: translate(-50%, -50%);
   z-index: 5;
   pointer-events: none;
-  width: 132px;
-  height: 72px;
+  /* padding-defined sizing: T/B = 40% of L/R (12/30 = 40%) */
+  padding: 12px 30px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -184,7 +184,7 @@
   position: absolute;
   inset: 0;
   border: 1px solid #ffffff;
-  border-radius: 36px;
+  border-radius: 999px;
   background: rgba(0, 0, 0, 0.35);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
@@ -195,7 +195,7 @@
   position: relative;
   color: #ffffff;
   font-family: var(--font-brand);
-  font-size: 32px;
+  font-size: 26px;
   line-height: 1;
   letter-spacing: 0.02em;
   user-select: none;

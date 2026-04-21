@@ -96,8 +96,8 @@ export default function CarouselDOMScene({
 
   useEffect(() => {
     if (showMobileBtn) {
-      pillPhys.current.vx = 1.8
-      pillPhys.current.vy = 1.2
+      pillPhys.current.vx = 1.4
+      pillPhys.current.vy = 0.6
     }
   }, [showMobileBtn])
 
@@ -186,42 +186,50 @@ export default function CarouselDOMScene({
       const gc         = ghostCfg.current
 
       // ── Pill physics (mobile, active card) ─────────────────────────────────
-      // Carousel vertical velocity injects inertia into the pill. The pill has
-      // its own velocity + friction and reflects off the card's inner edges.
-      // Bounds use the actual card size; pill is 132×72 per CSS.
-      const PILL_W = 132
-      const PILL_H = 72
-      const maxX = Math.max(0, (cardW - PILL_W) / 2 - 4)  // 4px edge margin
-      const maxY = Math.max(0, (cardH - PILL_H) / 2 - 4)
+      const PILL_W = 108   // padding-defined natural width (26px font + 30px L/R × 2)
+      const PILL_H = 50    // padding-defined natural height (26px font + 12px T/B × 2)
+      // Card-local bounds: pill edge stops at card edge
+      const cardMaxX = Math.max(0, (cardW - PILL_W) / 2 - 6)
+      const cardMaxY = Math.max(0, (cardH - PILL_H) / 2 - 6)
+      // Viewport-aware bounds: SCALE_ACTIVE=1.25 can make the card wider than the
+      // phone screen, letting pill travel off-viewport. Divide by scale to convert
+      // viewport half-size to card-local coordinates, then use whichever is tighter.
+      const activeScale = cfg.current.SCALE_ACTIVE
+      const vpMaxX = Math.max(0, d.viewportW / 2 / activeScale - PILL_W / 2 - 6)
+      const vpMaxY = Math.max(0, d.viewportH / 2 / activeScale - PILL_H / 2 - 6)
+      const boundsX = Math.min(cardMaxX, vpMaxX)
+      const boundsY = Math.min(cardMaxY, vpMaxY)
+
       const phys = pillPhys.current
-      // posY delta — works on both swipe-end (mobile) and drag (desktop) models.
-      // dPos is already per-frame, so no * dt (would double-count).
+      // posY delta — works on both swipe-end (mobile) and drag (desktop) models
       const prevPos = lastPosY.current
       const dPos = prevPos === null ? 0 : (posY.current - prevPos)
       lastPosY.current = posY.current
-      // Inject into BOTH axes every swipe so input is never 1-D.
-      // x gets the horizontal swipe direction; y gets ¾ of that.
-      phys.vx += dPos * 20
-      phys.vy += dPos * 15
-      // DVD floor: pill always travels — restore minimum speed in current direction.
+      // Aspect-ratio-scaled impulse: vy injection scaled to boundsX/boundsY so each
+      // swipe produces equal traversal fraction in both axes (no vertical dominance).
+      phys.vx += dPos * 22
+      phys.vy += dPos * 22 * (boundsX / Math.max(boundsY, 1))
+      // Propulsion: tiny continuous force in the direction of travel replaces the hard
+      // speed floor. The floor caused stuck-at-wall oscillation (floor restored speed
+      // to 0.7 → REST reduced to 0.574 → floor restored again → infinite loop).
+      // Propulsion gently rebuilds speed after each bounce over many frames instead.
       const speed = Math.hypot(phys.vx, phys.vy)
-      if (speed < 0.01) {
-        phys.vx = 1.8; phys.vy = 1.2   // bootstrap if completely stopped
-      } else if (speed < 0.7) {
-        const s = 0.7 / speed
-        phys.vx *= s; phys.vy *= s      // boost to floor, keep direction
+      if (speed > 0.01) {
+        const propulse = 0.013
+        phys.vx += (phys.vx / speed) * propulse
+        phys.vy += (phys.vy / speed) * propulse
       }
-      // Light friction — pill coasts between swipes
+      // Friction + integration
       phys.vx *= Math.pow(0.985, dt)
       phys.vy *= Math.pow(0.985, dt)
       phys.x  += phys.vx * dt
       phys.y  += phys.vy * dt
-      // Elastic wall bounces — springy feel without center attraction
-      const REST = 0.82
-      if (phys.x >  maxX) { phys.x =  maxX; phys.vx = -Math.abs(phys.vx) * REST }
-      if (phys.x < -maxX) { phys.x = -maxX; phys.vx =  Math.abs(phys.vx) * REST }
-      if (phys.y >  maxY) { phys.y =  maxY; phys.vy = -Math.abs(phys.vy) * REST }
-      if (phys.y < -maxY) { phys.y = -maxY; phys.vy =  Math.abs(phys.vy) * REST }
+      // Elastic wall bounces
+      const REST = 0.85
+      if (phys.x >  boundsX) { phys.x =  boundsX; phys.vx = -Math.abs(phys.vx) * REST }
+      if (phys.x < -boundsX) { phys.x = -boundsX; phys.vx =  Math.abs(phys.vx) * REST }
+      if (phys.y >  boundsY) { phys.y =  boundsY; phys.vy = -Math.abs(phys.vy) * REST }
+      if (phys.y < -boundsY) { phys.y = -boundsY; phys.vy =  Math.abs(phys.vy) * REST }
 
       transforms.forEach((t, i) => {
         const group = groupRefs.current[i]
