@@ -25,6 +25,7 @@
 .carouselStage {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
+  background: radial-gradient(ellipse 82% 50% at 50% 50%, #ffffff 60%, #e3e4ec 88%, #d6d8e6 100%);
 }
 
 /* ── Case panel ── */
