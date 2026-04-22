@@ -1,19 +1,12 @@
 'use client'
 
 import { useEffect, useLayoutEffect, useState } from 'react'
-import Image from 'next/image'
-import type { CaseStudy, CaseStripItem } from '@/data/cases'
+import type { CaseStudy } from '@/data/cases'
 import styles from './CaseStudy.module.css'
-
-// ── Sub-components — each has a unique name visible in the feedback tool ──────
-
-function CaseStudyHeroImage({ src }: { src: string }) {
-  return (
-    <div className={styles.caseStudyHeroImage}>
-      <Image src={src} alt="" fill sizes="100vw" style={{ objectFit: 'cover' }} priority />
-    </div>
-  )
-}
+import SlotHero from './SlotHero'
+import SlotMedia from './SlotMedia'
+import SlotStrip from './SlotStrip'
+import SlotPairs from './SlotPairs'
 
 function CaseStudyMetaRow({ claims, roleBody }: { claims: CaseStudy['claims']; roleBody: string }) {
   const [cur, setCur] = useState(0)
@@ -31,8 +24,8 @@ function CaseStudyMetaRow({ claims, roleBody }: { claims: CaseStudy['claims']; r
   ]
 
   return (
-    <div className={styles.caseStudyMetaRow}>
-      <div className={styles.caseStudyStatBlock}>
+    <div data-element="Meta row" className={styles.caseStudyMetaRow}>
+      <div data-element="Stat block" className={styles.caseStudyStatBlock}>
         <div className={styles.caseStudyClaims}>
           <p key={cur} className={styles.caseStudyClaim}>
             {words.map((item, i) => (
@@ -43,68 +36,10 @@ function CaseStudyMetaRow({ claims, roleBody }: { claims: CaseStudy['claims']; r
           </p>
         </div>
       </div>
-      <div className={styles.caseStudyRoleBlock}>
+      <div data-element="Role block" className={styles.caseStudyRoleBlock}>
         <span className={styles.caseStudyRoleLabel}>My role</span>
         <p className={styles.caseStudyBody}>{roleBody}</p>
       </div>
-    </div>
-  )
-}
-
-function CaseStudyMediaBlock({ img, children }: { img?: string; children?: React.ReactNode }) {
-  return (
-    <div className={styles.caseStudyMediaBlock}>
-      <div className={styles.caseStudyMediaFrame}>
-        {img && (
-          <Image src={img} alt="" fill sizes="100vw" style={{ objectFit: 'cover' }} />
-        )}
-      </div>
-      {children}
-    </div>
-  )
-}
-
-function CaseStudyStripReel({ items }: { items: CaseStripItem[] }) {
-  return (
-    <div className={styles.caseStudyStripReel} data-cursor="drag-h">
-      {items.map((item, i) => (
-        <div key={i} className={styles.caseStudyStripSlide}>
-          <div className={styles.caseStudyStripSlideImage}>
-            {item.img && (
-              <Image
-                src={item.img}
-                alt=""
-                fill
-                sizes="(max-width: 768px) 70vw, 42vw"
-                style={{ objectFit: 'cover' }}
-              />
-            )}
-          </div>
-          <p className={`${styles.caseStudyBody} ${styles.caseStudyStripSlideCaption}`}>{item.caption}</p>
-        </div>
-      ))}
-    </div>
-  )
-}
-
-function CaseStudyPairsSection({ pairs }: { pairs: string[][] }) {
-  return (
-    <div className={styles.caseStudyPairsSection}>
-      {pairs.map((pair, pi) => (
-        <div key={pi} className={styles.caseStudyPairRow}>
-          {pair.map((img, ii) => (
-            <div key={ii} className={styles.caseStudyPairSlot}>
-              <Image src={img} alt="" fill sizes="(max-width: 768px) 100vw, 50vw" style={{ objectFit: 'cover' }} />
-            </div>
-          ))}
-          {pair.length === 0 && (
-            <>
-              <div className={styles.caseStudyPairSlot} />
-              <div className={styles.caseStudyPairSlot} />
-            </>
-          )}
-        </div>
-      ))}
     </div>
   )
 }
@@ -183,12 +118,12 @@ export default function CaseStudyPage({ cs, isOverlay }: Props) {
             onClick={() => window.parent.postMessage({ type: 'case-close' }, '*')}
           />
         )}
-        {cs.heroImg && <CaseStudyHeroImage src={cs.heroImg} />}
-        <CaseStudyMediaBlock img={cs.mediaImg}>
+        {cs.heroImg && <SlotHero src={cs.heroImg} />}
+        <SlotMedia img={cs.mediaImg}>
           <CaseStudyMetaRow claims={cs.claims} roleBody={cs.roleBody} />
-        </CaseStudyMediaBlock>
-        <CaseStudyStripReel items={cs.strip} />
-        <CaseStudyPairsSection pairs={cs.pairs} />
+        </SlotMedia>
+        <SlotStrip items={cs.strip} />
+        <SlotPairs pairs={cs.pairs} />
       </div>
     </>
   )
