@@ -92,14 +92,24 @@ export const CASES: CaseStudy[] = [
     roleBody: 'We audited every existing pattern, distilled a minimal token architecture, and rebuilt the component library from the ground up — optimised for composability.',
     challenge: 'Three separate product teams were shipping UI at different speeds with no shared vocabulary.',
     solution: 'We audited every existing pattern, distilled a minimal token architecture, and rebuilt the component library from the ground up — optimised for composability.',
+    mediaImg: 'https://res.cloudinary.com/duee5dfom/image/upload/q_auto/f_auto/v1776899106/Frame_1000005676_avin8a.png',
     mediaCaption: 'Three separate product teams were shipping UI at different speeds with no shared vocabulary.',
     strip: [
-      { caption: 'Three teams, one design system.' },
-      { caption: 'Three teams, one design system.' },
-      { caption: 'Three teams, one design system.' },
-      { caption: 'Three teams, one design system.' },
+      { img: 'https://res.cloudinary.com/duee5dfom/image/upload/q_auto/f_auto/v1776898866/Frame_1000005674_cryrlh.png', caption: 'Three teams, one design system.' },
+      { img: 'https://res.cloudinary.com/duee5dfom/image/upload/q_auto/f_auto/v1776898865/Frame_1000005638_daacf6.png', caption: 'Three teams, one design system.' },
+      { img: 'https://res.cloudinary.com/duee5dfom/image/upload/q_auto/f_auto/v1776898865/Frame_1000005657_sw5nt5.png', caption: 'Three teams, one design system.' },
+      { img: 'https://res.cloudinary.com/duee5dfom/image/upload/q_auto/f_auto/v1776898865/Frame_1000005675_sl94mi.png', caption: 'Three teams, one design system.' },
     ],
-    pairs: [[], []],
+    pairs: [
+      [
+        'https://res.cloudinary.com/duee5dfom/image/upload/q_auto/f_auto/v1776899106/Frame_1000005676_avin8a.png',
+        'https://res.cloudinary.com/duee5dfom/image/upload/q_auto/f_auto/v1776898865/Frame_1000005675_sl94mi.png',
+      ],
+      [
+        'https://res.cloudinary.com/duee5dfom/image/upload/q_auto/f_auto/v1776898865/Frame_1000005657_sw5nt5.png',
+        'https://res.cloudinary.com/duee5dfom/image/upload/q_auto/f_auto/v1776898865/Frame_1000005638_daacf6.png',
+      ],
+    ],
   },
   {
     slug: '004',
