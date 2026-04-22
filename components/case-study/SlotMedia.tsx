@@ -5,9 +5,9 @@ export default function SlotMedia({ img, children }: { img?: string; children?: 
   return (
     <div className={s.wrap}>
       <div id="case-media" data-element="Media block" className={s.mediaBlock}>
-        <div data-element="Media frame" className={s.mediaFrame}>
+        <div id="case-media-frame" data-element="Media frame" className={s.mediaFrame}>
           {img && (
-            <Image src={img} alt="" fill sizes="100vw" style={{ objectFit: 'cover' }} />
+            <Image data-element="Media image" src={img} alt="" fill sizes="100vw" style={{ objectFit: 'cover' }} />
           )}
         </div>
         {children}
