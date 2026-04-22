@@ -1,0 +1,10 @@
+.wrap { display: contents; }
+
+.heroImage {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: var(--shape-md);
+  overflow: hidden;
+  position: relative;
+  background: var(--color-surface);
+}
