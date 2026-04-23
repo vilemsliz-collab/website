@@ -28,20 +28,50 @@ function CtrlRow({ label, min, max, step, defaultValue, unit, onChange }: {
   )
 }
 
-function StateBox({ title, cursorAttr, cursorLabel, dark, zoneLabel, onCopy, children }: {
+function ScrollRingPreview() {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%' }}>
+      <div style={{
+        width: 125, height: 31, borderRadius: 16,
+        background: 'transparent',
+        border: '1px solid #D2D3D8',
+        position: 'relative',
+        overflow: 'hidden',
+      }}>
+        {[0, 66, 144].map(delay => (
+          <div key={delay} style={{
+            position: 'absolute',
+            top: '50%', left: '50%',
+            transform: 'translate(-50%, -50%)',
+            borderRadius: '50%',
+            border: '1.5px solid #D2D3D8',
+            pointerEvents: 'none',
+            animation: `scrollRingLoop 1600ms cubic-bezier(0.1, 0, 0.35, 1) ${delay}ms infinite`,
+          }} />
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function StateBox({ title, cursorAttr, cursorLabel, dark, scrollH, zoneLabel, zoneContent, zoneStyle, onCopy, children }: {
   title: string
   cursorAttr?: string
   cursorLabel?: string
   dark?: boolean
+  scrollH?: boolean
   zoneLabel?: string
+  zoneContent?: React.ReactNode
+  zoneStyle?: React.CSSProperties
   onCopy?: () => Record<string, number>
   children?: React.ReactNode
 }) {
   const [copied, setCopied] = useState(false)
   const zoneProps: Record<string, string> = {}
-  if (cursorAttr)   zoneProps['data-cursor']       = cursorAttr
-  if (cursorLabel)  zoneProps['data-cursor-label'] = cursorLabel
-  if (dark)         zoneProps['data-dark']          = ''
+  if (cursorAttr)   zoneProps['data-cursor']        = cursorAttr
+  if (cursorLabel)  zoneProps['data-cursor-label']  = cursorLabel
+  if (dark)         zoneProps['data-dark']           = ''
+  if (scrollH)      zoneProps['data-cursor-scroll-h'] = ''
 
   const handleCopy = () => {
     if (!onCopy) return
@@ -62,8 +92,8 @@ function StateBox({ title, cursorAttr, cursorLabel, dark, zoneLabel, onCopy, chi
           >{copied ? 'copied' : 'copy'}</button>
         )}
       </div>
-      <div className={styles.stateBoxZone} {...zoneProps}>
-        <span className={styles.stateBoxZoneLabel}>{zoneLabel ?? 'hover here'}</span>
+      <div className={styles.stateBoxZone} style={zoneStyle} {...zoneProps}>
+        {zoneContent ?? <span className={styles.stateBoxZoneLabel}>{zoneLabel ?? 'hover here'}</span>}
       </div>
       {children && <div className={styles.stateBoxControls}>{children}</div>}
     </div>
@@ -85,6 +115,7 @@ export default function CardPage() {
 
   return (
     <div className={styles.page}>
+      <style>{`@keyframes scrollRingLoop{from{width:31px;height:31px;opacity:.85;filter:blur(0)}60%{width:140px;height:140px;opacity:.5;filter:blur(1px)}to{width:140px;height:140px;opacity:0;filter:blur(3px)}}`}</style>
       <CustomCursor tiltRef={cardTiltRef} configRef={cursorConfigRef} />
       <nav className={styles.siteNav}>
         <a href="/portfolio" data-cursor="link" data-cursor-label="Portfolio">Portfolio</a>
@@ -148,6 +179,14 @@ export default function CardPage() {
         <StateBox title="card distortion" cursorAttr="card" cursorLabel="open" dark zoneLabel="hover card →  distortion"
           onCopy={() => { const c = cursorConfigRef.current; return { backdropScaleCard: c.backdropScaleCard } }}>
           <CtrlRow label="card dist" min={0} max={200} step={1} defaultValue={DEFAULT_CURSOR_CONFIG.backdropScaleCard} unit="px" onChange={v => { cursorConfigRef.current.backdropScaleCard = v }} />
+        </StateBox>
+
+        {/* 5. HORIZONTAL SCROLL */}
+        <StateBox title="horizontal scroll" scrollH zoneContent={<ScrollRingPreview />}>
+          <CtrlRow label="narrow H"  min={2}   max={52}  step={1}    defaultValue={DEFAULT_CURSOR_CONFIG.scrollNarrowW}     unit="px" onChange={v => { cursorConfigRef.current.scrollNarrowW     = v }} />
+          <CtrlRow label="interval"  min={30}  max={350} step={5}    defaultValue={DEFAULT_CURSOR_CONFIG.scrollIntervalBase} unit="ms" onChange={v => { cursorConfigRef.current.scrollIntervalBase = v }} />
+          <CtrlRow label="scale"     min={1.5} max={10}  step={0.1}  defaultValue={DEFAULT_CURSOR_CONFIG.scrollRingScale}    unit="×"  onChange={v => { cursorConfigRef.current.scrollRingScale    = v }} />
+          <CtrlRow label="duration"  min={0.2} max={1.5} step={0.05} defaultValue={DEFAULT_CURSOR_CONFIG.scrollRingDuration} unit="s"  onChange={v => { cursorConfigRef.current.scrollRingDuration = v }} />
         </StateBox>
 
       </div>

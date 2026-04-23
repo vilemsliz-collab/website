@@ -262,7 +262,8 @@ export default function Carousel() {
     tiltTx.current    = 0
     tiltTy.current    = 0
     runSplitTransition('split', () => { loadPreset('split') })
-  }, [runSplitTransition, loadPreset])
+    startScrollHintTimer()
+  }, [runSplitTransition, loadPreset, startScrollHintTimer])
 
   const closeCasePanel = useCallback(() => {
     caseOpen.current = false
@@ -282,7 +283,8 @@ export default function Carousel() {
       }
       loadPreset(targetPreset)
     })
-  }, [runSplitTransition, loadPreset])
+    startScrollHintTimer()
+  }, [runSplitTransition, loadPreset, startScrollHintTimer])
 
   // ── Physics loop (posY/velY spring — R3F useFrame reads posY.current each frame) ──
   const kick = useCallback(() => {
@@ -518,9 +520,10 @@ export default function Carousel() {
     <div className={`${styles.root} ${caseOpenState ? styles.caseOpen : ''} ${ctrlOpen ? styles.ctrlOpen : ''}`}>
       <CustomCursor />
 
+      <ScrollHint visible={scrollHintVisible} />
+
       {/* ── DOM Carousel ── */}
       <div className={styles.carouselStage} onClick={handleStageClick}>
-        <ScrollHint visible={scrollHintVisible} />
         <CarouselDOMScene
           posY={posY}
           cfg={cfg}

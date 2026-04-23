@@ -1,29 +1,30 @@
-@keyframes scrollDot {
-  0%   { transform: translateX(-50%) translateY(0);   opacity: 1 }
-  55%  { transform: translateX(-50%) translateY(8px);  opacity: 0 }
-  56%  { transform: translateX(-50%) translateY(0);   opacity: 0 }
-  100% { transform: translateX(-50%) translateY(0);   opacity: 1 }
-}
-
-@keyframes chevronPulse1 {
-  0%, 100% { opacity: 0.25 }
-  40%       { opacity: 0.8  }
-}
-@keyframes chevronPulse2 {
-  0%, 100% { opacity: 0.25 }
-  40%       { opacity: 0.8  }
+@keyframes scrollRingLoop {
+  from { width: 34px; height: 34px; opacity: 0.85; filter: blur(0) }
+  60%  { width: 155px; height: 155px; opacity: 0.5; filter: blur(1px) }
+  to   { width: 155px; height: 155px; opacity: 0; filter: blur(3px) }
 }
 
 /* ── Wrapper ── */
+.label {
+  font-family: var(--font-brand);
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #A6A7AC;
+  margin: 8px 0 0;
+  text-align: center;
+  white-space: nowrap;
+}
+
 .wrapper {
-  position: absolute;
+  position: fixed;
   bottom: var(--space-10, 40px);
-  left: 50%;
+  left: var(--carousel-cx, 50%);
   transform: translateX(-50%);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--space-2, 8px);
   pointer-events: none;
   opacity: 0;
   transition: opacity 0.25s ease;
@@ -35,47 +36,26 @@
   transition: opacity 0.55s ease;
 }
 
-/* ── Mouse icon ── */
-.mouse {
-  width: 22px;
+/* ── Pill ── */
+.pill {
+  width: 138px;
   height: 34px;
-  border: 1.5px solid var(--color-on-surface-variant, #65666B);
-  border-radius: 11px;
-  opacity: 0.55;
+  border-radius: 18px;
+  background: transparent;
+  border: 1.5px solid #A6A7AC;
   position: relative;
-  flex-shrink: 0;
+  overflow: hidden;
 }
 
-.dot {
-  width: 3px;
-  height: 3px;
-  border-radius: 50%;
-  background: var(--color-on-surface-variant, #65666B);
+/* ── Rings (clipped inside pill) ── */
+.ring {
   position: absolute;
-  top: 6px;
+  top: 50%;
   left: 50%;
-  transform: translateX(-50%);
-  animation: scrollDot 1.8s cubic-bezier(0.45, 0, 0.55, 1) infinite;
-}
-
-/* ── Chevrons ── */
-.chevrons {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1px;
-}
-
-.chevron1 {
-  opacity: 0.25;
-  animation: chevronPulse1 1.8s ease-in-out infinite;
-  animation-delay: 0s;
-}
-
-.chevron2 {
-  opacity: 0.25;
-  animation: chevronPulse2 1.8s ease-in-out infinite;
-  animation-delay: 0.22s;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  border: 1.5px solid #A6A7AC;
+  animation: scrollRingLoop 1600ms cubic-bezier(0.1, 0, 0.35, 1) infinite;
 }
 
 @media (max-width: 767px) {

@@ -146,12 +146,14 @@ export default function CarouselDOMScene({
       wVel  *= Math.pow(0.85, dt)
       wPos  += wVel * dt
       carouselWidthRef.current = wPos
+      document.documentElement.style.setProperty('--carousel-cx', `${(wPos / 2).toFixed(1)}px`)
       // camX: subtract from tx so vanishing point stays centred in the carousel strip
       // (equivalent to Three.js cam.position.x = width/2 - wPos/2)
       const camX = mobileCase ? 0 : W / 2 - wPos / 2
 
       // 2. Update perspective
       stage.style.perspective = `${P}px`
+
 
       // 3. Shake spring
       shakeVel.current += -shakePos * 0.12 * dt
@@ -271,7 +273,7 @@ export default function CarouselDOMScene({
           onClick={(e) => { e.stopPropagation(); onCardClick(i) }}
           onMouseEnter={card.isAbout ? () => {
             if (seqRef.current === 'running') return
-            hoverTimerRef.current = setTimeout(runSequence, 4000)
+            hoverTimerRef.current = setTimeout(runSequence, 10000)
           } : undefined}
           onMouseLeave={card.isAbout ? () => {
             if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current)
@@ -369,6 +371,7 @@ export default function CarouselDOMScene({
               ref={el => { shineRefs.current[i] = el }}
               className={styles.cardShine}
             />
+
           </div>
 
         </div>
