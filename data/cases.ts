@@ -27,6 +27,7 @@ export interface CaseStudy {
   solution: string
   heroImg?: string
   mediaImg?: string
+  mediaVideo?: string
   mediaCaption: string
   strip: CaseStripItem[]
   stripCols?: number
@@ -93,6 +94,7 @@ export const CASES: CaseStudy[] = [
     challenge: 'Three separate product teams were shipping UI at different speeds with no shared vocabulary.',
     solution: 'We audited every existing pattern, distilled a minimal token architecture, and rebuilt the component library from the ground up — optimised for composability.',
     mediaImg: 'https://res.cloudinary.com/duee5dfom/image/upload/q_auto/f_auto/v1776899106/Frame_1000005676_avin8a.png',
+    mediaVideo: 'https://res.cloudinary.com/duee5dfom/video/upload/q_auto/f_auto/v1777116988/Final_Wrike_Copilot_Promo_Compressed_HB_1__2_gyxj2u.mp4',
     mediaCaption: 'Three separate product teams were shipping UI at different speeds with no shared vocabulary.',
     strip: [
       { img: 'https://res.cloudinary.com/duee5dfom/image/upload/q_auto/f_auto/v1776898866/Frame_1000005674_cryrlh.png', caption: 'Three teams, one design system.' },

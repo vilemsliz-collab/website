@@ -119,7 +119,7 @@ export default function CaseStudyPage({ cs, isOverlay }: Props) {
           />
         )}
         {cs.heroImg && <SlotHero src={cs.heroImg} />}
-        <SlotMedia img={cs.mediaImg}>
+        <SlotMedia img={cs.mediaImg} video={cs.mediaVideo}>
           <CaseStudyMetaRow claims={cs.claims} roleBody={cs.roleBody} />
         </SlotMedia>
         <SlotStrip items={cs.strip} />
