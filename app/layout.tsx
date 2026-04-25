@@ -33,6 +33,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={ibmPlexMono.variable}>
       <head>
+        <link rel="preconnect" href="https://res.cloudinary.com" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link

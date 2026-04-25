@@ -72,6 +72,7 @@ export default function Carousel() {
 
   const frontFrame  = useRef<HTMLIFrameElement | null>(null)
   const backFrame   = useRef<HTMLIFrameElement | null>(null)
+  const preloadTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const lastKickMs  = useRef(0)
   const shakeVel    = useRef(0)
   const stageTouch  = useRef<number | null>(null)
@@ -490,8 +491,9 @@ export default function Carousel() {
       window.removeEventListener('keydown', onKeyDown)
       window.removeEventListener('resize', onResize)
       window.removeEventListener('message', onIframeScroll)
-      if (rafId.current)      cancelAnimationFrame(rafId.current)
-      if (splitRafId.current) cancelAnimationFrame(splitRafId.current)
+      if (rafId.current)        cancelAnimationFrame(rafId.current)
+      if (splitRafId.current)  cancelAnimationFrame(splitRafId.current)
+      if (preloadTimer.current) clearTimeout(preloadTimer.current)
       if (gyroHandler.current) {
         window.removeEventListener('deviceorientation', gyroHandler.current)
         gyroHandler.current = null
@@ -512,9 +514,12 @@ export default function Carousel() {
     if (!isMobile() && caseOpen.current) {
       switchCaseContent(CARDS[i].href)
     } else if (!isMobile() && !caseOpen.current && CARDS[i].href.startsWith('/cases/')) {
-      const front = frontFrame.current
-      const targetUrl = new URL(CARDS[i].href, window.location.origin).href
-      if (front && front.src !== targetUrl) front.src = CARDS[i].href
+      if (preloadTimer.current) clearTimeout(preloadTimer.current)
+      preloadTimer.current = setTimeout(() => {
+        const front = frontFrame.current
+        const targetUrl = new URL(CARDS[i].href, window.location.origin).href
+        if (front && front.src !== targetUrl) front.src = CARDS[i].href
+      }, 300)
     }
   }, [switchCaseContent, startScrollHintTimer])
 

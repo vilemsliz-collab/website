@@ -25,7 +25,7 @@ export default function SlotMedia({
               style={{ objectFit: 'cover' }}
             />
           ) : img ? (
-            <Image data-element="Media image" src={img} alt="" fill sizes="100vw" style={{ objectFit: 'cover' }} />
+            <Image data-element="Media image" src={img} alt="" fill sizes="100vw" priority style={{ objectFit: 'cover' }} />
           ) : null}
         </div>
         {children}
