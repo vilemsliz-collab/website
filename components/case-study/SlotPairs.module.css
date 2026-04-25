@@ -24,4 +24,5 @@
 
 @media (max-width: 768px) {
   .pairRow { flex-direction: column; }
+  .pairSlot { max-height: 280px; }
 }
