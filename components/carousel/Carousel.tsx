@@ -15,6 +15,7 @@ import CustomCursor from '@/components/cursor/CustomCursor'
 import DevPanel, { type GlassConfig } from './DevPanel'
 import CarouselDOMScene from './CarouselDOMScene'
 import ScrollHint from './ScrollHint'
+import Loader from '@/components/loader/Loader'
 
 const N = CARDS.length
 
@@ -151,7 +152,17 @@ export default function Carousel() {
     return () => { if (scrollHintTimer.current) clearTimeout(scrollHintTimer.current) }
   }, [startScrollHintTimer])
 
+  // Loader: 3-second minimum + prefetch all case routes
+  useEffect(() => {
+    CARDS.forEach(card => {
+      if (card.href.startsWith('/cases/')) router.prefetch(card.href)
+    })
+    const t = setTimeout(() => setLoaderVisible(false), 3000)
+    return () => clearTimeout(t)
+  }, [router])
+
   // ── React state (only for things that need re-render) ──
+  const [loaderVisible, setLoaderVisible] = useState(true)
   const [caseOpenState, setCaseOpenState] = useState(false)
   const [ctrlOpen, setCtrlOpen] = useState(false)
 
@@ -255,7 +266,8 @@ export default function Carousel() {
     front.style.transition = 'none'
     front.style.transform  = 'translateX(0)'
     requestAnimationFrame(() => { front.style.transition = '' })
-    front.src = CARDS[cardIdx].href
+    const targetUrl = new URL(CARDS[cardIdx].href, window.location.origin).href
+    if (front.src !== targetUrl) front.src = CARDS[cardIdx].href
     caseOpen.current = true
     setCaseOpenState(true)
     baseTiltY.current = 0
@@ -341,6 +353,12 @@ export default function Carousel() {
     backFrame.current  = frameBRef.current
     if (frameBRef.current) {
       frameBRef.current.style.transform = 'translateX(100%)'
+    }
+
+    // Desktop: warm up front iframe with first case while loader covers the screen
+    if (navigator.maxTouchPoints === 0) {
+      const firstCase = CARDS.find(c => c.href.startsWith('/cases/'))
+      if (firstCase && frontFrame.current) frontFrame.current.src = firstCase.href
     }
 
     function checkBreakpoint() { loadPreset(dims.current.isMobile ? 'mobile' : 'desktop') }
@@ -489,10 +507,14 @@ export default function Carousel() {
 
   // ── Active card change ──
   const handleActiveChange = useCallback((i: number) => {
+    activeIdx.current = i
     startScrollHintTimer()
-    // Desktop: switch case panel content when panel is open
     if (!isMobile() && caseOpen.current) {
       switchCaseContent(CARDS[i].href)
+    } else if (!isMobile() && !caseOpen.current && CARDS[i].href.startsWith('/cases/')) {
+      const front = frontFrame.current
+      const targetUrl = new URL(CARDS[i].href, window.location.origin).href
+      if (front && front.src !== targetUrl) front.src = CARDS[i].href
     }
   }, [switchCaseContent, startScrollHintTimer])
 
@@ -518,6 +540,7 @@ export default function Carousel() {
 
   return (
     <div className={`${styles.root} ${caseOpenState ? styles.caseOpen : ''} ${ctrlOpen ? styles.ctrlOpen : ''}`}>
+      <Loader visible={loaderVisible} />
       <CustomCursor />
 
       <ScrollHint visible={scrollHintVisible} />
