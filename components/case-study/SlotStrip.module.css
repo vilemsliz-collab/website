@@ -9,6 +9,7 @@
   -ms-overflow-style: none;
   gap: 6px;
   cursor: grab;
+  margin-top: var(--space-16);
   margin-left: calc(-1 * var(--space-8));
   margin-right: calc(-1 * var(--space-8));
   padding-left: var(--space-8);
@@ -67,6 +68,7 @@
 
 @media (max-width: 768px) {
   .reel {
+    margin-top: var(--space-12);
     margin-left: calc(-1 * var(--space-3));
     margin-right: calc(-1 * var(--space-3));
     padding-left: var(--space-3);

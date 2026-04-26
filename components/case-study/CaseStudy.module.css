@@ -63,7 +63,7 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: var(--space-12);
+  gap: 0;
   padding: var(--space-8);
   scrollbar-width: none;
   -ms-overflow-style: none;
@@ -187,6 +187,7 @@
   flex-direction: column;
   justify-content: center;
   gap: var(--space-4);
+  margin-top: var(--space-4);
   border: 1px solid var(--gray-50);
   border-radius: var(--shape-md);
   padding: var(--space-8) var(--space-6);
@@ -194,7 +195,8 @@
 
 /* ── Responsive ── */
 @media (max-width: 768px) {
-  .caseStudyPage        { gap: var(--space-6); padding: var(--space-5) var(--space-3) var(--space-10); }
+  .caseStudyPage        { gap: 0; padding: var(--space-5) var(--space-3) var(--space-10); }
+  .caseStudyChallenge   { margin-top: var(--space-2); }
   .caseStudyTextInset   { padding-left: 0; padding-right: 0; }
   .caseStudyMetaRow     { flex-direction: column; }
   .caseStudyClaim       { font-size: var(--type-headline-small-size); line-height: var(--type-headline-small-lh); }

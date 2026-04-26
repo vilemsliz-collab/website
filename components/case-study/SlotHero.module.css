@@ -2,6 +2,7 @@
 
 .heroImage {
   width: 100%;
+  margin-top: 0;
   aspect-ratio: 16 / 9;
   border: 1px solid var(--gray-50);
   border-radius: var(--shape-md);
