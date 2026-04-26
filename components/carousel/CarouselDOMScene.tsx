@@ -375,7 +375,7 @@ export default function CarouselDOMScene({
               </>
             ) : (
               <>
-                <div className={styles.cardTopOverlay} />
+                <div className={styles.cardFrost} />
                 <div className={styles.cardTopText} />
               </>
             )}

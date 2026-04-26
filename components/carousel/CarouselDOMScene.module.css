@@ -175,13 +175,19 @@
   line-height: 1.05;
 }
 
-/* ── Top dark gradient for headline readability on image cards ── */
-.cardTopOverlay {
+/* ── Frosted glass text zone for project cards ── */
+.cardFrost {
   position: absolute;
-  inset: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 55%;
   z-index: 2;
-  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.52) 0%, rgba(0, 0, 0, 0) 42%);
   pointer-events: none;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  -webkit-mask-image: linear-gradient(to bottom, black 30%, transparent 100%);
+  mask-image: linear-gradient(to bottom, black 30%, transparent 100%);
 }
 
 /* ── Ghost clones ── */
