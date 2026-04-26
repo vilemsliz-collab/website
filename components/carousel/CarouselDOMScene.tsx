@@ -376,8 +376,10 @@ export default function CarouselDOMScene({
             ) : (
               <>
                 <div className={styles.cardTopText}>
-                  <p className={styles.cardLine}>{card.lines[0]}</p>
-                  <p className={styles.cardLine}>{card.lines[1]}</p>
+                  <div className={styles.cardHeadlineBox}>
+                    <p className={styles.cardLine}>{card.lines[0]}</p>
+                    <p className={styles.cardLine}>{card.lines[1]}</p>
+                  </div>
                 </div>
               </>
             )}
