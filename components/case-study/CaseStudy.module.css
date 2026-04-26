@@ -56,7 +56,7 @@
   background: var(--gray-900);
   border: none;
   border-radius: var(--shape-md);
-  padding: var(--space-6);
+  padding: var(--space-8);
   overflow: hidden;
   position: relative;
   display: flex;
@@ -68,7 +68,8 @@
   content: '';
   position: absolute;
   inset: 0;
-  background: radial-gradient(ellipse at 30% 60%, var(--gray-800) 0%, transparent 65%);
+  background: radial-gradient(ellipse 85% 85% at 30% 60%, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0.072) 45%, transparent 72%);
+  filter: blur(24px);
   transition: transform 0.7s cubic-bezier(0.25, 0, 0, 1);
   pointer-events: none;
 }
@@ -79,13 +80,13 @@
 .caseStudyClaims {
   position: relative;
   overflow: hidden;
-  min-height: calc(2 * var(--type-headline-large-lh));
+  min-height: calc(2 * var(--type-display-small-lh));
 }
 .caseStudyClaim {
   font-family: var(--font-brand);
-  font-size: var(--type-headline-large-size);
-  line-height: var(--type-headline-large-lh);
-  letter-spacing: var(--type-headline-large-ls);
+  font-size: var(--type-display-small-size);
+  line-height: var(--type-display-small-lh);
+  letter-spacing: var(--type-display-small-ls);
   font-weight: 400;
   font-variation-settings: 'wght' 400;
   color: var(--gray-300);
