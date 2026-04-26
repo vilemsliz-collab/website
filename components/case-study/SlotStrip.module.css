@@ -14,15 +14,30 @@
 .reel::-webkit-scrollbar { display: none; }
 
 /* math: (100% - 1.5 × 6px) / 2.5 ≈ 40% - 3.6px */
+/* aspect-ratio 848/675: makes strip height ≈ half a pair row (pair slot ~50% wide at 530/675) */
 .slide {
   flex: 0 0 calc(40% - 4px);
-  min-height: calc(var(--card-height) / 2);
+  aspect-ratio: 848 / 675;
   border: 1px solid var(--color-outline-variant);
   border-radius: var(--shape-md);
   overflow: hidden;
   display: flex;
   flex-direction: column;
   padding: 4px;
+  background: var(--color-surface);
+  position: relative;
+}
+
+.slide::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 70% 40%, rgba(255,255,255,0.55) 0%, transparent 65%);
+  transition: transform 0.7s cubic-bezier(0.25, 0, 0, 1);
+  pointer-events: none;
+}
+.slide:hover::before {
+  transform: translate(-36px, 20px);
 }
 
 .slideImage {
@@ -46,5 +61,5 @@
 }
 
 @media (max-width: 768px) {
-  .slide { flex: 0 0 calc(66% - 4px); min-height: 200px; }
+  .slide { flex: 0 0 calc(66% - 4px); }
 }
