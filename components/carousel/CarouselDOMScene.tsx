@@ -16,6 +16,14 @@ import OrbBackground from './OrbBackground'
 
 const N = CARDS.length
 
+const FLOAT_AMP     = 5.5
+const FLOAT_FREQ    = 0.40
+const BREATHE_AMP   = 0.006
+const BREATHE_FREQ  = 0.18
+const HOVER_MULT    = 1.8
+const HOVER_MOUSE_Y = 6
+const FLOAT_PHASES  = CARDS.map((_, i) => (i / CARDS.length) * Math.PI * 2)
+
 export interface CarouselDOMSceneProps {
   posY:             MutableRefObject<number>
   cfg:              MutableRefObject<CarouselCFG>
@@ -77,6 +85,7 @@ export default function CarouselDOMScene({
   const rafRef        = useRef<number | null>(null)
   const labelRef      = useRef('about')
   const hoverTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const hoverIdxRef   = useRef(-1)
   const seqRef        = useRef<'idle' | 'running'>('idle')
   const seqTimers     = useRef<ReturnType<typeof setTimeout>[]>([])
   const mousePos      = useRef({ x: 0, y: 0 })
@@ -167,6 +176,7 @@ export default function CarouselDOMScene({
       const transforms = computeCardTransforms(posY.current, N, cfg.current, wPos, rollBase.current)
       const tiltScale  = Math.min(1, P / 590)
       const gc         = ghostCfg.current
+      const floatT     = now * 0.001
 
       transforms.forEach((t, i) => {
         const group = groupRefs.current[i]
@@ -174,12 +184,29 @@ export default function CarouselDOMScene({
         const card  = CARDS[i]
         if (!group || !mesh) return
 
+        // ── Float & breathe ──────────────────────────────────────────────
+        const phase     = FLOAT_PHASES[i]
+        const isHov     = hoverIdxRef.current === i
+        const skipFloat = d.isMobile && t.isActive
+        let floatY: number
+        if (skipFloat) {
+          floatY = 0
+        } else {
+          const amp    = isHov ? FLOAT_AMP * HOVER_MULT : FLOAT_AMP
+          const base   = Math.sin(floatT * FLOAT_FREQ * Math.PI * 2 + phase) * amp
+          const mouseNY = isHov
+            ? (mousePos.current.y / d.viewportH - 0.5) * -HOVER_MOUSE_Y * 2
+            : 0
+          floatY = base + mouseNY
+        }
+        const breatheS = 1 + Math.sin(floatT * BREATHE_FREQ * Math.PI * 2 + phase) * BREATHE_AMP
+
         // ── Sphere 3D position (validated sign table — see plan) ──
         group.style.transform = [
           'translate(-50%,-50%)',
-          `translate3d(${(t.tx - camX).toFixed(2)}px,${t.ty.toFixed(2)}px,${t.tz.toFixed(2)}px)`,
+          `translate3d(${(t.tx - camX).toFixed(2)}px,${(t.ty + floatY).toFixed(2)}px,${t.tz.toFixed(2)}px)`,
           `rotateX(${t.rx.toFixed(3)}deg) rotateY(${(-t.ry).toFixed(3)}deg) rotateZ(${t.rollDeg.toFixed(3)}deg)`,
-          `scale(${t.scale.toFixed(4)})`,
+          `scale(${(t.scale * breatheS).toFixed(5)})`,
         ].join(' ')
         group.style.zIndex     = String(t.zIndex)
         group.dataset.active   = t.isActive ? 'true' : 'false'
@@ -271,13 +298,17 @@ export default function CarouselDOMScene({
           className={styles.cardGroup}
           data-dark
           onClick={(e) => { e.stopPropagation(); onCardClick(i) }}
-          onMouseEnter={card.isAbout ? () => {
-            if (seqRef.current === 'running') return
-            hoverTimerRef.current = setTimeout(runSequence, 10000)
-          } : undefined}
-          onMouseLeave={card.isAbout ? () => {
-            if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current)
-          } : undefined}
+          onMouseEnter={() => {
+            hoverIdxRef.current = i
+            if (card.isAbout) {
+              if (seqRef.current === 'running') return
+              hoverTimerRef.current = setTimeout(runSequence, 10000)
+            }
+          }}
+          onMouseLeave={() => {
+            hoverIdxRef.current = -1
+            if (card.isAbout && hoverTimerRef.current) clearTimeout(hoverTimerRef.current)
+          }}
         >
           {/* Ghost clones — behind mesh, same 3D position, different tilt angle */}
           {Array.from({ length: 4 }, (_, gi) => (
