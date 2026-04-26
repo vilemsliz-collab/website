@@ -131,10 +131,12 @@
   position: relative;
   overflow: hidden;
   height: calc(3 * var(--type-display-medium-lh));
+  display: flex;
+  align-items: center;
 }
 .caseStudyClaim {
-  position: absolute;
-  top: 0; left: 0; right: 0;
+  position: relative;
+  width: 100%;
   font-family: var(--font-brand);
   font-size: var(--type-display-medium-size);
   line-height: var(--type-display-medium-lh);
