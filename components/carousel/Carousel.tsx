@@ -576,6 +576,7 @@ export default function Carousel() {
 
       {/* ── Case panel ── */}
       <div ref={casePanelRef} className={styles.casePanel}>
+        <div className={styles.casePanelBlur} aria-hidden />
         <iframe
           ref={frameARef}
           id="case-frame-a"
