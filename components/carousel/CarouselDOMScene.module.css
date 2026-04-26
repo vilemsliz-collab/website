@@ -161,11 +161,11 @@
 }
 
 
-/* ── Bottom-positioned headline for project cards ── */
+/* ── Top-positioned headline for project cards ── */
 .cardTopText {
   position: absolute;
-  bottom: 0; left: 0; right: 0;
-  padding: 0 var(--space-6) var(--space-8);
+  top: 0; left: 0; right: 0;
+  padding: var(--space-6) var(--space-6) 0;
   z-index: 3;
   pointer-events: none;
 }
@@ -199,10 +199,10 @@
 }
 
 .cardTopText .cardLine {
-  font-size: 44px;
-  line-height: 1.05;
-  font-weight: 900;
-  color: #ffffff;
+  font-size: 28px;
+  line-height: 1.1;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.95);
 }
 
 
