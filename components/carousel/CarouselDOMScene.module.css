@@ -173,6 +173,8 @@
 .cardTopText .cardLine {
   font-size: 38px;
   line-height: 1.05;
+  font-weight: 900;
+  color: #000000;
 }
 
 /* ── Frosted glass text zone for project cards ── */
