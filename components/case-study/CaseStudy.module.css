@@ -85,9 +85,11 @@
 .caseStudyClaims {
   position: relative;
   overflow: hidden;
-  min-height: calc(2 * var(--type-display-medium-lh));
+  height: calc(3 * var(--type-display-medium-lh));
 }
 .caseStudyClaim {
+  position: absolute;
+  top: 0; left: 0; right: 0;
   font-family: var(--font-brand);
   font-size: var(--type-display-medium-size);
   line-height: var(--type-display-medium-lh);
@@ -137,6 +139,6 @@
   .caseStudyTextInset   { padding-left: 0; padding-right: 0; }
   .caseStudyMetaRow     { flex-direction: column; }
   .caseStudyClaim       { font-size: var(--type-headline-small-size); line-height: var(--type-headline-small-lh); }
-  .caseStudyClaims      { min-height: calc(2 * var(--type-headline-small-lh)); }
+  .caseStudyClaims      { height: calc(3 * var(--type-headline-small-lh)); }
   .caseStudyRoleBlock   { padding: var(--space-5) var(--space-4); }
 }
