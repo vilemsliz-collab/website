@@ -99,7 +99,7 @@
 .caseStudyStatBlock {
   flex: 1;
   background: var(--gray-900);
-  border: none;
+  border: 1px solid var(--gray-100);
   border-radius: var(--shape-md);
   padding: var(--space-8);
   overflow: hidden;
@@ -163,6 +163,7 @@
 
 .caseStudyRoleBlock {
   flex: 1;
+  border: 1px solid var(--gray-100);
   border-radius: var(--shape-md);
   padding: var(--space-8) var(--space-6);
   overflow: hidden;
