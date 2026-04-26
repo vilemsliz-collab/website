@@ -141,6 +141,9 @@ export default function CaseStudyPage({ cs, isOverlay }: Props) {
         style={undefined}
       >
         <div className={styles.caseStudyTopBlur} aria-hidden />
+        <div className={styles.caseStudyBottomBlur} aria-hidden />
+        <div className={styles.caseStudyLeftBlur} aria-hidden />
+        <div className={styles.caseStudyRightBlur} aria-hidden />
         {isIframe && (
           <div
             className={styles.caseStudyCloseZone}
