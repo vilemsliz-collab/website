@@ -12,7 +12,7 @@
 
 .caseStudyEdgeBlur[data-side="top"] {
   top: 0; left: 0; right: 0;
-  height: 80px;
+  height: 120px;
   background: linear-gradient(to top, transparent, var(--color-background));
   -webkit-mask-image: linear-gradient(to bottom, black var(--stop), transparent);
   mask-image: linear-gradient(to bottom, black var(--stop), transparent);
@@ -20,7 +20,7 @@
 
 .caseStudyEdgeBlur[data-side="bottom"] {
   bottom: 0; left: 0; right: 0;
-  height: 80px;
+  height: 120px;
   background: linear-gradient(to bottom, transparent, var(--color-background));
   -webkit-mask-image: linear-gradient(to top, black var(--stop), transparent);
   mask-image: linear-gradient(to top, black var(--stop), transparent);
@@ -28,7 +28,7 @@
 
 .caseStudyEdgeBlur[data-side="left"] {
   top: 0; bottom: 0; left: 0;
-  width: 60px;
+  width: 100px;
   background: linear-gradient(to left, transparent, var(--color-background));
   -webkit-mask-image: linear-gradient(to right, black var(--stop), transparent);
   mask-image: linear-gradient(to right, black var(--stop), transparent);
@@ -36,7 +36,7 @@
 
 .caseStudyEdgeBlur[data-side="right"] {
   top: 0; bottom: 0; right: 0;
-  width: 60px;
+  width: 100px;
   background: linear-gradient(to right, transparent, var(--color-background));
   -webkit-mask-image: linear-gradient(to left, black var(--stop), transparent);
   mask-image: linear-gradient(to left, black var(--stop), transparent);
