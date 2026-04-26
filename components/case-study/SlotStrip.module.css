@@ -1,4 +1,9 @@
-.wrap { display: contents; }
+.wrap {
+  display: block;
+  margin-top: var(--space-16);
+  margin-left: calc(-1 * var(--space-8));
+  margin-right: calc(-1 * var(--space-8));
+}
 
 .reel {
   display: flex;
@@ -9,9 +14,6 @@
   -ms-overflow-style: none;
   gap: 6px;
   cursor: grab;
-  margin-top: var(--space-16);
-  margin-left: calc(-1 * var(--space-8));
-  margin-right: calc(-1 * var(--space-8));
   padding-left: var(--space-8);
   padding-right: var(--space-8);
 }
@@ -67,10 +69,12 @@
 }
 
 @media (max-width: 768px) {
-  .reel {
+  .wrap {
     margin-top: var(--space-12);
     margin-left: calc(-1 * var(--space-3));
     margin-right: calc(-1 * var(--space-3));
+  }
+  .reel {
     padding-left: var(--space-3);
     padding-right: var(--space-3);
   }
