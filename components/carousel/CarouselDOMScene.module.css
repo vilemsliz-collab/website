@@ -184,6 +184,8 @@
   z-index: 2;
   pointer-events: none;
   overflow: hidden;
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
   -webkit-mask-image: linear-gradient(to top, black 30%, transparent 100%);
   mask-image: linear-gradient(to top, black 30%, transparent 100%);
 }
@@ -197,6 +199,7 @@
   object-fit: cover;
   display: block;
   filter: blur(20px);
+  transform-origin: bottom center;
   transform: scale(1.06);
   -webkit-user-drag: none;
   user-select: none;
