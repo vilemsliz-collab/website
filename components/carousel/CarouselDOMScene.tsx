@@ -16,13 +16,11 @@ import OrbBackground from './OrbBackground'
 
 const N = CARDS.length
 
-const FLOAT_AMP     = 5.5
-const FLOAT_FREQ    = 0.40
-const BREATHE_AMP   = 0.006
-const BREATHE_FREQ  = 0.18
-const HOVER_MULT    = 1.8
-const HOVER_MOUSE_Y = 6
-const FLOAT_PHASES  = CARDS.map((_, i) => (i / CARDS.length) * Math.PI * 2)
+const FLOAT_AMP    = 5.5
+const FLOAT_FREQ   = 0.40
+const BREATHE_AMP  = 0.006
+const BREATHE_FREQ = 0.18
+const FLOAT_PHASES = CARDS.map((_, i) => (i / CARDS.length) * Math.PI * 2)
 
 export interface CarouselDOMSceneProps {
   posY:             MutableRefObject<number>
@@ -85,7 +83,6 @@ export default function CarouselDOMScene({
   const rafRef        = useRef<number | null>(null)
   const labelRef      = useRef('about')
   const hoverTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const hoverIdxRef   = useRef(-1)
   const seqRef        = useRef<'idle' | 'running'>('idle')
   const seqTimers     = useRef<ReturnType<typeof setTimeout>[]>([])
   const mousePos      = useRef({ x: 0, y: 0 })
@@ -186,20 +183,9 @@ export default function CarouselDOMScene({
 
         // ── Float & breathe ──────────────────────────────────────────────
         const phase     = FLOAT_PHASES[i]
-        const isHov     = hoverIdxRef.current === i
         const skipFloat = d.isMobile && t.isActive
-        let floatY: number
-        if (skipFloat) {
-          floatY = 0
-        } else {
-          const amp    = isHov ? FLOAT_AMP * HOVER_MULT : FLOAT_AMP
-          const base   = Math.sin(floatT * FLOAT_FREQ * Math.PI * 2 + phase) * amp
-          const mouseNY = isHov
-            ? (mousePos.current.y / d.viewportH - 0.5) * -HOVER_MOUSE_Y * 2
-            : 0
-          floatY = base + mouseNY
-        }
-        const breatheS = 1 + Math.sin(floatT * BREATHE_FREQ * Math.PI * 2 + phase) * BREATHE_AMP
+        const floatY    = skipFloat ? 0 : Math.sin(floatT * FLOAT_FREQ * Math.PI * 2 + phase) * FLOAT_AMP
+        const breatheS  = 1 + Math.sin(floatT * BREATHE_FREQ * Math.PI * 2 + phase) * BREATHE_AMP
 
         // ── Sphere 3D position (validated sign table — see plan) ──
         group.style.transform = [
@@ -298,17 +284,13 @@ export default function CarouselDOMScene({
           className={styles.cardGroup}
           data-dark
           onClick={(e) => { e.stopPropagation(); onCardClick(i) }}
-          onMouseEnter={() => {
-            hoverIdxRef.current = i
-            if (card.isAbout) {
-              if (seqRef.current === 'running') return
-              hoverTimerRef.current = setTimeout(runSequence, 10000)
-            }
-          }}
-          onMouseLeave={() => {
-            hoverIdxRef.current = -1
-            if (card.isAbout && hoverTimerRef.current) clearTimeout(hoverTimerRef.current)
-          }}
+          onMouseEnter={card.isAbout ? () => {
+            if (seqRef.current === 'running') return
+            hoverTimerRef.current = setTimeout(runSequence, 10000)
+          } : undefined}
+          onMouseLeave={card.isAbout ? () => {
+            if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current)
+          } : undefined}
         >
           {/* Ghost clones — behind mesh, same 3D position, different tilt angle */}
           {Array.from({ length: 4 }, (_, gi) => (
