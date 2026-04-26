@@ -109,7 +109,7 @@ export const CARDS: CardData[] = [
   { id: 'about', name: 'Vilém', lines: ['Brand XP', 'Expressive UI'], role: '', href: '/about', bg: '#ffffff', ac: '#000000', isAbout: true },
   { id: '002', lines: ['Generative systems,', 'designed in code.'],    role: 'Creative Technologist', href: '/cases/002', bg: '#0d1a0d', ac: '#4dd0e1', img: 'https://res.cloudinary.com/duee5dfom/image/upload/f_auto,q_auto/carousel-card-pictures/case-002-new' },
   { id: '003', lines: ['Audio reactive,', 'visual frequency.'],        role: 'Interaction Designer',  href: '/cases/003', bg: '#0d1a0d', ac: '#4dd0e1', img: 'https://res.cloudinary.com/duee5dfom/image/upload/f_auto,q_auto/carousel-card-pictures/case-003-new' },
-  { id: '004', lines: ['Procedural terrain,', 'rendered at runtime.'], role: 'Generative Artist',     href: '/cases/004', bg: '#071207', ac: '#66ff99', img: 'https://res.cloudinary.com/duee5dfom/image/upload/f_auto,q_auto/carousel-card-pictures/case-004' },
+
   { id: '001', lines: ['Typographic motion,', 'ink meets screen.'],    role: 'Motion Designer',       href: '/cases/001', bg: '#12131a', ac: '#c8ff00', video: 'https://res.cloudinary.com/duee5dfom/video/upload/f_auto,q_auto/carousel-card-pictures/portfolio-reel' },
   { id: 'website', name: 'How I', lines: ['built this', 'website'], role: '', href: '/cases/website', bg: '#12131a', ac: '#ffffff', isWebsite: true },
 ]
