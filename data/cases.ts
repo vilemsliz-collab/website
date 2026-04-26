@@ -67,6 +67,7 @@ export const CASES: CaseStudy[] = [
         'https://res.cloudinary.com/duee5dfom/image/upload/q_auto/f_auto/v1777233941/Frame_1000005659_aw4jmv.png',
       ],
       [],
+      [],
     ],
   },
   {
