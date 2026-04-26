@@ -70,8 +70,8 @@
 /* ── Text content ── */
 .cardText {
   position: absolute;
-  bottom: 0; left: 0; right: 0;
-  padding: var(--space-6) var(--space-6) var(--space-10);
+  top: 0; left: 0; right: 0;
+  padding: var(--space-6) var(--space-6) 0;
   z-index: 3;
   pointer-events: none;
 }
@@ -103,8 +103,8 @@
 
 .cardNameWrap {
   position: absolute;
-  top: 0; left: 0; right: 0;
-  padding: var(--space-6) var(--space-6) 0;
+  bottom: 0; left: 0; right: 0;
+  padding: 0 var(--space-6) var(--space-8);
   z-index: 3;
   pointer-events: none;
 }
@@ -125,7 +125,11 @@
 }
 
 .cardAbout .cardLine {
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   color: #000000;
+  display: inline-block;
 }
 
 /* ── Website card (dark inverted) ── */
@@ -136,8 +140,8 @@
 
 .cardWebsiteText {
   position: absolute;
-  top: 0; left: 0; right: 0;
-  padding: var(--space-6) var(--space-6) 0;
+  bottom: 0; left: 0; right: 0;
+  padding: 0 var(--space-6) var(--space-10);
   z-index: 3;
   pointer-events: none;
 }
@@ -161,11 +165,11 @@
 }
 
 
-/* ── Top-positioned headline for project cards ── */
+/* ── Bottom-positioned headline for project cards ── */
 .cardTopText {
   position: absolute;
-  top: 0; left: 0; right: 0;
-  padding: var(--space-10) var(--space-8) 0;
+  bottom: 0; left: 0; right: 0;
+  padding: 0 var(--space-8) var(--space-10);
   z-index: 3;
   pointer-events: none;
 }
