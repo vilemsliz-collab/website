@@ -1,59 +1,45 @@
-/* ── Scroll blur overlay — mirrors card frost zone ── */
-.caseStudyTopBlur {
+/* ── Edge blur overlays — blur + fade-to-background on all 4 sides ── */
+.caseStudyEdgeBlur {
+  --blur: 20px;
+  --stop: 40%;
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
+  z-index: 20;
+  pointer-events: none;
+  user-select: none;
+  backdrop-filter: blur(var(--blur));
+  -webkit-backdrop-filter: blur(var(--blur));
+}
+
+.caseStudyEdgeBlur[data-side="top"] {
+  top: 0; left: 0; right: 0;
   height: 80px;
-  z-index: 20;
-  pointer-events: none;
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  -webkit-mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
-  mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
+  background: linear-gradient(to top, transparent, var(--color-background));
+  -webkit-mask-image: linear-gradient(to bottom, black var(--stop), transparent);
+  mask-image: linear-gradient(to bottom, black var(--stop), transparent);
 }
 
-/* ── Bottom / side blur overlays ── */
-.caseStudyBottomBlur {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
+.caseStudyEdgeBlur[data-side="bottom"] {
+  bottom: 0; left: 0; right: 0;
   height: 80px;
-  z-index: 20;
-  pointer-events: none;
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  -webkit-mask-image: linear-gradient(to top, black 40%, transparent 100%);
-  mask-image: linear-gradient(to top, black 40%, transparent 100%);
+  background: linear-gradient(to bottom, transparent, var(--color-background));
+  -webkit-mask-image: linear-gradient(to top, black var(--stop), transparent);
+  mask-image: linear-gradient(to top, black var(--stop), transparent);
 }
 
-.caseStudyLeftBlur {
-  position: fixed;
-  top: 0;
-  bottom: 0;
-  left: 0;
+.caseStudyEdgeBlur[data-side="left"] {
+  top: 0; bottom: 0; left: 0;
   width: 60px;
-  z-index: 20;
-  pointer-events: none;
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  -webkit-mask-image: linear-gradient(to right, black 40%, transparent 100%);
-  mask-image: linear-gradient(to right, black 40%, transparent 100%);
+  background: linear-gradient(to left, transparent, var(--color-background));
+  -webkit-mask-image: linear-gradient(to right, black var(--stop), transparent);
+  mask-image: linear-gradient(to right, black var(--stop), transparent);
 }
 
-.caseStudyRightBlur {
-  position: fixed;
-  top: 0;
-  bottom: 0;
-  right: 0;
+.caseStudyEdgeBlur[data-side="right"] {
+  top: 0; bottom: 0; right: 0;
   width: 60px;
-  z-index: 20;
-  pointer-events: none;
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  -webkit-mask-image: linear-gradient(to left, black 40%, transparent 100%);
-  mask-image: linear-gradient(to left, black 40%, transparent 100%);
+  background: linear-gradient(to right, transparent, var(--color-background));
+  -webkit-mask-image: linear-gradient(to left, black var(--stop), transparent);
+  mask-image: linear-gradient(to left, black var(--stop), transparent);
 }
 
 /* ── Back link ── */
