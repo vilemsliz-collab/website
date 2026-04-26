@@ -185,6 +185,7 @@
 .caseStudyChallenge {
   display: flex;
   flex-direction: column;
+  justify-content: center;
   gap: var(--space-4);
   border: 1px solid var(--gray-50);
   border-radius: var(--shape-md);
