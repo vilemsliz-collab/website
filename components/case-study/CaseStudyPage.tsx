@@ -48,7 +48,7 @@ function CaseStudyMetaRow({ claims, roleBody }: { claims: CaseStudy['claims']; r
 
   return (
     <div data-element="Meta row" className={styles.caseStudyMetaRow}>
-      <div ref={statRef} data-element="Stat block" className={styles.caseStudyStatBlock}>
+      <div ref={statRef} data-element="Challenge block" className={styles.caseStudyStatBlock}>
         <div className={styles.caseStudyClaims}>
           <p key={cur} className={styles.caseStudyClaim}>
             {words.map((item, i) => (
@@ -151,6 +151,10 @@ export default function CaseStudyPage({ cs, isOverlay }: Props) {
         <SlotMedia img={cs.mediaImg} video={cs.mediaVideo}>
           <CaseStudyMetaRow claims={cs.claims} roleBody={cs.roleBody} />
         </SlotMedia>
+        <div id="case-challenge" data-element="Challenge" className={`${styles.caseStudyChallenge} ${styles.caseStudyTextInset}`}>
+          <span className={styles.caseStudyRoleLabel}>Challenge</span>
+          <p className={styles.caseStudyBody}>{cs.challenge}</p>
+        </div>
         <SlotStrip items={cs.strip} />
         <SlotPairs pairs={cs.pairs} />
       </div>
