@@ -68,25 +68,34 @@
   content: '';
   position: absolute;
   inset: 0;
-  background: radial-gradient(ellipse 85% 85% at 30% 60%, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0.072) 45%, transparent 72%);
+  background: radial-gradient(ellipse 85% 85% at 30% 60%, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0.036) 45%, transparent 72%);
   filter: blur(24px);
   transition: transform 0.7s cubic-bezier(0.25, 0, 0, 1);
   pointer-events: none;
 }
 .caseStudyStatBlock:hover::before {
-  transform: translate(36px, -20px);
+  transform: translate(100px, -60px);
+}
+@media (hover: none) {
+  .caseStudyStatBlock::before {
+    animation: statBlockHighlightFloat 3s ease-in-out infinite alternate;
+  }
+}
+@keyframes statBlockHighlightFloat {
+  from { transform: translate(0, 0); }
+  to   { transform: translate(100px, -60px); }
 }
 
 .caseStudyClaims {
   position: relative;
   overflow: hidden;
-  min-height: calc(2 * var(--type-display-small-lh));
+  min-height: calc(2 * var(--type-display-medium-lh));
 }
 .caseStudyClaim {
   font-family: var(--font-brand);
-  font-size: var(--type-display-small-size);
-  line-height: var(--type-display-small-lh);
-  letter-spacing: var(--type-display-small-ls);
+  font-size: var(--type-display-medium-size);
+  line-height: var(--type-display-medium-lh);
+  letter-spacing: var(--type-display-medium-ls);
   font-weight: 400;
   font-variation-settings: 'wght' 400;
   color: var(--gray-300);
