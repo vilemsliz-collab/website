@@ -177,7 +177,7 @@
   color: #000000;
 }
 
-/* ── Shader zone for project cards (same blob as cursor) ── */
+/* ── Frosted glass text zone for project cards ── */
 .cardFrost {
   position: absolute;
   top: 0;
@@ -186,16 +186,23 @@
   height: 55%;
   z-index: 2;
   pointer-events: none;
+  overflow: hidden;
   -webkit-mask-image: linear-gradient(to bottom, black 30%, transparent 100%);
   mask-image: linear-gradient(to bottom, black 30%, transparent 100%);
 }
 
-.cardShaderCanvas {
+.cardFrostMedia {
   position: absolute;
-  inset: 0;
+  top: 0;
+  left: 0;
   width: 100%;
-  height: 100%;
+  height: calc(100% / 0.55);
+  object-fit: cover;
   display: block;
+  filter: blur(20px);
+  transform: scale(1.06);
+  -webkit-user-drag: none;
+  user-select: none;
 }
 
 /* ── Ghost clones ── */

@@ -13,7 +13,6 @@ import { computeCardTransforms, perspAngle } from '@/lib/carouselPhysics'
 import { computeStageWidth, type CardDimensions } from '@/lib/cardDimensions'
 import styles from './CarouselDOMScene.module.css'
 import OrbBackground from './OrbBackground'
-import CardShaderZone from './CardShaderZone'
 
 const N = CARDS.length
 
@@ -377,7 +376,12 @@ export default function CarouselDOMScene({
             ) : (
               <>
                 <div className={styles.cardFrost}>
-                  <CardShaderZone />
+                  {card.video ? (
+                    <video src={card.video} autoPlay muted loop playsInline className={styles.cardFrostMedia} aria-hidden />
+                  ) : card.img ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={card.img} alt="" className={styles.cardFrostMedia} />
+                  ) : null}
                 </div>
                 <div className={styles.cardTopText}>
                   <p className={styles.cardLine}>{card.lines[0]}</p>
