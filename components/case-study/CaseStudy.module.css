@@ -163,6 +163,7 @@
 
 .caseStudyRoleBlock {
   flex: 1;
+  background: var(--color-background);
   border: 1px solid var(--gray-50);
   border-radius: var(--shape-md);
   padding: var(--space-8) var(--space-6);
@@ -188,6 +189,7 @@
   justify-content: center;
   gap: var(--space-4);
   margin-top: var(--space-4);
+  background: var(--color-background);
   border: 1px solid var(--gray-50);
   border-radius: var(--shape-md);
   padding: var(--space-8) var(--space-6);
