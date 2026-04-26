@@ -172,7 +172,9 @@
 
 .cardHeadlineBox {
   display: inline-block;
-  background: #ffffff;
+  background: rgba(255, 255, 255, 0.60);
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
   border-radius: var(--shape-md);
   padding: var(--space-3) var(--space-4);
 }
