@@ -52,7 +52,7 @@ export const CASES: CaseStudy[] = [
     mediaVideo: 'https://res.cloudinary.com/duee5dfom/video/upload/q_auto/f_auto/v1777234237/stretched_1fsfsfsf_1_djmmca.mp4',
     mediaCaption: 'Three separate product teams were shipping UI at different speeds with no shared vocabulary.',
     strip: [
-      { caption: 'Three teams, one design system.' },
+      { img: 'https://res.cloudinary.com/duee5dfom/image/upload/q_auto/f_auto/v1777233941/Frame_1000005666_rlpzfv.png', caption: 'Three teams, one design system.' },
       { caption: 'Three teams, one design system.' },
       { img: 'https://res.cloudinary.com/duee5dfom/image/upload/q_auto/f_auto/v1777233941/Frame_1000005669_hdadna.png', caption: 'Three teams, one design system.' },
       { img: 'https://res.cloudinary.com/duee5dfom/image/upload/q_auto/f_auto/v1777233943/Frame_1000005670_qtoiwt.png', caption: 'Three teams, one design system.' },
