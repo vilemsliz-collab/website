@@ -63,19 +63,31 @@
   background: transparent;
 }
 
-/* ── Scroll blur overlay inside case panel ── */
-/* Lives in the parent page (not the iframe) so it can sample iframe content
-   through the compositing layer of .casePanel. */
+/* ── Case panel scroll blur — sibling above .casePanel ── */
+/* Must be a sibling OUTSIDE .casePanel and above it (z-index 51 > 50) so that
+   its backdrop-filter samples .casePanel's composited output (incl. iframe content).
+   Inside .casePanel the backdrop-filter compositing boundary blocks iframe pixels. */
 .casePanelBlur {
-  position: absolute;
-  top: 0; left: 0; right: 0;
+  position: fixed;
+  top: 20px;
+  left: calc(30vw + 20px);
+  right: 20px;
   height: 80px;
-  z-index: 60;
+  z-index: 51;
   pointer-events: none;
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   -webkit-mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
   mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
+  border-radius: 20px 20px 0 0;
+}
+
+@media (max-width: 767px) {
+  .casePanelBlur {
+    top: 12px;
+    left: 12px;
+    right: 12px;
+  }
 }
 
 

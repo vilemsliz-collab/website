@@ -576,7 +576,6 @@ export default function Carousel() {
 
       {/* ── Case panel ── */}
       <div ref={casePanelRef} className={styles.casePanel}>
-        <div className={styles.casePanelBlur} aria-hidden />
         <iframe
           ref={frameARef}
           id="case-frame-a"
@@ -590,6 +589,11 @@ export default function Carousel() {
           title="Case study next"
         />
       </div>
+
+      {/* ── Case panel scroll blur — sits ABOVE .casePanel (z 51 > 50) so backdrop-filter
+           samples .casePanel's full composited output (including live iframe pixels).
+           Inside .casePanel the layer boundary blocks iframe sampling. ── */}
+      <div className={styles.casePanelBlur} aria-hidden />
 
       {/* ── Site nav ── */}
       <nav className={styles.siteNav}>
