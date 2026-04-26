@@ -1,7 +1,6 @@
 'use client'
 
 import Image from 'next/image'
-import { useRef, useEffect } from 'react'
 import s from './SlotMedia.module.css'
 
 export default function SlotMedia({
@@ -13,19 +12,13 @@ export default function SlotMedia({
   video?: string
   children?: React.ReactNode
 }) {
-  const videoRef = useRef<HTMLVideoElement>(null)
-
-  useEffect(() => {
-    if (videoRef.current) videoRef.current.playbackRate = 1.5
-  }, [])
-
   return (
     <div className={s.wrap}>
       <div id="case-media" data-element="Media block" className={s.mediaBlock}>
         <div id="case-media-frame" data-element="Media frame" className={s.mediaFrame}>
           {video ? (
             <video
-              ref={videoRef}
+              ref={el => { if (el) el.playbackRate = 1.5 }}
               data-element="Media video"
               src={video}
               autoPlay

@@ -54,19 +54,22 @@ export const CASES: CaseStudy[] = [
     strip: [
       { caption: 'Three teams, one design system.' },
       { caption: 'Three teams, one design system.' },
-      { caption: 'Three teams, one design system.' },
-      { caption: 'Three teams, one design system.' },
+      { img: 'https://res.cloudinary.com/duee5dfom/image/upload/q_auto/f_auto/v1777233941/Frame_1000005669_hdadna.png', caption: 'Three teams, one design system.' },
+      { img: 'https://res.cloudinary.com/duee5dfom/image/upload/q_auto/f_auto/v1777233943/Frame_1000005670_qtoiwt.png', caption: 'Three teams, one design system.' },
     ],
     pairs: [
       [
-        'https://res.cloudinary.com/duee5dfom/video/upload/q_auto/f_auto/v1777234237/stretched_1fsfsfsf_1_djmmca.mp4',
+        'https://res.cloudinary.com/duee5dfom/image/upload/q_auto/f_auto/v1777233939/Frame_1000005661_zekl7h.png',
         'https://res.cloudinary.com/duee5dfom/image/upload/q_auto/f_auto/v1777233939/Frame_1000005663_tyzw5d.png',
       ],
       [
         'https://res.cloudinary.com/duee5dfom/image/upload/q_auto/f_auto/v1777233940/Frame_1000005656_lvzzdk.png',
         'https://res.cloudinary.com/duee5dfom/image/upload/q_auto/f_auto/v1777233941/Frame_1000005659_aw4jmv.png',
       ],
-      [],
+      [
+        'https://res.cloudinary.com/duee5dfom/image/upload/q_auto/f_auto/v1777233941/Frame_1000005660_bckqnw.png',
+        'https://res.cloudinary.com/duee5dfom/image/upload/q_auto/f_auto/v1777233943/Frame_1000005665_mc18e6.png',
+      ],
       [],
     ],
   },
