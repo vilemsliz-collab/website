@@ -10,9 +10,13 @@ function SlotPairRow({ pair, rowIndex }: { pair: string[]; rowIndex: number }) {
           <div id={`case-pairs-${rowIndex}-1`} data-element={`Pair ${rowIndex + 1}-2`} className={s.pairSlot} data-slot={`pair-${rowIndex}-1`} />
         </>
       ) : (
-        pair.map((img, ii) => (
+        pair.map((url, ii) => (
           <div key={ii} id={`case-pairs-${rowIndex}-${ii}`} data-element={`Pair ${rowIndex + 1}-${ii + 1}`} className={s.pairSlot} data-slot={`pair-${rowIndex}-${ii}`}>
-            <Image src={img} alt="" fill sizes="(max-width: 768px) 100vw, 50vw" style={{ objectFit: 'cover' }} />
+            {url.includes('/video/') ? (
+              <video src={url} autoPlay muted loop playsInline style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+            ) : (
+              <Image src={url} alt="" fill sizes="(max-width: 768px) 100vw, 50vw" style={{ objectFit: 'cover' }} />
+            )}
           </div>
         ))
       )}

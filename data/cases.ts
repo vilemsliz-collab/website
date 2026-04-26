@@ -49,6 +49,7 @@ export const CASES: CaseStudy[] = [
     roleBody: 'We audited every existing pattern, distilled a minimal token architecture, and rebuilt the component library from the ground up — optimised for composability.',
     challenge: 'Three separate product teams were shipping UI at different speeds with no shared vocabulary.',
     solution: 'We audited every existing pattern, distilled a minimal token architecture, and rebuilt the component library from the ground up — optimised for composability.',
+    mediaVideo: 'https://res.cloudinary.com/duee5dfom/video/upload/q_auto/f_auto/v1777234237/stretched_1fsfsfsf_1_djmmca.mp4',
     mediaCaption: 'Three separate product teams were shipping UI at different speeds with no shared vocabulary.',
     strip: [
       { caption: 'Three teams, one design system.' },
@@ -56,7 +57,17 @@ export const CASES: CaseStudy[] = [
       { caption: 'Three teams, one design system.' },
       { caption: 'Three teams, one design system.' },
     ],
-    pairs: [[], []],
+    pairs: [
+      [
+        'https://res.cloudinary.com/duee5dfom/video/upload/q_auto/f_auto/v1777234237/stretched_1fsfsfsf_1_djmmca.mp4',
+        'https://res.cloudinary.com/duee5dfom/image/upload/q_auto/f_auto/v1777233939/Frame_1000005663_tyzw5d.png',
+      ],
+      [
+        'https://res.cloudinary.com/duee5dfom/image/upload/q_auto/f_auto/v1777233940/Frame_1000005656_lvzzdk.png',
+        'https://res.cloudinary.com/duee5dfom/image/upload/q_auto/f_auto/v1777233941/Frame_1000005659_aw4jmv.png',
+      ],
+      [],
+    ],
   },
   {
     slug: '002',
