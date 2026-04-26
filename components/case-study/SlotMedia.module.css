@@ -4,12 +4,8 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-8);
-  margin-top: var(--space-8);
 }
 
-@media (max-width: 768px) {
-  .mediaBlock { margin-top: var(--space-6); }
-}
 
 .mediaFrame {
   width: 100%;
