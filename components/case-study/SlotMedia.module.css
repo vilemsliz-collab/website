@@ -10,7 +10,7 @@
   width: 100%;
   aspect-ratio: 1072 / 675;
   background: var(--color-surface);
-  border: 1px solid var(--gray-100);
+  border: 1px solid var(--gray-50);
   border-radius: var(--shape-md);
   overflow: hidden;
   position: relative;

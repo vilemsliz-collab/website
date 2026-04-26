@@ -22,7 +22,7 @@
 .slide {
   flex: 0 0 calc(40% - 4px);
   aspect-ratio: 848 / 675;
-  border: 1px solid var(--gray-100);
+  border: 1px solid var(--gray-50);
   border-radius: var(--shape-md);
   overflow: hidden;
   display: flex;
