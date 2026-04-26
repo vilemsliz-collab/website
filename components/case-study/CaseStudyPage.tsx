@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useLayoutEffect, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import type { CaseStudy } from '@/data/cases'
 import styles from './CaseStudy.module.css'
 import SlotHero from './SlotHero'
@@ -11,10 +11,32 @@ import Loader from '@/components/loader/Loader'
 
 function CaseStudyMetaRow({ claims, roleBody }: { claims: CaseStudy['claims']; roleBody: string }) {
   const [cur, setCur] = useState(0)
+  const statRef = useRef<HTMLDivElement>(null)
+
   useEffect(() => {
     const id = setInterval(() => setCur(c => (c + 1) % claims.length), 3500)
     return () => clearInterval(id)
   }, [claims.length])
+
+  useEffect(() => {
+    const el = statRef.current
+    if (!el) return
+    function onMove(e: MouseEvent) {
+      const r = el!.getBoundingClientRect()
+      el!.style.setProperty('--mx', ((e.clientX - r.left) / r.width  * 100).toFixed(1))
+      el!.style.setProperty('--my', ((e.clientY - r.top)  / r.height * 100).toFixed(1))
+    }
+    function onLeave() {
+      el!.style.setProperty('--mx', '30')
+      el!.style.setProperty('--my', '60')
+    }
+    el.addEventListener('mousemove', onMove)
+    el.addEventListener('mouseleave', onLeave)
+    return () => {
+      el.removeEventListener('mousemove', onMove)
+      el.removeEventListener('mouseleave', onLeave)
+    }
+  }, [])
 
   const claim = claims[cur]
   const [before, after] = claim.text.split('{bold}')
@@ -26,7 +48,7 @@ function CaseStudyMetaRow({ claims, roleBody }: { claims: CaseStudy['claims']; r
 
   return (
     <div data-element="Meta row" className={styles.caseStudyMetaRow}>
-      <div data-element="Stat block" className={styles.caseStudyStatBlock}>
+      <div ref={statRef} data-element="Stat block" className={styles.caseStudyStatBlock}>
         <div className={styles.caseStudyClaims}>
           <p key={cur} className={styles.caseStudyClaim}>
             {words.map((item, i) => (
