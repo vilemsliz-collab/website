@@ -375,11 +375,17 @@ export default function CarouselDOMScene({
               </>
             ) : (
               <>
+                <div className={styles.cardFrost}>
+                  {card.video ? (
+                    <video src={card.video} autoPlay muted loop playsInline className={styles.cardFrostMedia} aria-hidden />
+                  ) : card.img ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={card.img} alt="" className={styles.cardFrostMedia} />
+                  ) : null}
+                </div>
                 <div className={styles.cardTopText}>
-                  <div className={styles.cardHeadlineBox}>
-                    <p className={styles.cardLine}>{card.lines[0]}</p>
-                    <p className={styles.cardLine}>{card.lines[1]}</p>
-                  </div>
+                  <p className={styles.cardLine}>{card.lines[0]}</p>
+                  <p className={styles.cardLine}>{card.lines[1]}</p>
                 </div>
               </>
             )}
