@@ -354,6 +354,16 @@ export default function CarouselDOMScene({
               </>
             )}
 
+            {/* Frost zone — top of every card */}
+            <div className={styles.cardFrost}>
+              {card.video ? (
+                <video src={card.video} autoPlay muted loop playsInline className={styles.cardFrostMedia} aria-hidden />
+              ) : card.img ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={card.img} alt="" className={styles.cardFrostMedia} />
+              ) : null}
+            </div>
+
             {card.isAbout ? (
               <>
                 <div className={styles.cardNameWrap}>
@@ -374,20 +384,10 @@ export default function CarouselDOMScene({
                 </div>
               </>
             ) : (
-              <>
-                <div className={styles.cardFrost}>
-                  {card.video ? (
-                    <video src={card.video} autoPlay muted loop playsInline className={styles.cardFrostMedia} aria-hidden />
-                  ) : card.img ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={card.img} alt="" className={styles.cardFrostMedia} />
-                  ) : null}
-                </div>
-                <div className={styles.cardTopText}>
-                  <p className={styles.cardLine}>{card.lines[0]}</p>
-                  <p className={styles.cardLine}>{card.lines[1]}</p>
-                </div>
-              </>
+              <div className={styles.cardTopText}>
+                <p className={styles.cardLine}>{card.lines[0]}</p>
+                <p className={styles.cardLine}>{card.lines[1]}</p>
+              </div>
             )}
 
             <div

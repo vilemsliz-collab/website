@@ -170,28 +170,27 @@
   pointer-events: none;
 }
 
-/* ── Frosted glass text zone for project cards ── */
+/* ── Frosted glass zone — top of all cards ── */
 .cardFrost {
   position: absolute;
-  bottom: 0;
+  top: 0;
   left: 0;
   right: 0;
   height: 55%;
   z-index: 2;
   pointer-events: none;
   overflow: hidden;
-  -webkit-mask-image: linear-gradient(to top, black 30%, transparent 100%);
-  mask-image: linear-gradient(to top, black 30%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, black 30%, transparent 100%);
+  mask-image: linear-gradient(to bottom, black 30%, transparent 100%);
 }
 
 .cardFrostMedia {
   position: absolute;
-  bottom: 0;
+  top: 0;
   left: 0;
   width: 100%;
   height: calc(100% / 0.55);
   object-fit: cover;
-  object-position: bottom;
   display: block;
   filter: blur(20px);
   transform: scale(1.06);
