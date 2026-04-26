@@ -165,7 +165,7 @@
 .cardTopText {
   position: absolute;
   top: 0; left: 0; right: 0;
-  padding: var(--space-6) var(--space-6) 0;
+  padding: var(--space-10) var(--space-8) 0;
   z-index: 3;
   pointer-events: none;
 }
