@@ -144,7 +144,7 @@
 
 .cardWebsiteLine {
   font-family: var(--font-brand);
-  font-size: 48px;
+  font-size: 52px;
   font-weight: 700;
   line-height: 1.05;
   color: #ffffff;
@@ -171,7 +171,7 @@
 }
 
 .cardTopText .cardLine {
-  font-size: 48px;
+  font-size: 44px;
   line-height: 1.05;
   font-weight: 900;
   color: #000000;
