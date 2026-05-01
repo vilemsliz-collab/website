@@ -207,5 +207,5 @@
   .caseStudyBackLink    { top: calc(20px + env(safe-area-inset-top)); left: calc(24px + env(safe-area-inset-left)); }
   .caseStudyEdgeBlur[data-side="left"],
   .caseStudyEdgeBlur[data-side="right"] { display: none; }
-  .caseStudyEdgeBlur[data-side="top"]   { height: var(--top-blur-height, 40px); }
+  .caseStudyEdgeBlur[data-side="top"]   { height: var(--top-blur-height, 20px); }
 }
