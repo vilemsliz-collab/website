@@ -111,7 +111,7 @@ export default function CaseStudyPage({ cs, isOverlay }: Props) {
     let timer: ReturnType<typeof setTimeout>
     function onScroll() {
       const isMobile = window.innerWidth <= 768
-      el!.style.setProperty('--top-blur-height', isMobile ? '40px' : '160px')
+      el!.style.setProperty('--top-blur-height', isMobile ? '20px' : '160px')
       clearTimeout(timer)
       timer = setTimeout(() => el!.style.setProperty('--top-blur-height', isMobile ? '20px' : '80px'), 200)
     }
