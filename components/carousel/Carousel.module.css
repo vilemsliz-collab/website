@@ -82,20 +82,17 @@
   border-radius: 20px 20px 0 0;
 }
 
-@media (max-width: 767px) {
-  .casePanelBlur {
-    top: 12px;
-    left: 12px;
-    right: 12px;
-  }
-}
-
-
-/* Mobile: floating panel with smaller insets; hide desktop-only chrome */
+/* Mobile: full-screen panel — no inset, no border-radius; safe areas handled inside case study */
 @media (max-width: 767px) {
   .casePanel {
-    top: 12px; bottom: 12px;
-    left: 12px; right: 12px;
+    inset: 0;
+    border-radius: 0;
+  }
+  .casePanelBlur {
+    top: 0;
+    left: 0;
+    right: 0;
+    border-radius: 0;
   }
   .siteNav { display: none; }
 }
