@@ -34,7 +34,7 @@
 /* ── Case panel ── */
 .casePanel {
   position: fixed;
-  top: 20px; bottom: 20px;
+  top: 20px; bottom: -80px;
   left: calc(30vw + 20px); right: 20px;
   background: rgba(255, 255, 255, 0.60);
   backdrop-filter: blur(40px);
