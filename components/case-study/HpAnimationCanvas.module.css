@@ -1,9 +1,12 @@
 .canvasWrapper {
   --shadow-card:  0px 10px 22px rgba(22,41,54,0.021), 0px 20px 64px rgba(22,41,54,0.021);
   --shadow-hover: 0px 20px 48px rgba(22,41,54,0.042), 0px 8px 20px rgba(22,41,54,0.028);
-  position: absolute;
-  inset: 0;
+  width: 100%;
+  max-width: 648px;
+  min-height: 460px;
+  position: relative;
   overflow: visible;
+  margin: 0 auto;
 }
 
 .canvas {

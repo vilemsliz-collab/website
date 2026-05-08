@@ -28,6 +28,9 @@
 .pairSlotWide {
   flex: 1;
   aspect-ratio: 1060 / 675;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background: var(--color-background);
   border: 1px solid var(--gray-50);
   border-radius: var(--shape-md);
