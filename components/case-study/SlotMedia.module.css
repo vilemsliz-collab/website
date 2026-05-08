@@ -11,6 +11,7 @@
   width: 100%;
   aspect-ratio: 1072 / 675;
   background: var(--color-background);
+  border: 1px solid var(--color-surface-variant);
   clip-path: inset(0 round var(--shape-md));
   position: relative;
 }
