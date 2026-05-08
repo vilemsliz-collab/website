@@ -1,0 +1,176 @@
+.canvasWrapper {
+  --shadow-card:  0px 10px 22px rgba(22,41,54,0.021), 0px 20px 64px rgba(22,41,54,0.021);
+  --shadow-hover: 0px 20px 48px rgba(22,41,54,0.042), 0px 8px 20px rgba(22,41,54,0.028);
+  width: 100%;
+  max-width: 600px;
+  min-height: 460px;
+  position: relative;
+  overflow: visible;
+  margin: 0 auto;
+}
+
+.canvas {
+  position: relative;
+  width: 600px;
+  height: 460px;
+  background: #ffffff;
+  border-radius: 16px;
+  transform-origin: top left;
+}
+
+/* Cheap-blur trick: render blobs at 1/4 size with 1/4-radius blur, scale back up 4×.
+   Visually equivalent to blur(60px) on the full-size layer, ~16× cheaper to paint. */
+.gradientMap {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 25%;
+  height: 25%;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+  border-radius: 4px;
+  filter: blur(15px);
+  opacity: 0.75;
+  transform: scale(4);
+  transform-origin: top left;
+}
+
+.blob {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 54px;
+  height: 54px;
+  pointer-events: none;
+  will-change: transform;
+  transform: translate3d(0, 0, 0);
+}
+
+/* ── Card ── */
+.card {
+  position: absolute;
+  width: 264px;
+  background: #ffffff;
+  border-radius: 24px;
+  box-shadow: var(--shadow-card);
+  padding: 16px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  z-index: 1;
+}
+
+.cardHeader { display: flex; flex-direction: column; gap: 12px; }
+.cardTitleRow { display: flex; align-items: center; gap: 8px; }
+
+.cardIcon {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+.cardTitle {
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.2;
+  color: #162136;
+  flex: 1;
+  min-width: 0;
+}
+
+.cardLines { display: flex; flex-direction: column; gap: 8px; }
+
+.line {
+  height: 8px;
+  border-radius: 2px;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(90deg, rgba(170,255,0,0.2) 0%, rgba(0,224,92,0.2) 72%, rgba(0,229,229,0.2) 92%);
+}
+
+.line::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-color: #dce1eb;
+  opacity: 1;
+  transition: opacity 0.55s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.line::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(170,255,0,0) 0%, #aaff00 15%, #00e05c 72%, #00ff2b 92%, rgba(0,229,229,0) 100%);
+  opacity: 0;
+  transition: opacity 0.55s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+@keyframes lineFlow {
+  from { transform: translateX(-100%); }
+  to   { transform: translateX(100%); }
+}
+
+.linesActive .line::before { opacity: 0; }
+.linesActive .line::after {
+  opacity: 1;
+  animation: lineFlow 2.4s linear -1.2s infinite;
+  filter: blur(6px);
+}
+
+.lineShort { width: calc(100% - 20px); }
+
+/* ── Card footer ── */
+.cardFooter { display: flex; gap: 6px; align-items: center; }
+
+.avatar,
+.agentBadge {
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  flex-shrink: 0;
+  transition: transform 0.35s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.avatar {
+  background-color: #f2f5fa;
+  background-image: var(--hp-avatar-sprite);
+  background-size: 240px 48px;
+  background-repeat: no-repeat;
+}
+
+.avatarFemale02 { background-position: 0 0; }
+.avatarMale01   { background-position: -48px 0; }
+.avatarFemale03 { background-position: -96px 0; }
+.avatarMale02   { background-position: -144px 0; }
+.avatarFemale04 { background-position: -192px 0; }
+
+.agentBadge {
+  background: linear-gradient(135deg, #aaff00 0%, #00e05c 50%, #00ff2b 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.agentBadge svg {
+  width: 28px;
+  height: 28px;
+  color: #ffffff;
+  fill: #ffffff;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card,
+  .avatar,
+  .agentBadge,
+  .line,
+  .line::before,
+  .line::after,
+  .blob {
+    transition: none !important;
+    animation: none !important;
+    will-change: auto !important;
+  }
+  .card { opacity: 1 !important; }
+}

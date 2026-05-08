@@ -1,4 +1,5 @@
 import Image from 'next/image'
+import HpAnimationCanvas from './HpAnimationCanvas'
 import s from './SlotPairs.module.css'
 
 function SlotPairRow({ pair, rowIndex }: { pair: string[]; rowIndex: number }) {
@@ -12,7 +13,9 @@ function SlotPairRow({ pair, rowIndex }: { pair: string[]; rowIndex: number }) {
       ) : (
         pair.map((url, ii) => (
           <div key={ii} id={`case-pairs-${rowIndex}-${ii}`} data-element={`Pair ${rowIndex + 1}-${ii + 1}`} className={pair.length === 1 ? s.pairSlotWide : s.pairSlot} data-slot={`pair-${rowIndex}-${ii}`}>
-            {url.includes('/video/') ? (
+            {url === '@hp-animation' ? (
+              <HpAnimationCanvas />
+            ) : url.includes('/video/') ? (
               <video src={url} autoPlay muted loop playsInline style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
             ) : url.endsWith('.html') ? (
               <iframe src={url} style={{ width: '100%', height: '100%', border: 'none', display: 'block', pointerEvents: 'none' }} />
