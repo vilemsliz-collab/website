@@ -29,7 +29,6 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  padding: var(--space-1);
   background: var(--color-background);
   position: relative;
 }
