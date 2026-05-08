@@ -25,6 +25,7 @@ export interface CaseStudy {
   mediaVideo?: string
   mediaCaption: string
   pairs: string[][]
+  pairsBottom?: string[][]
   mobileSections?: MobileSection[]
 }
 
@@ -93,7 +94,6 @@ export const CASES: CaseStudy[] = [
     mediaVideo: 'https://res.cloudinary.com/duee5dfom/video/upload/q_auto/f_auto/v1777116988/Final_Wrike_Copilot_Promo_Compressed_HB_1__2_gyxj2u.mp4',
     mediaCaption: 'Three separate product teams were shipping UI at different speeds with no shared vocabulary.',
     pairs: [
-      ['@hp-animation'],
       [
         'https://res.cloudinary.com/duee5dfom/image/upload/q_auto/f_auto/v1776898866/Frame_1000005674_cryrlh.png',
         '/wrike-ai-carousel/index.html',
@@ -103,6 +103,7 @@ export const CASES: CaseStudy[] = [
         'https://res.cloudinary.com/duee5dfom/image/upload/q_auto/f_auto/v1776898865/Frame_1000005638_daacf6.png',
       ],
     ],
+    pairsBottom: [['@hp-animation']],
   },
   {
     slug: '004',

@@ -167,6 +167,7 @@ export default function CaseStudyPage({ cs, isOverlay }: Props) {
           <span className={styles.caseStudyRoleLabel}>Solution</span>
           <p className={styles.caseStudyBody}>{cs.solution}</p>
         </div>
+        {cs.pairsBottom && <SlotPairs pairs={cs.pairsBottom} />}
       </div>
     </>
   )
