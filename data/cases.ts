@@ -56,7 +56,6 @@ export const CASES: CaseStudy[] = [
       { img: 'https://res.cloudinary.com/duee5dfom/image/upload/q_auto/f_auto/v1777233941/Frame_1000005668_slboqh.png', caption: 'Three teams, one design system.' },
       { img: 'https://res.cloudinary.com/duee5dfom/image/upload/q_auto/f_auto/v1777233941/Frame_1000005669_hdadna.png', caption: 'Three teams, one design system.' },
       { img: 'https://res.cloudinary.com/duee5dfom/image/upload/q_auto/f_auto/v1777233943/Frame_1000005670_qtoiwt.png', caption: 'Three teams, one design system.' },
-      { img: '/temp-strip-test.png', caption: 'Three teams, one design system.' },
     ],
     pairs: [
       [
