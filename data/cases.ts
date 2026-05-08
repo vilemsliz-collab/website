@@ -11,11 +11,6 @@ export interface CaseClaim {
   bold: string
 }
 
-export interface CaseStripItem {
-  img?: string
-  caption: string
-}
-
 export interface CaseStudy {
   slug: string
   title: string
@@ -29,8 +24,6 @@ export interface CaseStudy {
   mediaImg?: string
   mediaVideo?: string
   mediaCaption: string
-  strip: CaseStripItem[]
-  stripCols?: number
   pairs: string[][]
   mobileSections?: MobileSection[]
 }
@@ -51,12 +44,6 @@ export const CASES: CaseStudy[] = [
     solution: 'We audited every existing pattern, distilled a minimal token architecture, and rebuilt the component library from the ground up — optimised for composability.',
     mediaVideo: 'https://res.cloudinary.com/duee5dfom/video/upload/q_auto/f_auto/v1777234237/stretched_1fsfsfsf_1_djmmca.mp4',
     mediaCaption: 'Three separate product teams were shipping UI at different speeds with no shared vocabulary.',
-    strip: [
-      { img: 'https://res.cloudinary.com/duee5dfom/image/upload/q_auto/f_auto/v1777233941/Frame_1000005666_rlpzfv.png', caption: 'Three teams, one design system.' },
-      { img: 'https://res.cloudinary.com/duee5dfom/image/upload/q_auto/f_auto/v1777233941/Frame_1000005668_slboqh.png', caption: 'Three teams, one design system.' },
-      { img: 'https://res.cloudinary.com/duee5dfom/image/upload/q_auto/f_auto/v1777233941/Frame_1000005669_hdadna.png', caption: 'Three teams, one design system.' },
-      { img: 'https://res.cloudinary.com/duee5dfom/image/upload/q_auto/f_auto/v1777233943/Frame_1000005670_qtoiwt.png', caption: 'Three teams, one design system.' },
-    ],
     pairs: [
       [
         'https://res.cloudinary.com/duee5dfom/image/upload/q_auto/f_auto/v1777233939/Frame_1000005661_zekl7h.png',
@@ -87,12 +74,6 @@ export const CASES: CaseStudy[] = [
     challenge: 'Three separate product teams were shipping UI at different speeds with no shared vocabulary.',
     solution: 'We audited every existing pattern, distilled a minimal token architecture, and rebuilt the component library from the ground up — optimised for composability.',
     mediaCaption: 'Three separate product teams were shipping UI at different speeds with no shared vocabulary.',
-    strip: [
-      { caption: 'Three teams, one design system.' },
-      { caption: 'Three teams, one design system.' },
-      { caption: 'Three teams, one design system.' },
-      { caption: 'Three teams, one design system.' },
-    ],
     pairs: [[], []],
   },
   {
@@ -111,12 +92,6 @@ export const CASES: CaseStudy[] = [
     mediaImg: 'https://res.cloudinary.com/duee5dfom/image/upload/q_auto/f_auto/v1776899106/Frame_1000005676_avin8a.png',
     mediaVideo: 'https://res.cloudinary.com/duee5dfom/video/upload/q_auto/f_auto/v1777116988/Final_Wrike_Copilot_Promo_Compressed_HB_1__2_gyxj2u.mp4',
     mediaCaption: 'Three separate product teams were shipping UI at different speeds with no shared vocabulary.',
-    strip: [
-      { img: 'https://res.cloudinary.com/duee5dfom/image/upload/q_auto/f_auto/v1776898866/Frame_1000005674_cryrlh.png', caption: 'Three teams, one design system.' },
-      { img: 'https://res.cloudinary.com/duee5dfom/image/upload/q_auto/f_auto/v1776898865/Frame_1000005638_daacf6.png', caption: 'Three teams, one design system.' },
-      { img: 'https://res.cloudinary.com/duee5dfom/image/upload/q_auto/f_auto/v1776898865/Frame_1000005657_sw5nt5.png', caption: 'Three teams, one design system.' },
-      { img: 'https://res.cloudinary.com/duee5dfom/image/upload/q_auto/f_auto/v1776898865/Frame_1000005675_sl94mi.png', caption: 'Three teams, one design system.' },
-    ],
     pairs: [
       ['@hp-animation'],
       [
@@ -143,11 +118,6 @@ export const CASES: CaseStudy[] = [
     challenge: 'Three separate product teams were shipping UI at different speeds with no shared vocabulary.',
     solution: 'We audited every existing pattern, distilled a minimal token architecture, and rebuilt the component library from the ground up — optimised for composability.',
     mediaCaption: 'Three separate product teams were shipping UI at different speeds with no shared vocabulary.',
-    strip: [
-      { caption: 'Three teams, one design system.' },
-      { caption: 'Three teams, one design system.' },
-    ],
-    stripCols: 2,
     pairs: [[], []],
   },
   {
@@ -164,12 +134,6 @@ export const CASES: CaseStudy[] = [
     challenge: 'Three separate product teams were shipping UI at different speeds with no shared vocabulary.',
     solution: 'We audited every existing pattern, distilled a minimal token architecture, and rebuilt the component library from the ground up — optimised for composability.',
     mediaCaption: 'Three separate product teams were shipping UI at different speeds with no shared vocabulary.',
-    strip: [
-      { caption: 'Three teams, one design system.' },
-      { caption: 'Three teams, one design system.' },
-      { caption: 'Three teams, one design system.' },
-      { caption: 'Three teams, one design system.' },
-    ],
     pairs: [[], []],
   },
 ]

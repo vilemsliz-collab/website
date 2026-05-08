@@ -5,7 +5,7 @@ import type { CaseStudy } from '@/data/cases'
 import styles from './CaseStudy.module.css'
 import SlotHero from './SlotHero'
 import SlotMedia from './SlotMedia'
-import SlotStrip from './SlotStrip'
+import SlotTimeline from './SlotTimeline'
 import SlotPairs from './SlotPairs'
 import Loader from '@/components/loader/Loader'
 
@@ -161,7 +161,7 @@ export default function CaseStudyPage({ cs, isOverlay }: Props) {
           <span className={styles.caseStudyRoleLabel}>Challenge</span>
           <p className={styles.caseStudyBody}>{cs.challenge}</p>
         </div>
-        <SlotStrip items={cs.strip} />
+        <SlotTimeline />
         <SlotPairs pairs={cs.pairs} />
       </div>
     </>
