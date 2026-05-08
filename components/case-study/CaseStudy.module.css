@@ -93,6 +93,7 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
+  transform: translateZ(0);
 }
 
 .caseStudyStatBlock::before {
@@ -156,6 +157,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
+  transform: translateZ(0);
 }
 
 .caseStudyRoleLabel {

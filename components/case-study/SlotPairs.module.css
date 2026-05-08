@@ -5,13 +5,13 @@
   flex-direction: column;
   gap: var(--space-2);
   margin-top: var(--space-8);
-  background: var(--color-background);
+  background: var(--color-surface);
 }
 
 .pairRow {
   display: flex;
   gap: var(--space-2);
-  background: var(--color-background);
+  background: var(--color-surface);
 }
 
 .pairSlot {
