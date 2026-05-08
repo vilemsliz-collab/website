@@ -1,3 +1,27 @@
+/* ── Float & breathe: CSS compositor-thread animations ──
+   @property lets the browser interpolate --float-t / --breathe-t as numbers so
+   sin() can produce a smooth sine wave. Running on the compositor thread means
+   this animation continues even when the JS main thread is busy (iframe loading)
+   and is not affected by backdrop-filter compositing snapshots from the case panel. */
+@property --float-t {
+  syntax: '<number>';
+  inherits: false;
+  initial-value: 0;
+}
+@property --breathe-t {
+  syntax: '<number>';
+  inherits: false;
+  initial-value: 0;
+}
+@keyframes floatCycle {
+  from { --float-t: 0; }
+  to   { --float-t: 1; }
+}
+@keyframes breatheCycle {
+  from { --breathe-t: 0; }
+  to   { --breathe-t: 1; }
+}
+
 /* ── Perspective container ── */
 .stage3d {
   position: fixed;
@@ -24,6 +48,15 @@
      perspective is applied per-element via perspective() in the transform string. */
   cursor: pointer;
   will-change: transform;
+  /* Float (Y) and breathe (scale) driven by CSS animations — immune to backdrop-filter
+     compositing and JS main-thread jank. Phase offsets set per-card via --float-delay /
+     --breathe-delay inline styles. JS overrides translate to '0 0px' on mobile active card. */
+  translate: 0 calc(sin(var(--float-t) * 360deg) * 5.5px);
+  scale: calc(1 + sin(var(--breathe-t) * 360deg) * 0.006);
+  animation:
+    floatCycle   2.5s   linear infinite,
+    breatheCycle 5.556s linear infinite;
+  animation-delay: var(--float-delay, 0s), var(--breathe-delay, 0s);
 }
 
 .cardGroup[data-active='true'] {

@@ -1,20 +1,6 @@
-@keyframes scrollRingLoop {
-  from { width: 34px; height: 34px; opacity: 0.85; filter: blur(0) }
-  60%  { width: 155px; height: 155px; opacity: 0.5; filter: blur(1px) }
-  to   { width: 155px; height: 155px; opacity: 0; filter: blur(3px) }
-}
-
-/* ── Wrapper ── */
-.label {
-  font-family: var(--font-brand);
-  font-size: 11px;
-  font-weight: 400;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: #A6A7AC;
-  margin: 8px 0 0;
-  text-align: center;
-  white-space: nowrap;
+@keyframes ringBurst {
+  0%   { width: 34px; height: 34px; opacity: 0.55; }
+  100% { width: 138px; height: 34px; opacity: 0; }
 }
 
 .wrapper {
@@ -36,26 +22,38 @@
   transition: opacity 0.55s ease;
 }
 
-/* ── Pill ── */
 .pill {
   width: 138px;
   height: 34px;
-  border-radius: 18px;
-  background: transparent;
-  border: 1.5px solid #A6A7AC;
+  border-radius: var(--shape-pill);
+  border: 1.5px solid var(--gray-400);
   position: relative;
   overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-/* ── Rings (clipped inside pill) ── */
 .ring {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  border-radius: 50%;
-  border: 1.5px solid #A6A7AC;
-  animation: scrollRingLoop 1600ms cubic-bezier(0.1, 0, 0.35, 1) infinite;
+  border-radius: var(--shape-pill);
+  border: 1.5px solid var(--gray-400);
+  animation: ringBurst 1800ms cubic-bezier(0, 0, 0.3, 1) infinite;
+}
+
+.label {
+  font-family: var(--font-brand);
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gray-400);
+  margin: 8px 0 0;
+  text-align: center;
+  white-space: nowrap;
 }
 
 @media (max-width: 767px) {

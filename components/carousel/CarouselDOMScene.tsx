@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useEffect, type MutableRefObject } from 'react'
+import React, { useRef, useEffect, type MutableRefObject } from 'react'
 import Image from 'next/image'
 import {
   CARDS,
@@ -16,11 +16,20 @@ import OrbBackground from './OrbBackground'
 
 const N = CARDS.length
 
-const FLOAT_AMP    = 5.5
-const FLOAT_FREQ   = 0.40
-const BREATHE_AMP  = 0.006
-const BREATHE_FREQ = 0.18
-const FLOAT_PHASES = CARDS.map((_, i) => (i / CARDS.length) * Math.PI * 2)
+// Float & breathe periods — must match the CSS animation durations in CarouselDOMScene.module.css
+const FLOAT_PERIOD   = 2.5    // s  (1 / 0.40 Hz)
+const BREATHE_PERIOD = 5.556  // s  (1 / 0.18 Hz)
+const FLOAT_PHASES   = CARDS.map((_, i) => (i / CARDS.length) * Math.PI * 2)
+
+// Per-card negative animation-delay values that offset each card to its phase.
+// Computed once; written as CSS custom properties on the group element.
+const CARD_DELAYS = FLOAT_PHASES.map(phase => {
+  const frac = phase / (2 * Math.PI)
+  return {
+    '--float-delay':   `${(-frac * FLOAT_PERIOD).toFixed(4)}s`,
+    '--breathe-delay': `${(-frac * BREATHE_PERIOD).toFixed(4)}s`,
+  }
+})
 
 export interface CarouselDOMSceneProps {
   posY:             MutableRefObject<number>
@@ -173,7 +182,6 @@ export default function CarouselDOMScene({
       const transforms = computeCardTransforms(posY.current, N, cfg.current, wPos, rollBase.current)
       const tiltScale  = Math.min(1, P / 590)
       const gc         = ghostCfg.current
-      const floatT     = now * 0.001
 
       transforms.forEach((t, i) => {
         const group = groupRefs.current[i]
@@ -182,17 +190,17 @@ export default function CarouselDOMScene({
         if (!group || !mesh) return
 
         // ── Float & breathe ──────────────────────────────────────────────
-        const phase     = FLOAT_PHASES[i]
+        // Handled by CSS compositor-thread animations (see .cardGroup in CSS module).
+        // On mobile the active card must not float; override translate inline to suppress it.
         const skipFloat = d.isMobile && t.isActive
-        const floatY    = skipFloat ? 0 : Math.sin(floatT * FLOAT_FREQ * Math.PI * 2 + phase) * FLOAT_AMP
-        const breatheS  = 1 + Math.sin(floatT * BREATHE_FREQ * Math.PI * 2 + phase) * BREATHE_AMP
+        group.style.translate = skipFloat ? '0 0px' : ''
 
         // ── Sphere 3D position (validated sign table — see plan) ──
         group.style.transform = [
           'translate(-50%,-50%)',
-          `translate3d(${(t.tx - camX).toFixed(2)}px,${(t.ty + floatY).toFixed(2)}px,${t.tz.toFixed(2)}px)`,
+          `translate3d(${(t.tx - camX).toFixed(2)}px,${t.ty.toFixed(2)}px,${t.tz.toFixed(2)}px)`,
           `rotateX(${t.rx.toFixed(3)}deg) rotateY(${(-t.ry).toFixed(3)}deg) rotateZ(${t.rollDeg.toFixed(3)}deg)`,
-          `scale(${(t.scale * breatheS).toFixed(5)})`,
+          `scale(${t.scale.toFixed(5)})`,
         ].join(' ')
         group.style.zIndex     = String(t.zIndex)
         group.dataset.active   = t.isActive ? 'true' : 'false'
@@ -282,6 +290,7 @@ export default function CarouselDOMScene({
           key={card.id}
           ref={el => { groupRefs.current[i] = el }}
           className={styles.cardGroup}
+          style={CARD_DELAYS[i] as React.CSSProperties}
           data-dark
           onClick={(e) => { e.stopPropagation(); onCardClick(i) }}
           onMouseEnter={card.isAbout ? () => {
