@@ -11,10 +11,8 @@
   width: 100%;
   aspect-ratio: 1072 / 675;
   background: var(--color-surface);
-  border-radius: var(--shape-md);
-  overflow: hidden;
+  clip-path: inset(0 round var(--shape-md));
   position: relative;
-  transform: translateZ(0);
 }
 .mediaFrame img,
 .mediaFrame video {

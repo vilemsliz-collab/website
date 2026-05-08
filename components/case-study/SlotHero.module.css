@@ -5,11 +5,9 @@
   margin-top: 0;
   margin-bottom: var(--space-6);
   aspect-ratio: 16 / 9;
-  border-radius: var(--shape-md);
-  overflow: hidden;
+  clip-path: inset(0 round var(--shape-md));
   position: relative;
   background: var(--color-surface);
-  transform: translateZ(0);
 }
 
 @media (max-width: 768px) {

@@ -86,14 +86,12 @@
 .caseStudyStatBlock {
   flex: 1;
   background: var(--gray-900);
-  border-radius: var(--shape-md);
+  clip-path: inset(0 round var(--shape-md));
   padding: var(--space-6);
-  overflow: hidden;
   position: relative;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  transform: translateZ(0);
 }
 
 .caseStudyStatBlock::before {
@@ -151,13 +149,11 @@
 .caseStudyRoleBlock {
   flex: 1;
   background: var(--color-background);
-  border-radius: var(--shape-md);
+  clip-path: inset(0 round var(--shape-md));
   padding: var(--space-6);
-  overflow: hidden;
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
-  transform: translateZ(0);
 }
 
 .caseStudyRoleLabel {
