@@ -9,6 +9,7 @@
   overflow: hidden;
   position: relative;
   background: var(--color-surface);
+  transform: translateZ(0);
 }
 
 @media (max-width: 768px) {

@@ -95,7 +95,7 @@ export default function SlotStrip({ items }: { items: CaseStripItem[] }) {
 
   return (
     <div className={s.wrap}>
-      <div ref={reelRef} id="case-strip" data-element="Strip" className={s.reel} data-cursor="drag-h">
+      <div ref={reelRef} id="case-strip" data-element="Strip" className={s.reel}>
         {items.map((item, i) => <SlotStripItem key={i} item={item} index={i} />)}
         {items.map((item, i) => <SlotStripItem key={`c${i}`} item={item} index={i} clone />)}
       </div>
