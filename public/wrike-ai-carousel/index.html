@@ -13,7 +13,7 @@
     }
 
     .viewport {
-      width: 1060px; height: 1350px;
+      width: 100vw; height: 100vh;
       overflow: hidden;
       background: #fff;
       display: flex; align-items: center; justify-content: center;
@@ -21,15 +21,15 @@
 
     .stack {
       position: relative;
-      width: 960px;
-      height: 600px;
+      width: 90.6vw;
+      height: 56.7vw;
     }
 
     .card {
       position: absolute;
       top: 0; left: 0;
-      width: 960px;
-      height: 540px;
+      width: 90.6vw;
+      height: 50.9vw;
       border-radius: 16px;
       overflow: hidden;
       /* hidden default state */
@@ -73,11 +73,12 @@
       ? 'linear(0,0.007,0.029 2.2%,0.118,0.237 7.1%,0.618 13.4%,0.829 17.3%,0.949 20.8%,1.001,1.034,1.052,1.056 26.7%,1.05,1.04 31.2%,1.013,1.004 37.2%,0.998,0.996 42%,0.998,1.001 48.5%,1.003,1.002,1)'
       : 'cubic-bezier(0.22, 1.1, 0.36, 1)';
 
-    // [translateY px, scale, blur px, opacity, z-index]
+    const vw = () => window.innerWidth / 100;
+    // [translateY vw, scale, blur vw, opacity, z-index]
     const STACK = [
-      [0,  1.00, 0, 1,    6],  // front — sharp, full size
-      [50, 0.88, 3, 1,    5],  // mid   — slight blur, slightly smaller
-      [90, 0.78, 8, 0.8,  4],  // back  — soft blur, noticeably smaller
+      [0,        1.00, 0,      1,    6],
+      [4.7 ,     0.88, 0.28,   1,    5],
+      [8.49,     0.78, 0.75,   0.8,  4],
     ];
 
     function set(card, pos, animate) {
@@ -87,14 +88,14 @@
 
       if (pos === null) {
         const [ty, sc, bl] = STACK[2];
-        card.style.transform = `translateY(${ty}px) scale(${sc})`;
-        card.style.filter    = `blur(${bl}px)`;
+        card.style.transform = `translateY(${ty * vw()}px) scale(${sc})`;
+        card.style.filter    = `blur(${bl * vw()}px)`;
         card.style.opacity   = '0';
         card.style.zIndex    = '0';
       } else {
         const [ty, sc, bl, op, zi] = STACK[pos];
-        card.style.transform = `translateY(${ty}px) scale(${sc})`;
-        card.style.filter    = bl > 0 ? `blur(${bl}px)` : 'none';
+        card.style.transform = `translateY(${ty * vw()}px) scale(${sc})`;
+        card.style.filter    = bl > 0 ? `blur(${bl * vw()}px)` : 'none';
         card.style.opacity   = String(op);
         card.style.zIndex    = String(zi);
       }
@@ -115,7 +116,7 @@
       // exit: fade out in place with subtle scale-up and blur — crossfade feel
       exitCard.style.transition = `opacity ${Math.round(TRANS_MS * 0.55)}ms ease, transform ${TRANS_MS}ms ${SPRING}, filter ${Math.round(TRANS_MS * 0.6)}ms ease`;
       exitCard.style.opacity    = '0';
-      exitCard.style.transform  = 'translateY(0px) scale(1.04)';
+      exitCard.style.transform  = `translateY(0px) scale(1.04)`;
       exitCard.style.filter     = 'blur(6px)';
       exitCard.style.zIndex     = '9';
 
