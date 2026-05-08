@@ -27,7 +27,7 @@ const BLOB_R       = 27
 const SPOT_COUNT   = 9
 const MIN_DT       = 1 / 240
 const MAX_DT       = 1 / 30
-const DWELL_MS     = 6000
+const DWELL_MS     = 4000
 const TRANSITION_MS = 800
 const SCALE_UP     = 1.10
 const SCALE_MID    = 0.93
@@ -336,7 +336,7 @@ export default function HpAnimationCanvas() {
 
     const ro = new ResizeObserver(entries => {
       const w     = entries[0].contentRect.width
-      const scale = Math.min(1.2, w / CANVAS_W)
+      const scale = Math.min(1.08, w / CANVAS_W)
       wrapper.style.height   = `${(CANVAS_H * scale).toFixed(1)}px`
       canvas.style.transform = `scale(${scale.toFixed(4)})`
     })
@@ -473,7 +473,7 @@ export default function HpAnimationCanvas() {
                     role="img"
                     aria-label={`${agent} agent`}
                   >
-                    <svg viewBox="0 0 76 76" aria-hidden="true">
+                    <svg width="28" height="28" viewBox="0 0 76 76" aria-hidden="true">
                       <use href={`#agent-${agent}`} />
                     </svg>
                   </div>
