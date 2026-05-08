@@ -43,7 +43,6 @@ export default function SlotTimeline() {
                   gridColumnStart: p.start,
                   gridColumnEnd: p.end + 1,
                   '--shade': i / last,
-                  '--i': i,
                 } as CSSProperties}
               >
                 <span className={s.label}>{p.label}</span>
