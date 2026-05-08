@@ -7,7 +7,7 @@
   aspect-ratio: 16 / 9;
   clip-path: inset(0 round var(--shape-md));
   position: relative;
-  background: var(--color-surface);
+  background: var(--color-background);
 }
 
 @media (max-width: 768px) {

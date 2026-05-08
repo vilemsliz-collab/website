@@ -27,7 +27,7 @@ function OverscrollRelay() {
 export default function CasesLayout({ children }: { children: React.ReactNode }) {
   return (
     <>
-      <style>{`html, body { background: var(--gray-50) !important; }`}</style>
+      <style>{`html, body { background: var(--white) !important; }`}</style>
       <OverscrollRelay />
       {children}
     </>

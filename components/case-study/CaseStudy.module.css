@@ -9,25 +9,25 @@
 .caseStudyEdgeBlur[data-side="top"] {
   top: 0; left: 0; right: 0;
   height: var(--space-3);
-  background: linear-gradient(to bottom, var(--color-surface), transparent);
+  background: linear-gradient(to bottom, var(--color-background), transparent);
 }
 
 .caseStudyEdgeBlur[data-side="bottom"] {
   bottom: 0; left: 0; right: 0;
   height: var(--space-3);
-  background: linear-gradient(to top, var(--color-surface), transparent);
+  background: linear-gradient(to top, var(--color-background), transparent);
 }
 
 .caseStudyEdgeBlur[data-side="left"] {
   top: 0; bottom: 0; left: 0;
   width: var(--space-3);
-  background: linear-gradient(to right, var(--color-surface), transparent);
+  background: linear-gradient(to right, var(--color-background), transparent);
 }
 
 .caseStudyEdgeBlur[data-side="right"] {
   top: 0; bottom: 0; right: 0;
   width: var(--space-3);
-  background: linear-gradient(to left, var(--color-surface), transparent);
+  background: linear-gradient(to left, var(--color-background), transparent);
 }
 
 /* ── Back link ── */

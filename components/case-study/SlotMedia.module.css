@@ -10,7 +10,7 @@
 .mediaFrame {
   width: 100%;
   aspect-ratio: 1072 / 675;
-  background: var(--color-surface);
+  background: var(--color-background);
   clip-path: inset(0 round var(--shape-md));
   position: relative;
 }
