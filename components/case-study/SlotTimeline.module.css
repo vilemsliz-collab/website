@@ -78,12 +78,39 @@
   transition: transform 240ms cubic-bezier(0.25, 0, 0, 1);
 }
 
-/* ── Hover: only the hovered pill reacts ── */
+/* ── Hover: ripple by row distance from the hovered pill ──
+   100% on hovered, 50% one row away, 25% two rows, 5% three rows. */
 .bar:hover {
   transform: scaleX(1.05);
 }
 .bar:hover .label {
   transform: translateX(3px);
+}
+
+/* Distance 1 (50%) */
+.row:has(.bar:hover) + .row .bar,
+.row:has(+ .row .bar:hover) .bar {
+  transform: scaleX(1.025);
+}
+.row:has(.bar:hover) + .row .label,
+.row:has(+ .row .bar:hover) .label {
+  transform: translateX(1.5px);
+}
+
+/* Distance 2 (25%) */
+.row:has(.bar:hover) + .row + .row .bar,
+.row:has(+ .row + .row .bar:hover) .bar {
+  transform: scaleX(1.0125);
+}
+.row:has(.bar:hover) + .row + .row .label,
+.row:has(+ .row + .row .bar:hover) .label {
+  transform: translateX(0.75px);
+}
+
+/* Distance 3 (5%) */
+.row:has(.bar:hover) + .row + .row + .row .bar,
+.row:has(+ .row + .row + .row .bar:hover) .bar {
+  transform: scaleX(1.0025);
 }
 
 @media (max-width: 768px) {
