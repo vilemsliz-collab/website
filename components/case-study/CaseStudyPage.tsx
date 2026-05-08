@@ -104,21 +104,6 @@ export default function CaseStudyPage({ cs, isOverlay }: Props) {
     return () => window.removeEventListener('message', handle)
   }, [])
 
-  // Expand top blur zone while scrolling
-  useEffect(() => {
-    const el = pageRef.current
-    if (!el) return
-    let timer: ReturnType<typeof setTimeout>
-    function onScroll() {
-      const isMobile = window.innerWidth <= 768
-      el!.style.setProperty('--top-blur-height', isMobile ? '20px' : '160px')
-      clearTimeout(timer)
-      timer = setTimeout(() => el!.style.setProperty('--top-blur-height', isMobile ? '20px' : '80px'), 200)
-    }
-    window.addEventListener('scroll', onScroll, { passive: true })
-    return () => { window.removeEventListener('scroll', onScroll); clearTimeout(timer) }
-  }, [])
-
   // Relay cursor events to parent so the custom cursor works across the iframe boundary
   useEffect(() => {
     if (window.self === window.top) return
@@ -160,6 +145,7 @@ export default function CaseStudyPage({ cs, isOverlay }: Props) {
         <div className={styles.caseStudyEdgeBlur} data-side="top" aria-hidden />
         <div className={styles.caseStudyEdgeBlur} data-side="left" aria-hidden />
         <div className={styles.caseStudyEdgeBlur} data-side="right" aria-hidden />
+        <div className={styles.caseStudyEdgeBlur} data-side="bottom" aria-hidden />
         {isIframe && (
           <div
             className={styles.caseStudyCloseZone}

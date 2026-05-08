@@ -3,9 +3,8 @@
 .heroImage {
   width: 100%;
   margin-top: 0;
-  margin-bottom: var(--space-8);
+  margin-bottom: var(--space-6);
   aspect-ratio: 16 / 9;
-  border: 1px solid var(--gray-50);
   border-radius: var(--shape-md);
   overflow: hidden;
   position: relative;
@@ -13,5 +12,5 @@
 }
 
 @media (max-width: 768px) {
-  .heroImage { margin-bottom: var(--space-6); }
+  .heroImage { margin-bottom: var(--space-5); }
 }

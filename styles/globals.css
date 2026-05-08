@@ -16,7 +16,7 @@ body {
   /* background-attachment:fixed is broken on iOS Safari — it renders relative
      to the safe-area viewport, not the layout viewport, causing a crop line
      behind Safari chrome. Remove "fixed"; scroll is identical on non-scrolling pages. */
-  background: radial-gradient(ellipse 82% 50% at 50% 50%, #ffffff 60%, #e3e4ec 88%, #d6d8e6 100%);
+  background: var(--white);
   font-family: var(--font-brand);
   font-variation-settings: 'wght' 400, 'GRAD' var(--fvs-grad), 'ROND' var(--fvs-rond), 'opsz' var(--fvs-opsz);
   -webkit-font-smoothing: antialiased;

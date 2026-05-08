@@ -1,8 +1,8 @@
 .wrap {
   display: block;
-  margin-top: var(--space-16);
-  margin-left: calc(-1 * var(--space-8));
-  margin-right: calc(-1 * var(--space-8));
+  margin-top: var(--space-10);
+  margin-left: calc(-1 * var(--space-3));
+  margin-right: calc(-1 * var(--space-3));
 }
 
 .reel {
@@ -12,10 +12,10 @@
   overflow-y: hidden;
   scrollbar-width: none;
   -ms-overflow-style: none;
-  gap: 6px;
+  gap: var(--space-2);
   cursor: grab;
-  padding-left: var(--space-8);
-  padding-right: var(--space-8);
+  padding-left: var(--space-3);
+  padding-right: var(--space-3);
 }
 .reel:active { cursor: grabbing; }
 .reel::-webkit-scrollbar { display: none; }
@@ -25,12 +25,11 @@
 .slide {
   flex: 0 0 calc(40% - 4px);
   aspect-ratio: 848 / 675;
-  border: 1px solid var(--gray-50);
   border-radius: var(--shape-md);
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  padding: 4px;
+  padding: var(--space-1);
   background: var(--color-background);
   position: relative;
 }
@@ -70,7 +69,7 @@
 
 @media (max-width: 768px) {
   .wrap {
-    margin-top: var(--space-12);
+    margin-top: var(--space-10);
     margin-left: calc(-1 * var(--space-3));
     margin-right: calc(-1 * var(--space-3));
   }

@@ -1,52 +1,39 @@
-/* ── Edge blur overlays — blur + fade-to-background on all 4 sides ── */
+/* ── Edge faders — fade-to-background on all 4 sides ── */
 .caseStudyEdgeBlur {
-  --blur: 20px;
-  --stop: 40%;
   position: fixed;
   z-index: 20;
   pointer-events: none;
   user-select: none;
-  backdrop-filter: blur(var(--blur));
-  -webkit-backdrop-filter: blur(var(--blur));
 }
 
 .caseStudyEdgeBlur[data-side="top"] {
   top: 0; left: 0; right: 0;
-  height: var(--top-blur-height, 80px);
-  transition: height 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-  background: linear-gradient(to top, transparent, var(--color-background));
-  -webkit-mask-image: linear-gradient(to bottom, black var(--stop), transparent);
-  mask-image: linear-gradient(to bottom, black var(--stop), transparent);
+  height: var(--space-3);
+  background: linear-gradient(to bottom, var(--color-surface), transparent);
 }
 
 .caseStudyEdgeBlur[data-side="bottom"] {
   bottom: 0; left: 0; right: 0;
-  height: 80px;
-  background: linear-gradient(to bottom, transparent, var(--color-background));
-  -webkit-mask-image: linear-gradient(to top, black var(--stop), transparent);
-  mask-image: linear-gradient(to top, black var(--stop), transparent);
+  height: var(--space-3);
+  background: linear-gradient(to top, var(--color-surface), transparent);
 }
 
 .caseStudyEdgeBlur[data-side="left"] {
   top: 0; bottom: 0; left: 0;
-  width: 60px;
-  background: linear-gradient(to left, transparent, var(--color-background));
-  -webkit-mask-image: linear-gradient(to right, black var(--stop), transparent);
-  mask-image: linear-gradient(to right, black var(--stop), transparent);
+  width: var(--space-3);
+  background: linear-gradient(to right, var(--color-surface), transparent);
 }
 
 .caseStudyEdgeBlur[data-side="right"] {
   top: 0; bottom: 0; right: 0;
-  width: 60px;
-  background: linear-gradient(to right, transparent, var(--color-background));
-  -webkit-mask-image: linear-gradient(to left, black var(--stop), transparent);
-  mask-image: linear-gradient(to left, black var(--stop), transparent);
+  width: var(--space-3);
+  background: linear-gradient(to left, var(--color-surface), transparent);
 }
 
 /* ── Back link ── */
 .caseStudyBackLink {
   position: fixed;
-  top: 20px; left: 24px;
+  top: var(--space-5); left: var(--space-6);
   font-family: var(--font-mono, 'IBM Plex Mono', monospace);
   font-size: 11px;
   letter-spacing: 0.1em;
@@ -64,7 +51,7 @@
   display: flex;
   flex-direction: column;
   gap: 0;
-  padding: var(--space-8);
+  padding: var(--space-3);
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
@@ -73,12 +60,12 @@
 .caseStudyCloseZone {
   position: absolute;
   top: 0; left: 0; right: 0;
-  height: var(--space-8);
+  height: var(--space-3);
   z-index: 10;
 }
 .caseStudyPage::-webkit-scrollbar { display: none; }
 
-.caseStudyTextInset { padding-left: var(--space-5); padding-right: var(--space-5); }
+.caseStudyTextInset { padding-left: 0; padding-right: 0; }
 
 .caseStudyBody {
   font-size: 16px;
@@ -99,9 +86,8 @@
 .caseStudyStatBlock {
   flex: 1;
   background: var(--gray-900);
-  border: 1px solid var(--gray-50);
   border-radius: var(--shape-md);
-  padding: var(--space-8);
+  padding: var(--space-6);
   overflow: hidden;
   position: relative;
   display: flex;
@@ -164,13 +150,12 @@
 .caseStudyRoleBlock {
   flex: 1;
   background: var(--color-background);
-  border: 1px solid var(--gray-50);
   border-radius: var(--shape-md);
-  padding: var(--space-8) var(--space-6);
+  padding: var(--space-6);
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  gap: var(--space-5);
+  gap: var(--space-4);
 }
 
 .caseStudyRoleLabel {
@@ -188,24 +173,20 @@
   flex-direction: column;
   justify-content: center;
   gap: var(--space-4);
-  margin-top: var(--space-4);
+  margin-top: var(--space-8);
   background: var(--color-background);
-  border: 1px solid var(--gray-50);
   border-radius: var(--shape-md);
-  padding: var(--space-8) var(--space-6);
+  padding: var(--space-6);
 }
 
 /* ── Responsive ── */
 @media (max-width: 768px) {
-  .caseStudyPage        { gap: 0; padding: var(--space-5) var(--space-3) var(--space-10); padding-top: calc(var(--space-5) + env(safe-area-inset-top)); padding-bottom: max(80px, calc(var(--space-10) + env(safe-area-inset-bottom))); min-height: 100dvh; }
-  .caseStudyChallenge   { margin-top: var(--space-2); }
+  .caseStudyPage        { gap: 0; padding: var(--space-3); padding-top: calc(var(--space-3) + env(safe-area-inset-top)); padding-bottom: max(80px, calc(var(--space-3) + env(safe-area-inset-bottom))); min-height: 100dvh; }
+  .caseStudyChallenge   { margin-top: var(--space-6); }
   .caseStudyTextInset   { padding-left: 0; padding-right: 0; }
   .caseStudyMetaRow     { flex-direction: column; }
   .caseStudyClaim       { font-size: var(--type-headline-small-size); line-height: var(--type-headline-small-lh); }
   .caseStudyClaims      { height: calc(3 * var(--type-headline-small-lh)); }
-  .caseStudyRoleBlock   { padding: var(--space-5) var(--space-4); }
-  .caseStudyBackLink    { top: calc(20px + env(safe-area-inset-top)); left: calc(24px + env(safe-area-inset-left)); }
-  .caseStudyEdgeBlur[data-side="left"],
-  .caseStudyEdgeBlur[data-side="right"] { display: none; }
-  .caseStudyEdgeBlur[data-side="top"]   { height: var(--top-blur-height, 20px); }
+  .caseStudyRoleBlock   { padding: var(--space-5) var(--space-3); }
+  .caseStudyBackLink    { top: calc(var(--space-5) + env(safe-area-inset-top)); left: calc(var(--space-6) + env(safe-area-inset-left)); }
 }
