@@ -23,6 +23,16 @@
 }
 .pairSlot img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
+.pairIframe {
+  width: 200%;
+  height: 200%;
+  border: none;
+  display: block;
+  transform: scale(0.5);
+  transform-origin: top left;
+  pointer-events: none;
+}
+
 @media (max-width: 768px) {
   .pairsSection { margin-top: var(--space-8); }
   .pairRow { flex-direction: column; }
