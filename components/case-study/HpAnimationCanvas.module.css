@@ -2,7 +2,7 @@
   --shadow-card:  0px 10px 22px rgba(22,41,54,0.021), 0px 20px 64px rgba(22,41,54,0.021);
   --shadow-hover: 0px 20px 48px rgba(22,41,54,0.042), 0px 8px 20px rgba(22,41,54,0.028);
   width: 100%;
-  max-width: 648px;
+  max-width: 720px;
   min-height: 460px;
   position: relative;
   overflow: visible;
@@ -142,11 +142,12 @@
   background-repeat: no-repeat;
 }
 
-.avatarFemale02 { background-color: #f2f5fa; background-position:    0    0; }
-.avatarMale01   { background-color: #f2f5fa; background-position:  -48px  0; }
-.avatarFemale03 { background-color: #f2f5fa; background-position:  -96px  0; }
-.avatarMale02   { background-color: #f2f5fa; background-position: -144px  0; }
-.avatarFemale04 { background-color: #f2f5fa; background-position: -192px  0; }
+/* Per-slot placeholder colors (show when --hp-avatar-sprite is not set). */
+.avatarFemale02 { background-color: #c8d4e6; background-position:    0    0; }
+.avatarMale01   { background-color: #c4dbd0; background-position:  -48px  0; }
+.avatarFemale03 { background-color: #e0cfd8; background-position:  -96px  0; }
+.avatarMale02   { background-color: #cfc8de; background-position: -144px  0; }
+.avatarFemale04 { background-color: #d8ddc4; background-position: -192px  0; }
 
 .agentBadge {
   background: linear-gradient(135deg, #aaff00 0%, #00e05c 50%, #00ff2b 100%);
