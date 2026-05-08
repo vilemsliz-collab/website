@@ -15,7 +15,7 @@
 .pairSlot {
   flex: 1;
   aspect-ratio: 530 / 675;
-  background: transparent;
+  background: var(--color-background);
   border-radius: var(--shape-md);
   overflow: hidden;
   position: relative;
