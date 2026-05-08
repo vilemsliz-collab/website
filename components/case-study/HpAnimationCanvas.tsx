@@ -335,10 +335,12 @@ export default function HpAnimationCanvas() {
     // ── Observers ─────────────────────────────────────────────────────────
 
     const ro = new ResizeObserver(entries => {
-      const w     = entries[0].contentRect.width
-      const scale = Math.min(1.08, w / CANVAS_W)
-      wrapper.style.height   = `${(CANVAS_H * scale).toFixed(1)}px`
-      canvas.style.transform = `scale(${scale.toFixed(4)})`
+      const { width: w, height: h } = entries[0].contentRect
+      if (!w || !h) return
+      const scale   = Math.max(w / CANVAS_W, h / CANVAS_H)
+      const offsetX = ((w - CANVAS_W * scale) / 2).toFixed(1)
+      const offsetY = ((h - CANVAS_H * scale) / 2).toFixed(1)
+      canvas.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(${scale.toFixed(4)})`
     })
     ro.observe(wrapper)
 
