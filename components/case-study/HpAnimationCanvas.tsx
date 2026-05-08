@@ -336,7 +336,7 @@ export default function HpAnimationCanvas() {
 
     const ro = new ResizeObserver(entries => {
       const w     = entries[0].contentRect.width
-      const scale = w / CANVAS_W
+      const scale = Math.min(1.5, w / CANVAS_W)
       wrapper.style.height   = `${(CANVAS_H * scale).toFixed(1)}px`
       canvas.style.transform = `scale(${scale.toFixed(4)})`
     })
