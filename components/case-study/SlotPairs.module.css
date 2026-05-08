@@ -3,20 +3,20 @@
 .pairsSection {
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
+  gap: 0;
   margin-top: var(--space-8);
 }
 
 .pairRow {
   display: flex;
-  gap: var(--space-2);
+  gap: 0;
 }
 
 .pairSlot {
   flex: 1;
   aspect-ratio: 530 / 675;
-  background: transparent;
-  border-radius: var(--shape-md);
+  background: var(--color-background);
+  border-radius: 0;
   overflow: hidden;
   position: relative;
 }
@@ -26,7 +26,6 @@
   .pairsSection { margin-top: var(--space-8); }
   .pairRow { flex-direction: column; }
   .pairSlot {
-    border-radius: 0;
     margin-left: calc(-1 * var(--space-3));
     margin-right: calc(-1 * var(--space-3));
     max-height: none;
