@@ -118,6 +118,7 @@ export const CASES: CaseStudy[] = [
       { img: 'https://res.cloudinary.com/duee5dfom/image/upload/q_auto/f_auto/v1776898865/Frame_1000005675_sl94mi.png', caption: 'Three teams, one design system.' },
     ],
     pairs: [
+      [''],
       [
         'https://res.cloudinary.com/duee5dfom/image/upload/q_auto/f_auto/v1776898866/Frame_1000005674_cryrlh.png',
         '/wrike-ai-carousel/index.html',
