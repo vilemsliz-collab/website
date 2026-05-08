@@ -3,7 +3,7 @@
 .heroImage {
   width: 100%;
   margin-top: 0;
-  margin-bottom: var(--space-6);
+  margin-bottom: var(--space-2);
   aspect-ratio: 16 / 9;
   background: var(--color-background);
   border: 1px solid var(--gray-50);
@@ -13,5 +13,5 @@
 }
 
 @media (max-width: 768px) {
-  .heroImage { margin-bottom: var(--space-5); }
+  .heroImage { margin-bottom: var(--space-2); }
 }
