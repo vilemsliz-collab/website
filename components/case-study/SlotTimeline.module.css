@@ -3,9 +3,10 @@
 .chart {
   position: relative;
   margin-top: var(--space-10);
-  background: var(--color-surface);
+  background: var(--color-background);
+  border: 1px solid var(--gray-50);
   border-radius: var(--shape-md);
-  padding: var(--space-6) var(--space-4) var(--space-3);
+  padding: var(--space-6) var(--space-4);
   overflow: hidden;
 }
 
@@ -13,7 +14,7 @@
 .gridLines {
   position: absolute;
   top: var(--space-3);
-  bottom: var(--space-7);
+  bottom: var(--space-3);
   left: var(--space-4);
   right: var(--space-4);
   pointer-events: none;
@@ -50,6 +51,7 @@
   padding: 0 var(--space-3);
   border-radius: var(--shape-pill);
   overflow: hidden;
+  transition: opacity 200ms ease;
 }
 
 .label {
@@ -65,39 +67,23 @@
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
+  transition: transform 200ms ease;
 }
 
 .discover { background: var(--gray-900); }
 .define   { background: var(--gray-700); }
 .design   { background: var(--gray-400); }
 
-/* ── X-axis ticks ── */
-.axis {
-  position: relative;
-  display: grid;
-  grid-template-columns: repeat(15, 1fr);
-  margin-top: var(--space-3);
-}
-.tick {
-  font-family: var(--font-brand);
-  font-size: var(--type-label-small-size);
-  line-height: var(--type-label-small-lh);
-  letter-spacing: var(--type-label-small-ls);
-  font-weight: var(--type-label-small-weight);
-  font-variation-settings: 'wght' var(--type-label-small-weight);
-  color: var(--gray-500);
-  text-align: center;
-  font-variant-numeric: tabular-nums;
-}
+/* ── Hover interactions ── */
+/* Dim other bars when one is hovered */
+.rows:has(.bar:hover) .bar { opacity: 0.4; }
+.rows:has(.bar:hover) .bar:hover { opacity: 1; }
+/* Subtle nudge — label slides 2px right */
+.bar:hover .label { transform: translateX(2px); }
 
 @media (max-width: 768px) {
-  .chart { padding: var(--space-4) var(--space-3) var(--space-2); }
-  .gridLines { left: var(--space-3); right: var(--space-3); bottom: var(--space-6); }
+  .chart { padding: var(--space-4) var(--space-3); }
+  .gridLines { left: var(--space-3); right: var(--space-3); }
   .row { min-height: var(--space-5); }
   .bar { padding: 0 var(--space-2); }
-}
-
-@media (max-width: 480px) {
-  .axis { display: none; }
-  .gridLines { bottom: 0; }
 }

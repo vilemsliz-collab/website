@@ -45,11 +45,6 @@ export default function SlotTimeline() {
             </li>
           ))}
         </ol>
-        <div className={s.axis} aria-hidden="true">
-          {Array.from({ length: TOTAL_COLS }).map((_, i) => (
-            <span key={i} className={s.tick}>{String(i + 1).padStart(2, '0')}</span>
-          ))}
-        </div>
       </div>
     </div>
   )
