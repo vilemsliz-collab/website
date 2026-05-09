@@ -21,11 +21,14 @@ class Spring {
 
 // ── Constants ───────────────────────────────────────────────────────────────
 
-const GRID_W     = 372
-const GRID_H     = 372
-const TILE_PITCH = 127   // 118px tile + 9px gap
-const TILE_HALF  = 59    // 118 / 2
-const WANDER_AMP = GRID_W * 0.38
+const GRID_W      = 372
+const GRID_H      = 372
+const TILE_PITCH  = 127   // 118px tile + 9px gap
+const TILE_HALF   = 59    // 118 / 2
+const WANDER_AMP  = GRID_W * 0.38
+const GRAD_SCALE  = 4
+const BLOB_R      = 13    // 26px div → visually ~50px apparent radius after blur + scale
+const BLOB_COLORS = ['#aaff00','#00e05c','#00e05c','#00ff2b','#00ff2b','#aaff00','#00e05c','#00ff2b','#00e05c'] as const
 
 const CFG = { hoverScale: 1.05, pushPx: 16, stagger: 30, hoverK: 100, hoverD: 40, moveK: 160, moveD: 40 }
 
@@ -49,11 +52,12 @@ export default function AgentsGridCanvas() {
   const gridRef    = useRef<HTMLDivElement>(null)
   const gradRef    = useRef<HTMLDivElement>(null)
   const tileRefs   = useRef<HTMLDivElement[]>([])
+  const blobRefs   = useRef<HTMLDivElement[]>([])
 
   useEffect(() => {
     const wrapper = wrapperRef.current!
     const grid    = gridRef.current!
-    const grad    = gradRef.current!
+    const blobEls = blobRefs.current
     const tileEls = tileRefs.current
 
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -84,11 +88,13 @@ export default function AgentsGridCanvas() {
     let isHovering = false
     let isVisible  = true
     let rafId      = 0
+    let lastTime   = 0
 
     // ── RAF loop ──────────────────────────────────────────────────────────
-    function loop() {
-      const dt  = 1 / 60
-      const tw  = performance.now() / 1000
+    function loop(now: number) {
+      const dt = lastTime === 0 ? 1 / 60 : Math.max(1 / 240, Math.min(1 / 30, (now - lastTime) / 1000))
+      lastTime = now
+      const tw  = now / 1000
       const TAU = Math.PI * 2
 
       tileSprings.forEach(({ hover, sx, sy }, i) => {
@@ -102,8 +108,6 @@ export default function AgentsGridCanvas() {
         mapY.setTarget(GRID_H / 2 + Math.sin(tw * 0.097 * TAU + 1.3) * WANDER_AMP)
       }
       mapX.tick(dt); mapY.tick(dt)
-      grad.style.setProperty('--map-x', `${mapX.value.toFixed(1)}px`)
-      grad.style.setProperty('--map-y', `${mapY.value.toFixed(1)}px`)
 
       const ampPulse = 90 + Math.sin(tw * 0.11 * TAU + 0.7) * 15
       spots.forEach((sp, i) => {
@@ -113,8 +117,10 @@ export default function AgentsGridCanvas() {
           sp.nextRetarget = tw + 3 + Math.random() * 5
         }
         sp.sprX.tick(dt); sp.sprY.tick(dt)
-        grad.style.setProperty(`--c${i}-dx`, `${sp.sprX.value.toFixed(1)}px`)
-        grad.style.setProperty(`--c${i}-dy`, `${sp.sprY.value.toFixed(1)}px`)
+        const bx = (mapX.value + sp.sprX.value - BLOB_R) / GRAD_SCALE
+        const by = (mapY.value + sp.sprY.value - BLOB_R) / GRAD_SCALE
+        const el = blobEls[i]
+        if (el) el.style.transform = `translate3d(${bx.toFixed(2)}px,${by.toFixed(2)}px,0)`
       })
 
       rafId = requestAnimationFrame(loop)
@@ -190,7 +196,7 @@ export default function AgentsGridCanvas() {
       const visible = entries[0].isIntersecting
       if (visible === isVisible) return
       isVisible = visible
-      if (visible) rafId = requestAnimationFrame(loop)
+      if (visible) { lastTime = 0; rafId = requestAnimationFrame(loop) }
       else { cancelAnimationFrame(rafId); rafId = 0 }
     }, { threshold: 0 })
     io.observe(wrapper)
@@ -240,7 +246,11 @@ export default function AgentsGridCanvas() {
         className={s.wrapper}
       >
         <div ref={gridRef} className={s.grid}>
-          <div ref={gradRef} className={s.gradientMap} aria-hidden="true" />
+          <div ref={gradRef} className={s.gradientMap} aria-hidden="true">
+            {BLOB_COLORS.map((color, i) => (
+              <div key={i} ref={el => { if (el) blobRefs.current[i] = el }} className={s.blob} style={{ background: color }} />
+            ))}
+          </div>
           <div className={s.agentGrid}>
             {TILES.map((tile, i) => (
               <div

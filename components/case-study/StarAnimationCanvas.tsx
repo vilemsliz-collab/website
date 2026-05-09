@@ -15,11 +15,15 @@ class Spring {
   }
 }
 
-const SPOT_COUNT = 9
+const SPOT_COUNT  = 9
+const GRAD_SCALE  = 4
+const BLOB_R      = 54   // 108px div — visually matches circle-210px + blur-70px feel
+const BLOB_COLORS = ['#aaff00','#00e05c','#00e05c','#00ff2b','#00ff2b','#aaff00','#00e05c','#00ff2b','#00e05c'] as const
 
 export default function StarAnimationCanvas() {
   const boxRef  = useRef<HTMLDivElement>(null)
   const gradRef = useRef<HTMLDivElement>(null)
+  const blobRefs = useRef<HTMLDivElement[]>([])
 
   useEffect(() => {
     const box  = boxRef.current!
@@ -27,8 +31,15 @@ export default function StarAnimationCanvas() {
 
     const mapX = new Spring(3, 1.6)
     const mapY = new Spring(3, 1.6)
-    mapX.value = mapX.target = box.offsetWidth  / 2
-    mapY.value = mapY.target = box.offsetHeight * 0.62
+
+    let boxW = 0, boxH = 0
+    const ro = new ResizeObserver(entries => {
+      const { width, height } = entries[0].contentRect
+      boxW = width; boxH = height
+      mapX.value = mapX.target = boxW / 2
+      mapY.value = mapY.target = boxH * 0.62
+    })
+    ro.observe(box)
 
     const spots = Array.from({ length: SPOT_COUNT }, (_, i) => {
       const sprX = new Spring(2.5, 1.4)
@@ -43,31 +54,26 @@ export default function StarAnimationCanvas() {
     let hoverPoint: { x: number; y: number } | null = null
     let isVisible = true
     let rafId = 0
-    let lastT = performance.now()
+    let lastT = 0
 
     const onMouseMove = (e: MouseEvent) => {
       const rect = box.getBoundingClientRect()
-      hoverPoint = {
-        x: ((e.clientX - rect.left) / rect.width)  * box.offsetWidth,
-        y: ((e.clientY - rect.top)  / rect.height) * box.offsetHeight,
-      }
+      hoverPoint = { x: e.clientX - rect.left, y: e.clientY - rect.top }
     }
     const onMouseLeave = () => { hoverPoint = null }
     box.addEventListener('mousemove', onMouseMove)
     box.addEventListener('mouseleave', onMouseLeave)
 
     function loop(now: number) {
-      const dt  = Math.min((now - lastT) / 1000, 1 / 30)
+      const dt  = lastT === 0 ? 1 / 60 : Math.max(1 / 240, Math.min(1 / 30, (now - lastT) / 1000))
       lastT = now
       const t   = now / 1000
       const TAU = Math.PI * 2
 
-      const w  = box.offsetWidth
-      const h  = box.offsetHeight
-      const cx = w / 2
-      const cy = h * 0.62
-      const wx = cx + Math.sin(t * 0.06  * TAU) * w * 0.17
-      const wy = cy - Math.sin(t * 0.045 * TAU + 1.3) * h * 0.10
+      const cx = boxW / 2
+      const cy = boxH * 0.62
+      const wx = cx + Math.sin(t * 0.06  * TAU) * boxW * 0.17
+      const wy = cy - Math.sin(t * 0.045 * TAU + 1.3) * boxH * 0.10
 
       if (hoverPoint) {
         mapX.setTarget(wx * 0.35 + hoverPoint.x * 0.65)
@@ -78,10 +84,9 @@ export default function StarAnimationCanvas() {
       }
       mapX.tick(dt)
       mapY.tick(dt)
-      grad.style.setProperty('--map-x', `${mapX.value.toFixed(1)}px`)
-      grad.style.setProperty('--map-y', `${mapY.value.toFixed(1)}px`)
 
-      const amp = w * 0.31 + Math.sin(t * 0.11 * TAU + 0.7) * w * 0.06
+      const amp = boxW * 0.31 + Math.sin(t * 0.11 * TAU + 0.7) * boxW * 0.06
+      const blobEls = blobRefs.current
       spots.forEach((sp, i) => {
         if (t > sp.nextRetarget) {
           sp.sprX.setTarget((Math.random() - 0.5) * 2 * amp)
@@ -90,8 +95,10 @@ export default function StarAnimationCanvas() {
         }
         sp.sprX.tick(dt)
         sp.sprY.tick(dt)
-        grad.style.setProperty(`--c${i}-dx`, `${sp.sprX.value.toFixed(1)}px`)
-        grad.style.setProperty(`--c${i}-dy`, `${sp.sprY.value.toFixed(1)}px`)
+        const bx = (mapX.value + sp.sprX.value - BLOB_R) / GRAD_SCALE
+        const by = (mapY.value + sp.sprY.value - BLOB_R) / GRAD_SCALE
+        const el = blobEls[i]
+        if (el) el.style.transform = `translate3d(${bx.toFixed(2)}px,${by.toFixed(2)}px,0)`
       })
 
       rafId = requestAnimationFrame(loop)
@@ -102,7 +109,7 @@ export default function StarAnimationCanvas() {
       if (visible === isVisible) return
       isVisible = visible
       if (visible) {
-        lastT = performance.now()
+        lastT = 0
         rafId = requestAnimationFrame(loop)
       } else {
         cancelAnimationFrame(rafId); rafId = 0
@@ -110,12 +117,12 @@ export default function StarAnimationCanvas() {
     }, { threshold: 0 })
     io.observe(box)
 
-    lastT = performance.now()
     rafId = requestAnimationFrame(loop)
 
     return () => {
       cancelAnimationFrame(rafId)
       io.disconnect()
+      ro.disconnect()
       box.removeEventListener('mousemove', onMouseMove)
       box.removeEventListener('mouseleave', onMouseLeave)
     }
@@ -123,7 +130,11 @@ export default function StarAnimationCanvas() {
 
   return (
     <div ref={boxRef} className={s.starBox}>
-      <div ref={gradRef} className={s.gradientMap} aria-hidden="true" />
+      <div ref={gradRef} className={s.gradientMap} aria-hidden="true">
+        {BLOB_COLORS.map((color, i) => (
+          <div key={i} ref={el => { if (el) blobRefs.current[i] = el }} className={s.blob} style={{ background: color }} />
+        ))}
+      </div>
       <Image
         src="/wrike-star-animation/star-foreground.png"
         alt=""

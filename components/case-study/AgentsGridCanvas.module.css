@@ -23,20 +23,25 @@
 
 .gradientMap {
   position: absolute;
-  inset: 0;
+  top: 0; left: 0;
+  width: 25%;
+  height: 25%;
   z-index: 0;
   pointer-events: none;
-  filter: blur(34px);
-  background-image:
-    radial-gradient(circle 50px at calc(var(--map-x, 50%) + var(--c0-dx, 0px)) calc(var(--map-y, 50%) + var(--c0-dy, 0px)), #aaff00, transparent),
-    radial-gradient(circle 50px at calc(var(--map-x, 50%) + var(--c1-dx, 0px)) calc(var(--map-y, 50%) + var(--c1-dy, 0px)), #00e5bf, transparent),
-    radial-gradient(circle 50px at calc(var(--map-x, 50%) + var(--c2-dx, 0px)) calc(var(--map-y, 50%) + var(--c2-dy, 0px)), #00e05c, transparent),
-    radial-gradient(circle 50px at calc(var(--map-x, 50%) + var(--c3-dx, 0px)) calc(var(--map-y, 50%) + var(--c3-dy, 0px)), #00ff2b, transparent),
-    radial-gradient(circle 50px at calc(var(--map-x, 50%) + var(--c4-dx, 0px)) calc(var(--map-y, 50%) + var(--c4-dy, 0px)), #00e5e5, transparent),
-    radial-gradient(circle 50px at calc(var(--map-x, 50%) + var(--c5-dx, 0px)) calc(var(--map-y, 50%) + var(--c5-dy, 0px)), #aaff00, transparent),
-    radial-gradient(circle 50px at calc(var(--map-x, 50%) + var(--c6-dx, 0px)) calc(var(--map-y, 50%) + var(--c6-dy, 0px)), #00e05c, transparent),
-    radial-gradient(circle 50px at calc(var(--map-x, 50%) + var(--c7-dx, 0px)) calc(var(--map-y, 50%) + var(--c7-dy, 0px)), #00ff2b, transparent),
-    radial-gradient(circle 50px at calc(var(--map-x, 50%) + var(--c8-dx, 0px)) calc(var(--map-y, 50%) + var(--c8-dy, 0px)), #00e5bf, transparent);
+  filter: blur(15px);
+  transform: scale(4);
+  transform-origin: top left;
+  overflow: hidden;
+  border-radius: 4px;
+}
+
+.blob {
+  position: absolute;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  will-change: transform;
+  transform: translate3d(0, 0, 0);
 }
 
 .agentGrid {
