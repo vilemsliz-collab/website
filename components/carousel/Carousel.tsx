@@ -6,6 +6,7 @@ import {
   PRESETS, CARDS, REVEAL, INPUT, TILT, GHOST, LIGHT,
   type CarouselCFG, type CarouselPreset,
 } from '@/lib/carouselConfig'
+import { CASES } from '@/data/cases'
 import {
   buildRollBase,
 } from '@/lib/carouselPhysics'
@@ -153,11 +154,11 @@ export default function Carousel() {
     return () => { if (scrollHintTimer.current) clearTimeout(scrollHintTimer.current) }
   }, [startScrollHintTimer])
 
-  // Loader: 3-second minimum + prefetch all case routes
+  // Loader: 3-second minimum + prefetch all case routes (all slugs in data/cases.ts,
+  // so the mobile next-pill is instant from any case — including 004/005 which
+  // aren't in the carousel CARDS array).
   useEffect(() => {
-    CARDS.forEach(card => {
-      if (card.href.startsWith('/cases/')) router.prefetch(card.href)
-    })
+    CASES.forEach(c => router.prefetch(`/cases/${c.slug}`))
     const t = setTimeout(() => setLoaderVisible(false), 3000)
     return () => clearTimeout(t)
   }, [router])

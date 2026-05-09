@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
+import MobileCaseShell from '@/components/case-study/MobileCaseShell'
 
 function OverscrollRelay() {
   useEffect(() => {
@@ -29,7 +30,7 @@ export default function CasesLayout({ children }: { children: React.ReactNode })
     <>
       <style>{`html, body { background: var(--white) !important; }`}</style>
       <OverscrollRelay />
-      {children}
+      <MobileCaseShell>{children}</MobileCaseShell>
     </>
   )
 }

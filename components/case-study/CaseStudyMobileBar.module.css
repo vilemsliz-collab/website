@@ -1,0 +1,41 @@
+.bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  padding-top: calc(var(--space-2) + env(safe-area-inset-top));
+  padding-left: calc(var(--space-3) + env(safe-area-inset-left));
+  padding-right: calc(var(--space-3) + env(safe-area-inset-right));
+  z-index: 110;
+  pointer-events: none;
+}
+
+.pill {
+  pointer-events: auto;
+  appearance: none;
+  border: 1px solid var(--gray-50);
+  background: rgba(255, 255, 255, 0.86);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  border-radius: 999px;
+  padding: 10px 16px;
+  font-family: var(--font-mono, 'IBM Plex Mono', monospace);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-on-background);
+  cursor: pointer;
+  transition: transform 0.15s ease, background-color 0.15s ease;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.pill:active {
+  transform: scale(0.96);
+  background: rgba(255, 255, 255, 1);
+}

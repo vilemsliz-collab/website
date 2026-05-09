@@ -1,0 +1,26 @@
+.shell {
+  position: relative;
+  min-height: 100dvh;
+  background: var(--color-background);
+  will-change: transform;
+}
+
+.topSwipeZone {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: calc(env(safe-area-inset-top) + 56px);
+  z-index: 105;
+  touch-action: none;
+}
+
+.rightSwipeZone {
+  position: fixed;
+  top: calc(env(safe-area-inset-top) + 56px);
+  right: 0;
+  bottom: 0;
+  width: 20px;
+  z-index: 105;
+  touch-action: pan-y;
+}
