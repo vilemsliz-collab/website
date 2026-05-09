@@ -103,7 +103,7 @@ export const CASES: CaseStudy[] = [
         'https://res.cloudinary.com/duee5dfom/image/upload/q_auto/f_auto/v1776898865/Frame_1000005638_daacf6.png',
       ],
     ],
-    pairsBottom: [['@hp-animation', '']],
+    pairsBottom: [['@hp-animation', '/wrike-star-animation/index.html']],
   },
   {
     slug: '004',
