@@ -6,17 +6,35 @@
   background: var(--color-background);
   border: 1px solid var(--gray-50);
   border-radius: var(--shape-md);
-  padding: var(--space-6) var(--space-4);
+  padding: var(--space-6);
   overflow: hidden;
+}
+
+/* ── Section heading ── */
+.heading {
+  display: block;
+  font-family: var(--font-brand);
+  color: var(--color-on-background);
+  font-size: 23px;
+  line-height: 32px;
+  letter-spacing: var(--type-body-large-ls);
+  font-weight: 400;
+  font-variation-settings: 'wght' 400;
+  margin-bottom: var(--space-4);
+}
+
+/* Plot wrapper — gridlines and bar rows positioned relative to here */
+.plot {
+  position: relative;
 }
 
 /* ── Vertical dashed gridlines (between columns) ── */
 .gridLines {
   position: absolute;
-  top: var(--space-3);
-  bottom: var(--space-3);
-  left: var(--space-4);
-  right: var(--space-4);
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
   pointer-events: none;
 }
 .gridLine {
@@ -88,7 +106,6 @@
 
 @media (max-width: 768px) {
   .chart { padding: var(--space-4) var(--space-3); }
-  .gridLines { left: var(--space-3); right: var(--space-3); }
   .row { min-height: var(--space-5); }
   .bar { padding: 0 var(--space-2); }
 }

@@ -24,32 +24,35 @@ export default function SlotTimeline() {
   return (
     <div className={s.wrap}>
       <div id="case-timeline" data-element="Process timeline" className={s.chart}>
-        <div className={s.gridLines} aria-hidden="true">
-          {Array.from({ length: TOTAL_COLS - 1 }).map((_, i) => (
-            <span key={i} className={s.gridLine} style={{ left: `calc(${(i + 1) * (100 / TOTAL_COLS)}%)` }} />
-          ))}
-        </div>
-        <ol className={s.rows}>
-          {PHASES.map((p, i) => (
-            <li
-              key={i}
-              id={`case-timeline-${i}`}
-              data-element={`Phase ${i + 1}`}
-              className={s.row}
-            >
-              <span
-                className={s.bar}
-                style={{
-                  gridColumnStart: p.start,
-                  gridColumnEnd: p.end + 1,
-                  '--shade': i / last,
-                } as CSSProperties}
+        <span data-element="Process heading" className={s.heading}>Process</span>
+        <div className={s.plot}>
+          <div className={s.gridLines} aria-hidden="true">
+            {Array.from({ length: TOTAL_COLS - 1 }).map((_, i) => (
+              <span key={i} className={s.gridLine} style={{ left: `calc(${(i + 1) * (100 / TOTAL_COLS)}%)` }} />
+            ))}
+          </div>
+          <ol className={s.rows}>
+            {PHASES.map((p, i) => (
+              <li
+                key={i}
+                id={`case-timeline-${i}`}
+                data-element={`Phase ${i + 1}`}
+                className={s.row}
               >
-                <span className={s.label}>{p.label}</span>
-              </span>
-            </li>
-          ))}
-        </ol>
+                <span
+                  className={s.bar}
+                  style={{
+                    gridColumnStart: p.start,
+                    gridColumnEnd: p.end + 1,
+                    '--shade': i / last,
+                  } as CSSProperties}
+                >
+                  <span className={s.label}>{p.label}</span>
+                </span>
+              </li>
+            ))}
+          </ol>
+        </div>
       </div>
     </div>
   )
