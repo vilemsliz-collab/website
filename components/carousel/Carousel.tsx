@@ -83,6 +83,8 @@ export default function Carousel() {
   const splitRafId  = useRef<number | null>(null)
   const gyroHandler = useRef<((e: Event) => void) | null>(null)
   const permBtn     = useRef<HTMLButtonElement | null>(null)
+  const pendingLoadFrame   = useRef<HTMLIFrameElement | null>(null)
+  const pendingLoadHandler = useRef<(() => void) | null>(null)
 
   // Mutable config refs (updated live by DevPanel)
   const revealRef = useRef({ ...REVEAL })
@@ -154,12 +156,18 @@ export default function Carousel() {
     return () => { if (scrollHintTimer.current) clearTimeout(scrollHintTimer.current) }
   }, [startScrollHintTimer])
 
-  // Loader: 3-second minimum + prefetch all case routes (all slugs in data/cases.ts,
-  // so the mobile next-pill is instant from any case — including 004/005 which
-  // aren't in the carousel CARDS array).
+  // Loader runs once per session (skip on returns from a case study).
+  // Always prefetch case routes so mobile next-pill is instant from any case.
   useEffect(() => {
     CASES.forEach(c => router.prefetch(`/cases/${c.slug}`))
-    const t = setTimeout(() => setLoaderVisible(false), 3000)
+    if (typeof window !== 'undefined' && sessionStorage.getItem('carousel-loaded')) {
+      setLoaderVisible(false)
+      return
+    }
+    const t = setTimeout(() => {
+      setLoaderVisible(false)
+      try { sessionStorage.setItem('carousel-loaded', '1') } catch {}
+    }, 3000)
     return () => clearTimeout(t)
   }, [router])
 
@@ -176,6 +184,13 @@ export default function Carousel() {
     const front = frontFrame.current
     if (!back || !front) return
 
+    // Cancel any in-flight load handler from a previous rapid switch
+    if (pendingLoadFrame.current && pendingLoadHandler.current) {
+      pendingLoadFrame.current.removeEventListener('load', pendingLoadHandler.current)
+    }
+    pendingLoadFrame.current = null
+    pendingLoadHandler.current = null
+
     // Position back frame off-screen left, invisible — no transition
     back.style.transition = 'none'
     back.style.transform  = 'translateX(-40px)'
@@ -186,7 +201,12 @@ export default function Carousel() {
     front.style.transition = 'opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
     front.style.opacity    = '0'
 
-    back.addEventListener('load', () => {
+    const onLoad = () => {
+      // Clear pending refs once this handler runs
+      if (pendingLoadFrame.current === back) {
+        pendingLoadFrame.current = null
+        pendingLoadHandler.current = null
+      }
       // Send position to back frame before it slides in so content renders at the
       // correct offset and doesn't shift after the slide-in completes.
       const cardH = dims.current.cardH
@@ -206,7 +226,11 @@ export default function Carousel() {
           backFrame.current  = front
         }, 560)
       })
-    }, { once: true })
+    }
+
+    pendingLoadFrame.current = back
+    pendingLoadHandler.current = onLoad
+    back.addEventListener('load', onLoad, { once: true })
   }, [])
 
   const loadPreset = useCallback((name: string) => {

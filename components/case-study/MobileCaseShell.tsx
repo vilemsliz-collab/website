@@ -2,7 +2,7 @@
 
 import { createContext, useCallback, useMemo, useRef, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
-import { motion } from 'framer-motion'
+import { LazyMotion, domAnimation, m } from 'framer-motion'
 import { CASES } from '@/data/cases'
 import { useIsMobile } from '@/hooks/useIsMobile'
 import CaseStudyMobileBar from './CaseStudyMobileBar'
@@ -79,30 +79,32 @@ export default function MobileCaseShell({ children }: { children: React.ReactNod
 
   return (
     <MobileCaseShellContext.Provider value={ctxValue}>
-      <motion.div
-        className={s.shell}
-        initial={{ y: '100%' }}
-        animate={isClosing ? { y: '100%' } : { y: 0 }}
-        transition={TRANSITION}
-        onAnimationComplete={() => {
-          if (isClosing) router.push('/portfolio')
-        }}
-      >
-        <CaseStudyMobileBar />
-        <div
-          className={s.topSwipeZone}
-          onTouchStart={onTopStart}
-          onTouchEnd={onTopEnd}
-          aria-hidden
-        />
-        <div
-          className={s.rightSwipeZone}
-          onTouchStart={onRightStart}
-          onTouchEnd={onRightEnd}
-          aria-hidden
-        />
-        <CaseSlideShell>{children}</CaseSlideShell>
-      </motion.div>
+      <LazyMotion features={domAnimation} strict>
+        <m.div
+          className={s.shell}
+          initial={{ y: '100%' }}
+          animate={isClosing ? { y: '100%' } : { y: 0 }}
+          transition={TRANSITION}
+          onAnimationComplete={() => {
+            if (isClosing) router.push('/portfolio')
+          }}
+        >
+          <CaseStudyMobileBar />
+          <div
+            className={s.topSwipeZone}
+            onTouchStart={onTopStart}
+            onTouchEnd={onTopEnd}
+            aria-hidden
+          />
+          <div
+            className={s.rightSwipeZone}
+            onTouchStart={onRightStart}
+            onTouchEnd={onRightEnd}
+            aria-hidden
+          />
+          <CaseSlideShell>{children}</CaseSlideShell>
+        </m.div>
+      </LazyMotion>
     </MobileCaseShellContext.Provider>
   )
 }

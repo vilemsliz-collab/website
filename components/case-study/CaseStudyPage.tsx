@@ -8,7 +8,6 @@ import SlotMedia from './SlotMedia'
 import SlotTimeline from './SlotTimeline'
 import SlotPairs from './SlotPairs'
 import AgentsGridCanvas from './AgentsGridCanvas'
-import Loader from '@/components/loader/Loader'
 
 function CaseStudyMetaRow({ claims, roleBody }: { claims: CaseStudy['claims']; roleBody: string }) {
   const [cur, setCur] = useState(0)
@@ -77,16 +76,11 @@ interface Props {
 
 export default function CaseStudyPage({ cs, isOverlay }: Props) {
   const [isIframe, setIsIframe] = useState(false)
-  const [loaderVisible, setLoaderVisible] = useState(true)
   const pageRef = useRef<HTMLDivElement>(null)
   useEffect(() => {
     const inIframe = window.self !== window.top
     setIsIframe(inIframe)
     if (inIframe) document.documentElement.style.scrollbarWidth = 'none'
-  }, [])
-  useEffect(() => {
-    const t = setTimeout(() => setLoaderVisible(false), 3000)
-    return () => clearTimeout(t)
   }, [])
 
   const [cardTop, setCardTop] = useState<number | null>(null)
@@ -133,7 +127,6 @@ export default function CaseStudyPage({ cs, isOverlay }: Props) {
 
   return (
     <>
-      {!isIframe && <Loader visible={loaderVisible} />}
       {!isIframe && !isOverlay && (
         <a className={styles.caseStudyBackLink} href="/portfolio" data-cursor="link" data-cursor-label="Portfolio">← portfolio</a>
       )}
