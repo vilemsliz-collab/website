@@ -1,7 +1,6 @@
 .wrapper {
   width: 100%;
   position: relative;
-  overflow: visible;
   margin-top: var(--space-2);
   display: flex;
   align-items: center;
@@ -14,6 +13,7 @@
   height: 372px;
   transform-origin: top left;
   font-family: var(--font-brand);
+  flex-shrink: 0;
 }
 
 .gradientMap {
