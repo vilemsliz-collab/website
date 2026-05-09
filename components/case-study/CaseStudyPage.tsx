@@ -165,11 +165,11 @@ export default function CaseStudyPage({ cs, isOverlay }: Props) {
         <SlotTimeline />
         {cs.widget === '@agents-grid' && <AgentsGridCanvas />}
         {cs.pairsBottom && <SlotPairs pairs={cs.pairsBottom} />}
-        <SlotPairs pairs={cs.pairs} />
         <div id="case-solution" data-element="Solution" className={`${styles.caseStudyChallenge} ${styles.caseStudyTextInset}`}>
           <span className={styles.caseStudyRoleLabel}>Solution</span>
           <p className={styles.caseStudyBody}>{cs.solution}</p>
         </div>
+        <SlotPairs pairs={cs.pairs} />
       </div>
     </>
   )
