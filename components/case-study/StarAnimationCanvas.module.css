@@ -24,15 +24,15 @@
   filter: blur(70px);
   opacity: 0.9;
   background-image:
-    radial-gradient(circle 273px at calc(var(--map-x, 50%) + var(--c0-dx, 0px)) calc(var(--map-y, 62%) + var(--c0-dy, 0px)), #aaff00, transparent),
-    radial-gradient(circle 273px at calc(var(--map-x, 50%) + var(--c1-dx, 0px)) calc(var(--map-y, 62%) + var(--c1-dy, 0px)), #00e05c, transparent),
-    radial-gradient(circle 273px at calc(var(--map-x, 50%) + var(--c2-dx, 0px)) calc(var(--map-y, 62%) + var(--c2-dy, 0px)), #00e05c, transparent),
-    radial-gradient(circle 273px at calc(var(--map-x, 50%) + var(--c3-dx, 0px)) calc(var(--map-y, 62%) + var(--c3-dy, 0px)), #00ff2b, transparent),
-    radial-gradient(circle 273px at calc(var(--map-x, 50%) + var(--c4-dx, 0px)) calc(var(--map-y, 62%) + var(--c4-dy, 0px)), #00ff2b, transparent),
-    radial-gradient(circle 273px at calc(var(--map-x, 50%) + var(--c5-dx, 0px)) calc(var(--map-y, 62%) + var(--c5-dy, 0px)), #aaff00, transparent),
-    radial-gradient(circle 273px at calc(var(--map-x, 50%) + var(--c6-dx, 0px)) calc(var(--map-y, 62%) + var(--c6-dy, 0px)), #00e05c, transparent),
-    radial-gradient(circle 273px at calc(var(--map-x, 50%) + var(--c7-dx, 0px)) calc(var(--map-y, 62%) + var(--c7-dy, 0px)), #00ff2b, transparent),
-    radial-gradient(circle 273px at calc(var(--map-x, 50%) + var(--c8-dx, 0px)) calc(var(--map-y, 62%) + var(--c8-dy, 0px)), #00e05c, transparent);
+    radial-gradient(circle 180px at calc(var(--map-x, 50%) + var(--c0-dx, 0px)) calc(var(--map-y, 62%) + var(--c0-dy, 0px)), #aaff00, transparent),
+    radial-gradient(circle 180px at calc(var(--map-x, 50%) + var(--c1-dx, 0px)) calc(var(--map-y, 62%) + var(--c1-dy, 0px)), #00e05c, transparent),
+    radial-gradient(circle 180px at calc(var(--map-x, 50%) + var(--c2-dx, 0px)) calc(var(--map-y, 62%) + var(--c2-dy, 0px)), #00e05c, transparent),
+    radial-gradient(circle 180px at calc(var(--map-x, 50%) + var(--c3-dx, 0px)) calc(var(--map-y, 62%) + var(--c3-dy, 0px)), #00ff2b, transparent),
+    radial-gradient(circle 180px at calc(var(--map-x, 50%) + var(--c4-dx, 0px)) calc(var(--map-y, 62%) + var(--c4-dy, 0px)), #00ff2b, transparent),
+    radial-gradient(circle 180px at calc(var(--map-x, 50%) + var(--c5-dx, 0px)) calc(var(--map-y, 62%) + var(--c5-dy, 0px)), #aaff00, transparent),
+    radial-gradient(circle 180px at calc(var(--map-x, 50%) + var(--c6-dx, 0px)) calc(var(--map-y, 62%) + var(--c6-dy, 0px)), #00e05c, transparent),
+    radial-gradient(circle 180px at calc(var(--map-x, 50%) + var(--c7-dx, 0px)) calc(var(--map-y, 62%) + var(--c7-dy, 0px)), #00ff2b, transparent),
+    radial-gradient(circle 180px at calc(var(--map-x, 50%) + var(--c8-dx, 0px)) calc(var(--map-y, 62%) + var(--c8-dy, 0px)), #00e05c, transparent);
 }
 
 .starForeground {
