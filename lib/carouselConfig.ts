@@ -106,7 +106,7 @@ export const GHOST: GhostConfig   = { layers: 0, opacity: 0.16, blur: 0, blend: 
 export const LIGHT: LightConfig   = { intensity: 0.6, size: 85, travel: 68, diffuse: 0.10, shadow: 0.18, blur: 24 }
 
 export const CARDS: CardData[] = [
-  { id: 'about', name: 'Vilém', lines: ['Brand XP', 'Expressive UI'], role: '', href: '/cases/001', bg: '#ffffff', ac: '#000000', isAbout: true },
+  { id: 'about', name: 'Vilém', lines: ['Brand XP', 'Expressive UI'], role: '', href: '/cases/about', bg: '#ffffff', ac: '#000000', isAbout: true },
   { id: '002', lines: ['Generative systems,', 'designed in code.'],    role: 'Creative Technologist', href: '/cases/002', bg: '#0d1a0d', ac: '#4dd0e1', video: 'https://res.cloudinary.com/duee5dfom/video/upload/f_auto,q_auto/card_1_gkybmm' },
   { id: '003', lines: ['Wrike AI —', 'I made it glow.'],               role: 'Interaction Designer',  href: '/cases/003', bg: '#0d1a0d', ac: '#4dd0e1', video: 'https://res.cloudinary.com/duee5dfom/video/upload/f_auto,q_auto/card_6_hjffwo' },
 

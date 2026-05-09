@@ -32,6 +32,27 @@ export interface CaseStudy {
 
 export const CASES: CaseStudy[] = [
   {
+    slug: 'about',
+    title: 'Vilém Slíž',
+    headlineDark: 'Vilém Slíž',
+    headlineMuted: '',
+    claims: [
+      { bold: 'brand systems', text: 'Generalist designer focused on {bold}' },
+      { bold: 'top of funnel to product', text: 'Building brand experiences from {bold}' },
+      { bold: 'B2B SaaS', text: 'Specialising in {bold} at Wrike' },
+    ],
+    roleBody: 'I build seamless brand experiences from top of the funnel to product in the B2B SaaS space at Wrike. I care about turning brand strategy into systems people actually enjoy using.',
+    challenge: 'I build seamless brand experiences from top of the funnel to product in the B2B SaaS space at Wrike. I care about turning brand strategy into systems people actually enjoy using.',
+    solution: '',
+    mediaCaption: '',
+    pairs: [
+      [
+        '@bio-card',
+        'https://res.cloudinary.com/duee5dfom/image/upload/q_auto/f_auto/v1778365303/7826c895-4091-4159-9025-999e4f274797.png',
+      ],
+    ],
+  },
+  {
     slug: '001',
     title: 'I made Wrike AI glow',
     headlineDark: 'I made Wrike AI glow',
