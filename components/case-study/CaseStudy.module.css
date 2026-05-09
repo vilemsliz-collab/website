@@ -163,8 +163,9 @@
 .caseStudyRoleLabel {
   font-family: var(--font-brand);
   color: var(--gray-800);
-  font-size: var(--type-headline-small-size);
-  line-height: var(--type-headline-small-lh);
+  font-size: 20px;
+  line-height: 28px;
+  letter-spacing: var(--type-body-large-ls);
   font-weight: 400;
   font-variation-settings: 'wght' 400;
 }
