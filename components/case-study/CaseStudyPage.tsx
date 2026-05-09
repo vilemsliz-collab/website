@@ -147,22 +147,28 @@ export default function CaseStudyPage({ cs, isOverlay }: Props) {
             onClick={() => window.parent.postMessage({ type: 'case-close' }, '*')}
           />
         )}
-        {cs.heroImg && <SlotHero src={cs.heroImg} />}
-        <SlotMedia img={cs.mediaImg} video={cs.mediaVideo}>
-          <CaseStudyMetaRow claims={cs.claims} roleBody={cs.roleBody} />
-        </SlotMedia>
-        <div id="case-challenge" data-element="Challenge" className={`${styles.caseStudyChallenge} ${styles.caseStudyTextInset}`}>
-          <span className={styles.caseStudyRoleLabel}>Challenge</span>
-          <p className={styles.caseStudyBody}>{cs.challenge}</p>
-        </div>
-        <SlotTimeline />
-        {cs.widget === '@agents-grid' && <AgentsGridCanvas />}
-        {cs.pairsBottom && <SlotPairs pairs={cs.pairsBottom} />}
-        <div id="case-solution" data-element="Solution" className={`${styles.caseStudyChallenge} ${styles.caseStudyTextInset}`}>
-          <span className={styles.caseStudyRoleLabel}>Solution</span>
-          <p className={styles.caseStudyBody}>{cs.solution}</p>
-        </div>
-        <SlotPairs pairs={cs.pairs} />
+        {cs.layout === 'about' ? (
+          <SlotPairs pairs={cs.pairs} />
+        ) : (
+          <>
+            {cs.heroImg && <SlotHero src={cs.heroImg} />}
+            <SlotMedia img={cs.mediaImg} video={cs.mediaVideo}>
+              <CaseStudyMetaRow claims={cs.claims} roleBody={cs.roleBody} />
+            </SlotMedia>
+            <div id="case-challenge" data-element="Challenge" className={`${styles.caseStudyChallenge} ${styles.caseStudyTextInset}`}>
+              <span className={styles.caseStudyRoleLabel}>Challenge</span>
+              <p className={styles.caseStudyBody}>{cs.challenge}</p>
+            </div>
+            <SlotTimeline />
+            {cs.widget === '@agents-grid' && <AgentsGridCanvas />}
+            {cs.pairsBottom && <SlotPairs pairs={cs.pairsBottom} />}
+            <div id="case-solution" data-element="Solution" className={`${styles.caseStudyChallenge} ${styles.caseStudyTextInset}`}>
+              <span className={styles.caseStudyRoleLabel}>Solution</span>
+              <p className={styles.caseStudyBody}>{cs.solution}</p>
+            </div>
+            <SlotPairs pairs={cs.pairs} />
+          </>
+        )}
       </div>
     </>
   )

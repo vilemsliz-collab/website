@@ -28,6 +28,7 @@ export interface CaseStudy {
   pairsBottom?: string[][]
   widget?: string
   mobileSections?: MobileSection[]
+  layout?: 'about'
 }
 
 export const CASES: CaseStudy[] = [
@@ -45,6 +46,7 @@ export const CASES: CaseStudy[] = [
     challenge: 'I build seamless brand experiences from top of the funnel to product in the B2B SaaS space at Wrike. I care about turning brand strategy into systems people actually enjoy using.',
     solution: '',
     mediaCaption: '',
+    layout: 'about',
     pairs: [
       [
         '@bio-card',
