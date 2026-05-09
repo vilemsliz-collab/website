@@ -41,10 +41,4 @@
 @media (max-width: 768px) {
   .pairsSection { margin-top: var(--space-2); }
   .pairRow { flex-direction: column; }
-  .pairSlot {
-    border-radius: 0;
-    margin-left: calc(-1 * var(--space-3));
-    margin-right: calc(-1 * var(--space-3));
-    max-height: none;
-  }
 }
