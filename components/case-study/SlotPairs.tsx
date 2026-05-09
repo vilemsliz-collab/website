@@ -1,6 +1,7 @@
 import Image from 'next/image'
 import HpAnimationCanvas from './HpAnimationCanvas'
 import StarAnimationCanvas from './StarAnimationCanvas'
+import BioPairCard from './BioPairCard'
 import s from './SlotPairs.module.css'
 
 function SlotPairRow({ pair, rowIndex }: { pair: string[]; rowIndex: number }) {
@@ -14,7 +15,9 @@ function SlotPairRow({ pair, rowIndex }: { pair: string[]; rowIndex: number }) {
       ) : (
         pair.map((url, ii) => (
           <div key={ii} id={`case-pairs-${rowIndex}-${ii}`} data-element={`Pair ${rowIndex + 1}-${ii + 1}`} className={pair.length === 1 ? s.pairSlotWide : s.pairSlot} data-slot={`pair-${rowIndex}-${ii}`}>
-            {url === '@hp-animation' ? (
+            {url === '@bio-card' ? (
+              <BioPairCard />
+            ) : url === '@hp-animation' ? (
               <HpAnimationCanvas />
             ) : url === '@star-animation' ? (
               <StarAnimationCanvas />
