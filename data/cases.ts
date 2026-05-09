@@ -45,12 +45,7 @@ export const CASES: CaseStudy[] = [
     challenge: 'Three separate product teams were shipping UI at different speeds with no shared vocabulary.',
     solution: 'We audited every existing pattern, distilled a minimal token architecture, and rebuilt the component library from the ground up — optimised for composability.',
     mediaCaption: '',
-    pairs: [
-      [
-        '@bio-card',
-        'https://res.cloudinary.com/duee5dfom/image/upload/q_auto/f_auto/v1778365303/7826c895-4091-4159-9025-999e4f274797.png',
-      ],
-    ],
+    pairs: [[], []],
   },
   {
     slug: '002',
