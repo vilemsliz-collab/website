@@ -68,8 +68,8 @@
 .caseStudyTextInset { padding-left: 0; padding-right: 0; }
 
 .caseStudyBody {
-  font-size: 20px;
-  line-height: 28px;
+  font-size: 23px;
+  line-height: 32px;
   letter-spacing: var(--type-body-large-ls);
   font-weight: 400;
   font-variation-settings: 'wght' 400;
@@ -162,9 +162,9 @@
 
 .caseStudyRoleLabel {
   font-family: var(--font-brand);
-  color: var(--gray-800);
-  font-size: 20px;
-  line-height: 28px;
+  color: var(--color-on-background);
+  font-size: 23px;
+  line-height: 32px;
   letter-spacing: var(--type-body-large-ls);
   font-weight: 400;
   font-variation-settings: 'wght' 400;
