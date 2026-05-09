@@ -52,6 +52,7 @@
   flex-direction: column;
   gap: 0;
   padding: var(--space-3);
+  padding-bottom: var(--space-8);
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
