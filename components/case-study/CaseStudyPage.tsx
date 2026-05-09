@@ -7,6 +7,7 @@ import SlotHero from './SlotHero'
 import SlotMedia from './SlotMedia'
 import SlotTimeline from './SlotTimeline'
 import SlotPairs from './SlotPairs'
+import AgentsGridCanvas from './AgentsGridCanvas'
 import Loader from '@/components/loader/Loader'
 
 function CaseStudyMetaRow({ claims, roleBody }: { claims: CaseStudy['claims']; roleBody: string }) {
@@ -168,6 +169,7 @@ export default function CaseStudyPage({ cs, isOverlay }: Props) {
           <p className={styles.caseStudyBody}>{cs.solution}</p>
         </div>
         {cs.pairsBottom && <SlotPairs pairs={cs.pairsBottom} />}
+        {cs.widget === '@agents-grid' && <AgentsGridCanvas />}
       </div>
     </>
   )

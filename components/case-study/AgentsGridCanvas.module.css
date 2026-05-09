@@ -1,0 +1,91 @@
+.wrapper {
+  width: 100%;
+  position: relative;
+  overflow: visible;
+  margin-top: var(--space-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.grid {
+  position: relative;
+  width: 372px;
+  height: 372px;
+  transform-origin: top left;
+  font-family: var(--font-brand);
+}
+
+.gradientMap {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  filter: blur(34px);
+  background-image:
+    radial-gradient(circle 50px at calc(var(--map-x, 50%) + var(--c0-dx, 0px)) calc(var(--map-y, 50%) + var(--c0-dy, 0px)), #aaff00, transparent),
+    radial-gradient(circle 50px at calc(var(--map-x, 50%) + var(--c1-dx, 0px)) calc(var(--map-y, 50%) + var(--c1-dy, 0px)), #00e5bf, transparent),
+    radial-gradient(circle 50px at calc(var(--map-x, 50%) + var(--c2-dx, 0px)) calc(var(--map-y, 50%) + var(--c2-dy, 0px)), #00e05c, transparent),
+    radial-gradient(circle 50px at calc(var(--map-x, 50%) + var(--c3-dx, 0px)) calc(var(--map-y, 50%) + var(--c3-dy, 0px)), #00ff2b, transparent),
+    radial-gradient(circle 50px at calc(var(--map-x, 50%) + var(--c4-dx, 0px)) calc(var(--map-y, 50%) + var(--c4-dy, 0px)), #00e5e5, transparent),
+    radial-gradient(circle 50px at calc(var(--map-x, 50%) + var(--c5-dx, 0px)) calc(var(--map-y, 50%) + var(--c5-dy, 0px)), #aaff00, transparent),
+    radial-gradient(circle 50px at calc(var(--map-x, 50%) + var(--c6-dx, 0px)) calc(var(--map-y, 50%) + var(--c6-dy, 0px)), #00e05c, transparent),
+    radial-gradient(circle 50px at calc(var(--map-x, 50%) + var(--c7-dx, 0px)) calc(var(--map-y, 50%) + var(--c7-dy, 0px)), #00ff2b, transparent),
+    radial-gradient(circle 50px at calc(var(--map-x, 50%) + var(--c8-dx, 0px)) calc(var(--map-y, 50%) + var(--c8-dy, 0px)), #00e5bf, transparent);
+}
+
+.agentGrid {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(3, 118px);
+  grid-template-rows: repeat(3, 118px);
+  gap: 9px;
+}
+
+.tile {
+  width: 118px;
+  height: 118px;
+  position: relative;
+  z-index: 1;
+  cursor: pointer;
+  will-change: transform;
+}
+
+.tilePerson {
+  border-radius: 24px;
+  overflow: hidden;
+  background: #bfc7d9;
+}
+
+.tilePerson img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  display: block;
+  transition: transform 500ms cubic-bezier(.23, 1, .32, 1);
+}
+
+.tilePerson:hover img { transform: scale(1.10); }
+
+.tileAgent {
+  border-radius: 28px;
+  background: #ffffff;
+  border: 3px solid #00e05c;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tileAgentSvg {
+  width: 76px;
+  height: 76px;
+  color: #00e05c;
+  display: block;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tile { transition: none !important; will-change: auto !important; }
+  .tilePerson img { transition: none !important; }
+}

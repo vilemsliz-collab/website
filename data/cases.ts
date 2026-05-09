@@ -26,6 +26,7 @@ export interface CaseStudy {
   mediaCaption: string
   pairs: string[][]
   pairsBottom?: string[][]
+  widget?: string
   mobileSections?: MobileSection[]
 }
 
@@ -104,6 +105,7 @@ export const CASES: CaseStudy[] = [
       ],
     ],
     pairsBottom: [['@hp-animation', '@star-animation']],
+    widget: '@agents-grid',
   },
   {
     slug: '004',
