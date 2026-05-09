@@ -625,8 +625,7 @@ export default function Carousel() {
           className={styles.caseFrame}
           title="Case study"
           loading="eager"
-          // @ts-expect-error fetchpriority is valid HTML, missing from React types
-          fetchpriority="high"
+          {...({ fetchPriority: 'high' } as { fetchPriority?: 'high' | 'low' | 'auto' })}
         />
         <iframe
           ref={frameBRef}
