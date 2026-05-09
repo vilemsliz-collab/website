@@ -25,14 +25,14 @@ export default function StarAnimationCanvas() {
     const box  = boxRef.current!
     const grad = gradRef.current!
 
-    const mapX = new Spring(13, 6)
-    const mapY = new Spring(13, 6)
+    const mapX = new Spring(3, 1.6)
+    const mapY = new Spring(3, 1.6)
     mapX.value = mapX.target = box.offsetWidth  / 2
     mapY.value = mapY.target = box.offsetHeight * 0.62
 
     const spots = Array.from({ length: SPOT_COUNT }, (_, i) => {
-      const sprX = new Spring(10, 4)
-      const sprY = new Spring(10, 4)
+      const sprX = new Spring(2.5, 1.4)
+      const sprY = new Spring(2.5, 1.4)
       const a = (i / SPOT_COUNT) * Math.PI * 2
       const r = 35 + Math.random() * 25
       sprX.value = sprX.target = Math.cos(a) * r
@@ -66,8 +66,8 @@ export default function StarAnimationCanvas() {
       const h  = box.offsetHeight
       const cx = w / 2
       const cy = h * 0.62
-      const wx = cx + Math.sin(t * 0.13  * TAU) * w * 0.17
-      const wy = cy - Math.sin(t * 0.097 * TAU + 1.3) * h * 0.10
+      const wx = cx + Math.sin(t * 0.06  * TAU) * w * 0.17
+      const wy = cy - Math.sin(t * 0.045 * TAU + 1.3) * h * 0.10
 
       if (hoverPoint) {
         mapX.setTarget(wx * 0.35 + hoverPoint.x * 0.65)
@@ -86,7 +86,7 @@ export default function StarAnimationCanvas() {
         if (t > sp.nextRetarget) {
           sp.sprX.setTarget((Math.random() - 0.5) * 2 * amp)
           sp.sprY.setTarget((Math.random() - 0.5) * 2 * amp)
-          sp.nextRetarget = t + 3 + Math.random() * 5
+          sp.nextRetarget = t + 6 + Math.random() * 9
         }
         sp.sprX.tick(dt)
         sp.sprY.tick(dt)
