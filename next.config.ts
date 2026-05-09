@@ -8,7 +8,18 @@ const securityHeaders = [
   { key: 'Permissions-Policy',      value: 'camera=(), microphone=(), geolocation=()' },
 ]
 
+// SSG case routes never change without a redeploy → cacheable forever at the
+// CDN. The browser revalidates (max-age=0) so a redeploy is picked up
+// immediately, but s-maxage keeps repeat hits free for everyone behind the CDN.
+const caseCacheHeaders = [
+  { key: 'Cache-Control', value: 'public, max-age=0, s-maxage=31536000, must-revalidate' },
+]
+
 const nextConfig: NextConfig = {
+  reactCompiler: true,
+  experimental: {
+    optimizePackageImports: ['framer-motion', 'lenis'],
+  },
   images: {
     remotePatterns: [
       { protocol: 'https', hostname: 'res.cloudinary.com' },
@@ -16,10 +27,8 @@ const nextConfig: NextConfig = {
   },
   async headers() {
     return [
-      {
-        source: '/(.*)',
-        headers: securityHeaders,
-      },
+      { source: '/(.*)',          headers: securityHeaders },
+      { source: '/cases/:slug*',  headers: caseCacheHeaders },
     ]
   },
 }

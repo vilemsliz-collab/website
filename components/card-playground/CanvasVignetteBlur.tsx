@@ -70,7 +70,7 @@ export default function CanvasVignetteBlur({ imgRef, blur, start }: Props) {
   }, [])
 
   // Re-render when blur/start props change
-  useEffect(() => { render() })
+  useEffect(() => { render() }, [blur, start]) // eslint-disable-line react-hooks/exhaustive-deps
 
   return <canvas ref={canvasRef} className={styles.cardZoomBlur} />
 }

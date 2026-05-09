@@ -82,7 +82,11 @@ export default function TiltCard({ imgSrc, line1, line2, tilt, ghost, light, rev
     }
   }, [ghost.layers, ghost.variant])
 
+  const cfgRef = useRef({ tilt, ghost, light })
+  cfgRef.current = { tilt, ghost, light }
+
   const drawGhosts = useCallback(() => {
+    const { ghost: g } = cfgRef.current
     const mag = Math.abs(tiltRx.current) + Math.abs(tiltRy.current)
     if (mag < 0.3) { ghostClones.current.forEach(c => { c.style.opacity = '0' }); return }
     const P     = 800
@@ -91,56 +95,56 @@ export default function TiltCard({ imgSrc, line1, line2, tilt, ghost, light, rev
     const halfW = card.offsetWidth  / 2
     const halfH = card.offsetHeight / 2
     ghostClones.current.forEach((clone, i) => {
-      const scalar = (i + 1) / (ghost.layers + 1)
+      const scalar = (i + 1) / (g.layers + 1)
       const rx = perspAngle(tiltRx.current, scalar, halfH, P)
       const ry = perspAngle(tiltRy.current, scalar, halfW, P)
       clone.style.transform    = `rotateX(${rx.toFixed(3)}deg) rotateY(${ry.toFixed(3)}deg)`
-      clone.style.opacity      = String(ghost.opacity * scalar)
-      clone.style.filter       = ghost.blur > 0 ? `blur(${(ghost.blur * (1 - scalar)).toFixed(2)}px)` : ''
-      clone.style.mixBlendMode = ghost.blend
+      clone.style.opacity      = String(g.opacity * scalar)
+      clone.style.filter       = g.blur > 0 ? `blur(${(g.blur * (1 - scalar)).toFixed(2)}px)` : ''
+      clone.style.mixBlendMode = g.blend
     })
-  }, [ghost])
+  }, [])
 
   const updateShine = useCallback(() => {
     const shine = shineRef.current
     if (!shine) return
-    const maxT = tilt.max || 12
+    const { tilt: t, light: l } = cfgRef.current
+    const maxT = t.max || 12
     const nx =  tiltRy.current / maxT
     const ny = -tiltRx.current / maxT
     const mag = Math.min(Math.hypot(nx, ny), 1)
     if (mag < 0.015) { shine.style.background = 'none'; return }
 
-    const hx = (50 - nx * light.travel).toFixed(1)
-    const hy = (50 + ny * light.travel).toFixed(1)
-    const specPeak  = (light.intensity * mag).toFixed(3)
-    const specMid   = (light.intensity * 0.12 * mag).toFixed(3)
-    const sz        = light.size
+    const hx = (50 - nx * l.travel).toFixed(1)
+    const hy = (50 + ny * l.travel).toFixed(1)
+    const specPeak  = (l.intensity * mag).toFixed(3)
+    const specMid   = (l.intensity * 0.12 * mag).toFixed(3)
+    const sz        = l.size
     const litAngle  = (Math.atan2(-nx, -ny) * 180 / Math.PI).toFixed(1)
-    const diffAmt   = (light.diffuse * mag).toFixed(3)
-    const shadowAmt = (light.shadow  * mag).toFixed(3)
+    const diffAmt   = (l.diffuse * mag).toFixed(3)
+    const shadowAmt = (l.shadow  * mag).toFixed(3)
 
     shine.style.background = [
       `radial-gradient(ellipse ${sz}% ${sz}% at ${hx}% ${hy}%, rgba(255,255,255,${specPeak}) 0%, rgba(255,255,255,${specMid}) 45%, transparent 72%)`,
       `linear-gradient(${litAngle}deg, rgba(255,255,255,${diffAmt}) 0%, transparent 55%)`,
       `linear-gradient(${(+litAngle + 180).toFixed(1)}deg, rgba(0,0,0,${shadowAmt}) 0%, transparent 60%)`,
     ].join(',')
-  }, [tilt.max, light])
+  }, [])
 
-  // Tilt loop + event listeners
   useEffect(() => {
     let rafId: number
 
     function tiltLoop() {
-      tiltVx.current += (tiltTx.current - tiltRx.current) * tilt.stiffness
-      tiltVy.current += (tiltTy.current - tiltRy.current) * tilt.stiffness
-      tiltVx.current *= tilt.damping
-      tiltVy.current *= tilt.damping
+      const { tilt: t } = cfgRef.current
+      tiltVx.current += (tiltTx.current - tiltRx.current) * t.stiffness
+      tiltVy.current += (tiltTy.current - tiltRy.current) * t.stiffness
+      tiltVx.current *= t.damping
+      tiltVy.current *= t.damping
       tiltRx.current += tiltVx.current
       tiltRy.current += tiltVy.current
       if (cardRef.current) {
         cardRef.current.style.transform = `rotateX(${tiltRx.current.toFixed(3)}deg) rotateY(${tiltRy.current.toFixed(3)}deg)`
       }
-      // Expose live tilt to parent (cursor system reads this)
       if (tiltRef) {
         tiltRef.current.rx = tiltRx.current
         tiltRef.current.ry = tiltRy.current
@@ -153,34 +157,39 @@ export default function TiltCard({ imgSrc, line1, line2, tilt, ghost, light, rev
 
     function onMouseMove(e: MouseEvent) {
       if (isMobile()) return
-      tiltTy.current =  (e.clientX / window.innerWidth  - 0.5) * 2 * tilt.max
-      tiltTx.current = -(e.clientY / window.innerHeight - 0.5) * 2 * tilt.max
+      const max = cfgRef.current.tilt.max
+      tiltTy.current =  (e.clientX / window.innerWidth  - 0.5) * 2 * max
+      tiltTx.current = -(e.clientY / window.innerHeight - 0.5) * 2 * max
     }
-    function attachGyro() {
-      window.addEventListener('deviceorientation', e => {
-        const gamma = (e as DeviceOrientationEvent).gamma ?? 0
-        const beta  = (e as DeviceOrientationEvent).beta  ?? 0
-        tiltTy.current = clamp( (gamma / 30) * tilt.max, -tilt.max, tilt.max)
-        tiltTx.current = clamp(((beta - 45) / 30) * tilt.max, -tilt.max, tilt.max)
-      })
+    function onGyro(e: DeviceOrientationEvent) {
+      const max = cfgRef.current.tilt.max
+      const gamma = e.gamma ?? 0
+      const beta  = e.beta  ?? 0
+      tiltTy.current = clamp( (gamma / 30) * max, -max, max)
+      tiltTx.current = clamp(((beta - 45) / 30) * max, -max, max)
     }
+
+    let permBtn: HTMLButtonElement | null = null
+    let permBtnClick: (() => void) | null = null
+
     if (isMobile()) {
-      if (
-        typeof DeviceOrientationEvent !== 'undefined' &&
-        typeof (DeviceOrientationEvent as unknown as { requestPermission?: () => Promise<string> }).requestPermission === 'function'
-      ) {
-        const permBtn = document.createElement('button')
+      const DOE = DeviceOrientationEvent as unknown as { requestPermission?: () => Promise<string> }
+      if (typeof DeviceOrientationEvent !== 'undefined' && typeof DOE.requestPermission === 'function') {
+        permBtn = document.createElement('button')
         permBtn.textContent = 'enable tilt'
         permBtn.style.cssText = 'position:fixed;bottom:20px;right:20px;padding:10px 16px;border-radius:8px;border:1px solid rgba(0,0,0,0.15);background:#1c1b1f;color:#fff;font-family:monospace;font-size:12px;cursor:pointer;z-index:999'
         document.body.appendChild(permBtn)
-        permBtn.addEventListener('click', () => {
-          ;(DeviceOrientationEvent as unknown as { requestPermission: () => Promise<string> })
-            .requestPermission()
-            .then(state => { if (state === 'granted') attachGyro(); permBtn.remove() })
-            .catch(() => permBtn.remove())
-        })
+        permBtnClick = () => {
+          DOE.requestPermission!()
+            .then(state => {
+              if (state === 'granted') window.addEventListener('deviceorientation', onGyro)
+              permBtn?.remove(); permBtn = null
+            })
+            .catch(() => { permBtn?.remove(); permBtn = null })
+        }
+        permBtn.addEventListener('click', permBtnClick)
       } else {
-        attachGyro()
+        window.addEventListener('deviceorientation', onGyro)
       }
     }
 
@@ -188,14 +197,11 @@ export default function TiltCard({ imgSrc, line1, line2, tilt, ghost, light, rev
     return () => {
       cancelAnimationFrame(rafId)
       document.removeEventListener('mousemove', onMouseMove)
+      window.removeEventListener('deviceorientation', onGyro)
+      if (permBtn && permBtnClick) permBtn.removeEventListener('click', permBtnClick)
+      permBtn?.remove()
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tilt.max, tilt.stiffness, tilt.damping, drawGhosts, updateShine])
-
-  // Tilt target refs need a different approach since they're used inside the loop
-  const tiltTxRef = tiltTx
-  const tiltTyRef = tiltTy
-  ;(void tiltTxRef); (void tiltTyRef) // suppress unused warning
+  }, [drawGhosts, updateShine, tiltRef])
 
   // Init words + clones
   useEffect(() => {

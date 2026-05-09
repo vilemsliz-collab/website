@@ -25,7 +25,7 @@ body {
 }
 
 :root {
-  --font-brand: 'Google Sans Flex', system-ui, sans-serif;
+  --font-brand: var(--font-brand-google), 'Google Sans Flex', system-ui, sans-serif;
 
   /* ── Font variation axes (Google Sans Flex) ── */
   --fvs-grad: 68;

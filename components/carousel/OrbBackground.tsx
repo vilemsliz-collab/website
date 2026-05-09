@@ -386,16 +386,17 @@ export default function OrbBackground({ dark = false }: { dark?: boolean }) {
         device.queue.writeBuffer(particleBuf, 0, pBuf)
         if (colorsDirty) { device.queue.writeBuffer(colorBuf, 0, cBuf); colorsDirty = false }
 
-        if (!bindGroup) { rafId = requestAnimationFrame(tick); return }
-        const encoder = device.createCommandEncoder()
-        const pass = encoder.beginRenderPass({
-          colorAttachments: [{ view: gpuCtx!.getCurrentTexture().createView(), loadOp: 'clear', storeOp: 'store', clearValue: { r: 1, g: 1, b: 1, a: 1 } }],
-        })
-        pass.setPipeline(pipeline)
-        pass.setBindGroup(0, bindGroup)
-        pass.draw(3)
-        pass.end()
-        device.queue.submit([encoder.finish()])
+        if (bindGroup) {
+          const encoder = device.createCommandEncoder()
+          const pass = encoder.beginRenderPass({
+            colorAttachments: [{ view: gpuCtx!.getCurrentTexture().createView(), loadOp: 'clear', storeOp: 'store', clearValue: { r: 1, g: 1, b: 1, a: 1 } }],
+          })
+          pass.setPipeline(pipeline)
+          pass.setBindGroup(0, bindGroup)
+          pass.draw(3)
+          pass.end()
+          device.queue.submit([encoder.finish()])
+        }
 
         rafId = requestAnimationFrame(tick)
       }

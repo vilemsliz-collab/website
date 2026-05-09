@@ -467,7 +467,7 @@ export default function CustomCursor({ tiltRef, configRef }: CursorProps) {
       if (scrollTimer) clearTimeout(scrollTimer)
       document.body.style.cursor = ''
     }
-  }, [tiltRef])
+  }, [tiltRef, configRef])
 
   return (
     <div ref={wrapperRef} className={styles.wrapper} aria-hidden>

@@ -157,18 +157,36 @@ export default function Carousel() {
   }, [startScrollHintTimer])
 
   // Loader runs once per session (skip on returns from a case study).
-  // Always prefetch case routes so mobile next-pill is instant from any case.
+  // - router.prefetch warms the RSC payload for client navigation (mobile next-pill)
+  // - <link rel="prefetch" as="document"> warms the full HTML so the iframe path
+  //   (split-screen) starts from cache, not network.
   useEffect(() => {
     CASES.forEach(c => router.prefetch(`/cases/${c.slug}`))
+
+    const prefetchLinks: HTMLLinkElement[] = []
+    CASES.forEach(c => {
+      const link = document.createElement('link')
+      link.rel = 'prefetch'
+      link.as = 'document'
+      link.href = `/cases/${c.slug}`
+      document.head.appendChild(link)
+      prefetchLinks.push(link)
+    })
+
+    let loaderTimer: ReturnType<typeof setTimeout> | null = null
     if (typeof window !== 'undefined' && sessionStorage.getItem('carousel-loaded')) {
       setLoaderVisible(false)
-      return
+    } else {
+      loaderTimer = setTimeout(() => {
+        setLoaderVisible(false)
+        try { sessionStorage.setItem('carousel-loaded', '1') } catch {}
+      }, 3000)
     }
-    const t = setTimeout(() => {
-      setLoaderVisible(false)
-      try { sessionStorage.setItem('carousel-loaded', '1') } catch {}
-    }, 3000)
-    return () => clearTimeout(t)
+
+    return () => {
+      if (loaderTimer) clearTimeout(loaderTimer)
+      prefetchLinks.forEach(l => l.remove())
+    }
   }, [router])
 
   // ── React state (only for things that need re-render) ──
@@ -606,12 +624,16 @@ export default function Carousel() {
           id="case-frame-a"
           className={styles.caseFrame}
           title="Case study"
+          loading="eager"
+          // @ts-expect-error fetchpriority is valid HTML, missing from React types
+          fetchpriority="high"
         />
         <iframe
           ref={frameBRef}
           id="case-frame-b"
           className={styles.caseFrame}
           title="Case study next"
+          loading="lazy"
         />
       </div>
 
