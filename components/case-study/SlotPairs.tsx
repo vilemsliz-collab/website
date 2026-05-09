@@ -18,7 +18,7 @@ function SlotPairRow({ pair, rowIndex }: { pair: string[]; rowIndex: number }) {
             ) : url.includes('/video/') ? (
               <video src={url} autoPlay muted loop playsInline style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
             ) : url.endsWith('.html') ? (
-              <iframe src={url} style={{ width: '100%', height: '100%', border: 'none', display: 'block', pointerEvents: 'none' }} />
+              <iframe src={url} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', border: 'none', display: 'block', pointerEvents: 'none' }} />
             ) : url ? (
               <Image src={url} alt="" fill sizes="(max-width: 768px) 100vw, 50vw" style={{ objectFit: 'cover' }} />
             ) : null}
