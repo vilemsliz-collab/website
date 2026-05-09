@@ -68,8 +68,8 @@
 .caseStudyTextInset { padding-left: 0; padding-right: 0; }
 
 .caseStudyBody {
-  font-size: 16px;
-  line-height: var(--type-body-large-lh);
+  font-size: 20px;
+  line-height: 28px;
   letter-spacing: var(--type-body-large-ls);
   font-weight: 400;
   font-variation-settings: 'wght' 400;
