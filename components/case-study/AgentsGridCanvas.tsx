@@ -177,17 +177,11 @@ export default function AgentsGridCanvas() {
     grid.addEventListener('mouseleave', onLeave)
     off.push(() => grid.removeEventListener('mouseleave', onLeave))
 
-    // ── ResizeObserver — scale down only on narrow containers ─────────────
+    // ── ResizeObserver — scale grid down to fit box if needed ─────────────
     const ro = new ResizeObserver(entries => {
-      const w = entries[0].contentRect.width
-      if (w < GRID_W) {
-        const scale = w / GRID_W
-        wrapper.style.height = `${(GRID_H * scale).toFixed(1)}px`
-        grid.style.transform = `scale(${scale.toFixed(4)})`
-      } else {
-        wrapper.style.height = ''
-        grid.style.transform = ''
-      }
+      const { width: w, height: h } = entries[0].contentRect
+      const scale = Math.min(1, w / GRID_W, h / GRID_H)
+      grid.style.transform = scale < 1 ? `scale(${scale.toFixed(4)})` : ''
     })
     ro.observe(wrapper)
 

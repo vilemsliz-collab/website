@@ -1,5 +1,10 @@
 .wrapper {
   width: 100%;
+  aspect-ratio: 1072 / 675;
+  background: var(--color-background);
+  border: 1px solid var(--gray-50);
+  border-radius: var(--shape-md);
+  overflow: hidden;
   position: relative;
   margin-top: var(--space-2);
   display: flex;
@@ -11,7 +16,7 @@
   position: relative;
   width: 372px;
   height: 372px;
-  transform-origin: top left;
+  transform-origin: center center;
   font-family: var(--font-brand);
   flex-shrink: 0;
 }
