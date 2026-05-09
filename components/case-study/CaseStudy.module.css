@@ -73,7 +73,7 @@
   letter-spacing: var(--type-body-large-ls);
   font-weight: 400;
   font-variation-settings: 'wght' 400;
-  color: var(--gray-800);
+  color: var(--gray-600);
 }
 
 /* ── Stat + Role row ── */
