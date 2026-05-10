@@ -71,6 +71,7 @@
   clip-path: inset(0 round var(--shape-card));
   overflow: hidden;
   will-change: transform, opacity;
+  container-type: inline-size;
 }
 
 /* ── Reserved shader canvas slot ── */
@@ -139,10 +140,10 @@
 
 .cardAboutQuote {
   position: absolute;
-  top: var(--space-5);
-  left: var(--space-5);
+  top: 11.4cqw;
+  left: 5.9cqw;
   font-family: var(--font-brand);
-  font-size: 72px;
+  font-size: 11cqw;
   font-weight: 900;
   line-height: 0.75;
   color: #000000;
@@ -153,13 +154,13 @@
 
 .cardAboutHeadline {
   position: absolute;
-  top: calc(var(--space-5) + 60px);
-  left: var(--space-5);
-  right: var(--space-5);
+  top: 30cqw;
+  left: 5.9cqw;
+  right: 5.9cqw;
   font-family: var(--font-brand);
-  font-size: var(--type-display-large-size);
-  line-height: var(--type-display-large-lh);
-  letter-spacing: var(--type-display-large-ls);
+  font-size: 13.2cqw;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
   font-weight: var(--type-display-large-weight);
   font-variation-settings: 'wght' var(--type-display-large-weight);
   color: #000000;
@@ -170,14 +171,14 @@
 
 .cardAboutBadge {
   position: absolute;
-  bottom: var(--space-4);
-  left: var(--space-4);
-  right: var(--space-4);
+  bottom: 4cqw;
+  left: 4cqw;
+  right: 4cqw;
   background: rgba(245, 245, 247, 0.92);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border-radius: var(--shape-md);
-  padding: var(--space-3) var(--space-4);
+  border-radius: 5.5cqw;
+  padding: 4.4cqw;
   z-index: 3;
   pointer-events: none;
 }
@@ -185,13 +186,13 @@
 .cardAboutBadgeTop {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
+  gap: 3.8cqw;
 }
 
 .cardAboutPhoto {
-  width: 56px;
-  height: 56px;
-  border-radius: var(--space-2);
+  width: 16.9cqw;
+  height: 16.9cqw;
+  border-radius: 3.8cqw;
   object-fit: cover;
   object-position: center top;
   flex-shrink: 0;
@@ -199,26 +200,26 @@
 
 .cardAboutBadgeName {
   font-family: var(--font-brand);
-  font-size: var(--type-display-large-size);
-  line-height: var(--type-display-large-lh);
-  font-weight: 300;
-  font-variation-settings: 'wght' 300;
+  font-size: 13.2cqw;
+  line-height: 1;
+  font-weight: var(--type-display-large-weight);
+  font-variation-settings: 'wght' var(--type-display-large-weight);
   color: #000000;
 }
 
 .cardAboutBadgeLines {
   display: flex;
-  gap: var(--space-4);
-  margin-top: var(--space-2);
+  gap: 5.5cqw;
+  margin-top: 2.7cqw;
 }
 
 .cardAboutBadgeLine {
   font-family: var(--font-brand);
-  font-size: var(--type-title-large-size);
-  line-height: var(--type-title-large-lh);
-  letter-spacing: var(--type-title-large-ls);
-  font-weight: var(--type-title-large-weight);
-  font-variation-settings: 'wght' var(--type-title-large-weight);
+  font-size: 4.9cqw;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  font-weight: var(--type-display-large-weight);
+  font-variation-settings: 'wght' var(--type-display-large-weight);
   color: #000000;
 }
 
