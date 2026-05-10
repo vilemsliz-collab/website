@@ -138,24 +138,9 @@
   color: #000000;
 }
 
-.cardAboutQuote {
-  position: absolute;
-  /* Card padding: top matches the original quote glyph offset, left matches headline. */
-  top: 11.4cqw;
-  left: 5.9cqw;
-  /* Match the original font-size visually; SVG viewBox 105×80 preserves aspect. */
-  width: 14.7cqw;
-  height: auto;
-  /* Match case-study body text color. */
-  color: var(--gray-600);
-  z-index: 3;
-  pointer-events: none;
-  user-select: none;
-}
-
 .cardAboutHeadline {
   position: absolute;
-  top: 30cqw;
+  top: 11.4cqw;
   left: 5.9cqw;
   right: 5.9cqw;
   font-family: var(--font-brand);
