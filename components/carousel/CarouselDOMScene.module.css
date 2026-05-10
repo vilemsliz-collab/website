@@ -139,10 +139,10 @@
 
 .cardAboutQuote {
   position: absolute;
-  top: var(--space-6);
-  left: var(--space-6);
+  top: var(--space-5);
+  left: var(--space-5);
   font-family: var(--font-brand);
-  font-size: 72px;
+  font-size: calc(var(--card-width) * 0.11);
   font-weight: 900;
   line-height: 0.75;
   color: #000000;
@@ -153,30 +153,35 @@
 
 .cardAboutHeadline {
   position: absolute;
-  top: calc(var(--space-6) + 60px);
-  left: var(--space-6);
-  right: var(--space-6);
+  top: calc(var(--space-5) + var(--card-width) * 0.095);
+  left: var(--space-5);
+  right: var(--space-5);
   font-family: var(--font-brand);
-  font-size: clamp(32px, 8.5vw, 42px);
-  font-weight: 800;
-  font-variation-settings: 'wght' 800;
-  line-height: 1.1;
+  font-size: calc(var(--card-width) * 0.132);
+  font-weight: 300;
+  font-variation-settings: 'wght' 300;
+  line-height: 1.05;
   color: #000000;
   margin: 0;
   z-index: 3;
   pointer-events: none;
 }
 
+.cardAboutHeadlineAccent {
+  font-weight: 400;
+  font-variation-settings: 'wght' 400;
+}
+
 .cardAboutBadge {
   position: absolute;
-  bottom: var(--space-5);
-  left: var(--space-5);
-  right: var(--space-5);
+  bottom: calc(var(--card-width) * 0.055);
+  left: calc(var(--card-width) * 0.04);
+  right: calc(var(--card-width) * 0.04);
   background: rgba(245, 245, 247, 0.92);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border-radius: 20px;
-  padding: var(--space-4) var(--space-5);
+  border-radius: calc(var(--card-width) * 0.055);
+  padding: calc(var(--card-width) * 0.044) calc(var(--card-width) * 0.055);
   z-index: 3;
   pointer-events: none;
 }
@@ -184,13 +189,13 @@
 .cardAboutBadgeTop {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
+  gap: calc(var(--card-width) * 0.038);
 }
 
 .cardAboutPhoto {
-  width: 48px;
-  height: 48px;
-  border-radius: 10px;
+  width: calc(var(--card-width) * 0.169);
+  height: calc(var(--card-width) * 0.169);
+  border-radius: calc(var(--card-width) * 0.038);
   object-fit: cover;
   object-position: center top;
   flex-shrink: 0;
@@ -198,26 +203,26 @@
 
 .cardAboutBadgeName {
   font-family: var(--font-brand);
-  font-size: clamp(42px, 11vw, 56px);
-  font-weight: 700;
-  font-variation-settings: 'wght' 700;
+  font-size: calc(var(--card-width) * 0.132);
+  font-weight: 300;
+  font-variation-settings: 'wght' 300;
   line-height: 1;
   color: #000000;
 }
 
 .cardAboutBadgeLines {
   display: flex;
-  gap: var(--space-6);
-  margin-top: var(--space-2);
+  gap: calc(var(--card-width) * 0.055);
+  margin-top: calc(var(--card-width) * 0.027);
 }
 
 .cardAboutBadgeLine {
   font-family: var(--font-brand);
-  font-size: 13px;
-  font-weight: 700;
-  font-variation-settings: 'wght' 700;
+  font-size: calc(var(--card-width) * 0.049);
+  font-weight: 300;
+  font-variation-settings: 'wght' 300;
   color: #000000;
-  letter-spacing: 0.01em;
+  letter-spacing: 0.02em;
 }
 
 /* ── Website card (dark inverted) ── */
