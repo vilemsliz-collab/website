@@ -138,27 +138,6 @@
   color: #000000;
 }
 
-.cardAboutQuote {
-  position: absolute;
-  top: 0;
-  left: 5.9cqw;
-  width: 58.8cqw;
-  /* viewBox aspect: 65/32 → height = width * 32/65 */
-  height: calc(58.8cqw * 32 / 65);
-  overflow: visible;
-  z-index: 3;
-  pointer-events: none;
-  user-select: none;
-}
-
-.cardAboutQuote text {
-  font-family: var(--font-brand);
-  font-size: 100px;
-  font-weight: var(--type-display-large-weight);
-  font-variation-settings: 'wght' var(--type-display-large-weight);
-  letter-spacing: -0.03em;
-  fill: #000000;
-}
 
 .cardAboutHeadline {
   position: absolute;
