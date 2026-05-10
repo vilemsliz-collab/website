@@ -378,14 +378,8 @@ export default function CarouselDOMScene({
 
             {card.isAbout ? (
               <>
-                <svg
-                  className={styles.cardAboutQuote}
-                  viewBox="0 28 65 32"
-                  preserveAspectRatio="xMinYMin meet"
-                  aria-hidden
-                >
-                  <text x="0" y="0" dominantBaseline="text-before-edge">&ldquo;</text>
-                </svg>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/quote.svg" alt="" className={styles.cardAboutQuote} />
                 {card.headline && (
                   <p className={styles.cardAboutHeadline}>
                     {card.headline.split('\n').map((line, li, arr) => (
