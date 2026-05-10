@@ -171,7 +171,7 @@
   pointer-events: none;
 }
 
-.cardAboutBadge {
+.cardAboutWidget {
   position: absolute;
   bottom: 4cqw;
   left: 4cqw;
@@ -179,54 +179,58 @@
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 4.9cqw;
-  background: #ffffff;
-  border-radius: 4.1cqw;
-  overflow: hidden;
-  padding: 0 7.3cqw 0 0;
   z-index: 3;
   pointer-events: none;
 }
 
 .cardAboutPhoto {
-  width: 25.4cqw;
-  height: 25.4cqw;
+  width: 28cqw;
+  height: 28cqw;
+  border-radius: 5.5cqw;
   object-fit: cover;
   object-position: center top;
   flex-shrink: 0;
-  display: block;
+  position: relative;
+  z-index: 1;
 }
 
-.cardAboutBadgeRight {
+.cardAboutBadge {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 1.8cqw;
+  gap: 2cqw;
+  background: #ffffff;
+  border-radius: 5.5cqw;
+  padding: 3.5cqw;
+  margin-left: -3cqw;
+  position: relative;
+  z-index: 2;
   min-width: 0;
 }
 
 .cardAboutBadgeName {
   font-family: var(--font-brand);
-  font-size: 13.2cqw;
-  line-height: 1.05;
-  font-weight: 300;
-  font-variation-settings: 'wght' 300;
+  font-size: 11cqw;
+  line-height: 1;
+  font-weight: var(--type-display-large-weight);
+  font-variation-settings: 'wght' var(--type-display-large-weight);
   color: #000000;
   white-space: nowrap;
+  overflow: hidden;
 }
 
 .cardAboutBadgeLines {
   display: flex;
-  gap: 7cqw;
+  gap: 5.5cqw;
 }
 
 .cardAboutBadgeLine {
   font-family: var(--font-brand);
   font-size: 3.5cqw;
   line-height: 1;
-  letter-spacing: 0.02em;
-  font-weight: 300;
-  font-variation-settings: 'wght' 300;
+  letter-spacing: var(--type-body-large-ls);
+  font-weight: 500;
+  font-variation-settings: 'wght' 500;
   color: #000000;
   white-space: nowrap;
 }
