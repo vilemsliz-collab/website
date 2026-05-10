@@ -210,7 +210,7 @@
 
 .cardAboutBadgeName {
   font-family: var(--font-brand);
-  font-size: 11cqw;
+  font-size: 9cqw;
   line-height: 1;
   font-weight: var(--type-display-large-weight);
   font-variation-settings: 'wght' var(--type-display-large-weight);
@@ -226,7 +226,7 @@
 
 .cardAboutBadgeLine {
   font-family: var(--font-brand);
-  font-size: 5cqw;
+  font-size: 3.8cqw;
   line-height: 1;
   letter-spacing: var(--type-body-large-ls);
   font-weight: 500;
