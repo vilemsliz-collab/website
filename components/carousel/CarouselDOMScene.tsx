@@ -2,6 +2,7 @@
 
 import React, { useRef, useEffect, type MutableRefObject } from 'react'
 import Image from 'next/image'
+import { Quote } from 'lucide-react'
 import {
   CARDS,
   type CarouselCFG,
@@ -376,7 +377,7 @@ export default function CarouselDOMScene({
 
             {card.isAbout ? (
               <>
-                <div className={styles.cardAboutQuote}>&ldquo;</div>
+                <Quote className={styles.cardAboutQuote} aria-hidden />
                 {card.headline && (
                   <p className={styles.cardAboutHeadline}>
                     {card.headline.split('\n').map((line, li, arr) => (

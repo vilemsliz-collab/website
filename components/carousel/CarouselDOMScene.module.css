@@ -142,13 +142,10 @@
   position: absolute;
   top: 11.4cqw;
   left: 5.9cqw;
-  font-family: var(--font-brand);
-  font-size: 14.7cqw;
-  line-height: 0.75;
-  letter-spacing: -0.03em;
-  font-weight: var(--type-display-large-weight);
-  font-variation-settings: 'wght' var(--type-display-large-weight);
+  width: 14.7cqw;
+  height: 14.7cqw;
   color: #000000;
+  stroke-width: 1.5;
   z-index: 3;
   pointer-events: none;
   user-select: none;
