@@ -82,11 +82,11 @@
   display: inline;
 }
 
-/* ── Lucide icon variant (card hover) ── */
+/* ── Lucide icon variant (card hover) — scales with pill size ── */
 .iconArrow {
   display: none;
-  width: 24px;
-  height: 24px;
+  width: 46%;
+  height: 46%;
   stroke-width: 2;
 }
 

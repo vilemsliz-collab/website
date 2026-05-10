@@ -56,15 +56,13 @@ export type CursorState =
 function getStateTarget(state: CursorState, label?: string) {
   switch (state) {
     case 'card': {
-      return { w: 52, h: 52, label }
+      return { w: 72, h: 72, label }
     }
     case 'link': {
       const w = label ? Math.min(Math.round((label.length * 9 + 52) * 1.58), 215) : 158
       return { w, h: 52, label }
     }
-    case 'card-close': {
-      return { w: 68, h: 68, label: '×' }
-    }
+    case 'card-close':
     case 'case-close': {
       return { w: 68, h: 68, label: '×' }
     }
@@ -175,9 +173,10 @@ export default function CustomCursor({ tiltRef, configRef }: CursorProps) {
 
       const isPillState = state === 'card' || state === 'card-close' || state === 'case-close' || state === 'link'
       const isIconState = state === 'card'
+      const isCloseState = state === 'card-close' || state === 'case-close'
       body.classList.toggle(styles.bodyBlackPill, isPillState)
       content.classList.toggle(styles.contentIcon, isIconState)
-      content.style.fontSize = state === 'card-close' ? '37px' : state === 'case-close' ? '22px' : isPillState ? '30px' : '13px'
+      content.style.fontSize = isCloseState ? '32px' : isPillState ? '30px' : '13px'
 
       labelEl.textContent = !isIconState && t.label ? t.label : ''
       content.style.opacity = (isIconState || t.label) ? '1' : '0'
