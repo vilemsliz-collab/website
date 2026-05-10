@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, type MutableRefObject } from 'react'
+import { ArrowUpRight } from 'lucide-react'
 import styles from './Cursor.module.css'
 
 // ── Config (live-tweakable via configRef) ─────────────────────────────────────
@@ -55,8 +56,7 @@ export type CursorState =
 function getStateTarget(state: CursorState, label?: string) {
   switch (state) {
     case 'card': {
-      const w = label ? Math.min(Math.round((label.length * 9 + 52) * 1.58), 215) : 158
-      return { w, h: 52, label }
+      return { w: 52, h: 52, label }
     }
     case 'link': {
       const w = label ? Math.min(Math.round((label.length * 9 + 52) * 1.58), 215) : 158
@@ -89,6 +89,7 @@ export default function CustomCursor({ tiltRef, configRef }: CursorProps) {
   const backdropRef = useRef<HTMLDivElement>(null)
   const borderRef   = useRef<HTMLDivElement>(null)
   const contentRef  = useRef<HTMLDivElement>(null)
+  const labelRef    = useRef<HTMLSpanElement>(null)
 
   useEffect(() => {
     // No custom cursor on touch devices — they already have no pointer,
@@ -100,7 +101,8 @@ export default function CustomCursor({ tiltRef, configRef }: CursorProps) {
     const backdrop = backdropRef.current
     const border   = borderRef.current
     const content  = contentRef.current
-    if (!wrapper || !body || !backdrop || !border || !content) return
+    const labelEl  = labelRef.current
+    if (!wrapper || !body || !backdrop || !border || !content || !labelEl) return
 
     document.body.style.cursor = 'none'
 
@@ -172,15 +174,13 @@ export default function CustomCursor({ tiltRef, configRef }: CursorProps) {
 
 
       const isPillState = state === 'card' || state === 'card-close' || state === 'case-close' || state === 'link'
+      const isIconState = state === 'card'
       body.classList.toggle(styles.bodyBlackPill, isPillState)
+      content.classList.toggle(styles.contentIcon, isIconState)
       content.style.fontSize = state === 'card-close' ? '37px' : state === 'case-close' ? '22px' : isPillState ? '30px' : '13px'
 
-      if (t.label) {
-        content.textContent = t.label
-      } else {
-        content.textContent = ''
-      }
-      content.style.opacity = t.label ? '1' : '0'
+      labelEl.textContent = !isIconState && t.label ? t.label : ''
+      content.style.opacity = (isIconState || t.label) ? '1' : '0'
     }
 
     const spawnScrollRing = (expandHorizontal: boolean) => {
@@ -475,7 +475,10 @@ export default function CustomCursor({ tiltRef, configRef }: CursorProps) {
       <div ref={bodyRef} className={styles.body}>
         <div ref={backdropRef} className={styles.backdrop} />
         <div ref={borderRef} className={styles.border} />
-        <div ref={contentRef} className={styles.content} />
+        <div ref={contentRef} className={styles.content}>
+          <span ref={labelRef} className={styles.label} />
+          <ArrowUpRight className={styles.iconArrow} aria-hidden />
+        </div>
       </div>
     </div>
   )

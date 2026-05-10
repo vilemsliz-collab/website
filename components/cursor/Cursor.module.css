@@ -77,6 +77,22 @@
   color: var(--white);
 }
 
+/* ── Label text node ── */
+.label {
+  display: inline;
+}
+
+/* ── Lucide icon variant (card hover) ── */
+.iconArrow {
+  display: none;
+  width: 24px;
+  height: 24px;
+  stroke-width: 2;
+}
+
+.contentIcon .label { display: none; }
+.contentIcon .iconArrow { display: block; }
+
 /* ── Scroll rings: spawned inside cursor body, clipped by overflow:hidden ──
    Animation is driven from JS (Web Animations API) so width/height grow instead
    of transform:scale — the 1px border stays crisp throughout the expansion. */
