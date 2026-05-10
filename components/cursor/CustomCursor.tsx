@@ -55,12 +55,12 @@ export type CursorState =
 function getStateTarget(state: CursorState, label?: string) {
   switch (state) {
     case 'card': {
-      const w = label ? Math.min(Math.round((label.length * 9 + 52) * 1.5), 210) : 156
-      return { w, h: 72, label }
+      const w = label ? Math.min(Math.round((label.length * 9 + 52) * 1.7), 230) : 170
+      return { w, h: 56, label }
     }
     case 'link': {
-      const w = label ? Math.min(Math.round((label.length * 9 + 52) * 1.5), 210) : 156
-      return { w, h: 72, label }
+      const w = label ? Math.min(Math.round((label.length * 9 + 52) * 1.7), 230) : 170
+      return { w, h: 56, label }
     }
     case 'card-close': {
       return { w: 72, h: 72, label: '×' }
