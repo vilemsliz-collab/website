@@ -225,9 +225,9 @@
   font-family: var(--font-brand);
   font-size: 3.5cqw;
   line-height: 1;
-  letter-spacing: 0.02em;
-  font-weight: 700;
-  font-variation-settings: 'wght' 700;
+  letter-spacing: var(--type-body-large-ls);
+  font-weight: 500;
+  font-variation-settings: 'wght' 500;
   color: #000000;
   white-space: nowrap;
 }
