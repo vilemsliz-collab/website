@@ -186,31 +186,23 @@
   z-index: 3;
   pointer-events: none;
   isolation: isolate;
-  transition: opacity 350ms ease;
-}
-
-@keyframes badgeFadeIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
-
-.cardGroup[data-active='true'] .cardAboutBadge {
-  animation: badgeFadeIn 500ms ease both;
-}
-
-.cardGroup[data-case-open='true'] .cardAboutBadge {
-  opacity: 0;
-  transition: opacity 250ms ease;
 }
 
 .cardAboutPhoto {
-  aspect-ratio: 1;
+  /* badge inner height = 26cqw - 1.5cqw top - 1.5cqw bottom = 23cqw; photo is square */
+  width: 23cqw;
   height: 100%;
   border-radius: 4cqw;
   object-fit: cover;
   object-position: center top;
   flex-shrink: 0;
   display: block;
+  transition: opacity 250ms ease, width 300ms ease;
+}
+
+.cardGroup[data-case-open='true'] .cardAboutPhoto {
+  opacity: 0;
+  width: 0;
 }
 
 .cardAboutBadgeRight {
