@@ -171,10 +171,6 @@
   pointer-events: none;
 }
 
-.cardAboutHeadline span:first-child {
-  color: var(--gray-600);
-}
-
 .cardAboutBadge {
   position: absolute;
   bottom: 4cqw;
