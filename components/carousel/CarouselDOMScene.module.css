@@ -190,6 +190,7 @@
 .cardAboutPhoto {
   width: 26cqw;
   height: 100%;
+  border-radius: 5.5cqw;
   object-fit: cover;
   object-position: center top;
   flex-shrink: 0;
