@@ -175,9 +175,8 @@
   left: 4cqw;
   right: 4cqw;
   display: flex;
-  flex-direction: row;
-  align-items: stretch;
-  gap: 3.8cqw;
+  flex-direction: column;
+  gap: 2.7cqw;
   background: rgba(245, 245, 247, 0.92);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
@@ -187,40 +186,39 @@
   pointer-events: none;
 }
 
+.cardAboutBadgeTop {
+  display: flex;
+  align-items: center;
+  gap: 3.8cqw;
+}
+
 .cardAboutPhoto {
   width: 20cqw;
-  aspect-ratio: 1;
+  height: 20cqw;
   border-radius: 3cqw;
   object-fit: cover;
   object-position: center top;
   flex-shrink: 0;
-  align-self: stretch;
-}
-
-.cardAboutBadgeRight {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  min-width: 0;
 }
 
 .cardAboutBadgeName {
   font-family: var(--font-brand);
-  font-size: 13.2cqw;
+  font-size: 11cqw;
   line-height: 1;
   font-weight: var(--type-display-large-weight);
   font-variation-settings: 'wght' var(--type-display-large-weight);
   color: #000000;
+  white-space: nowrap;
 }
 
 .cardAboutBadgeLines {
   display: flex;
-  gap: 5.5cqw;
+  justify-content: space-between;
 }
 
 .cardAboutBadgeLine {
   font-family: var(--font-brand);
-  font-size: 4.9cqw;
+  font-size: 4cqw;
   line-height: 1;
   letter-spacing: 0.02em;
   font-weight: 700;
