@@ -171,9 +171,9 @@
 
 .cardAboutBadge {
   position: absolute;
-  bottom: 4cqw;
-  left: 4cqw;
-  right: 4cqw;
+  bottom: 2cqw;
+  left: 2cqw;
+  right: 2cqw;
   background: rgba(245, 245, 247, 0.92);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
