@@ -178,9 +178,7 @@
   flex-direction: row;
   align-items: stretch;
   gap: 3.8cqw;
-  background: rgba(245, 245, 247, 0.92);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: #ffffff;
   border-radius: 5.5cqw;
   padding: 3.5cqw;
   z-index: 3;
