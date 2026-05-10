@@ -245,7 +245,8 @@ export default function CustomCursor({ tiltRef, configRef }: CursorProps) {
       const rW = Math.max(1, Math.round(curW))
       const rH = Math.max(1, Math.round(curH))
       const isPillLive = cursorState === 'card' || cursorState === 'link' || cursorState === 'card-close' || cursorState === 'case-close'
-      if (isPillLive) content.style.fontSize = `${Math.round((cursorState === 'card-close' ? 40 : cursorState === 'case-close' ? 24 : 32) * liveScale)}px`
+      const isCloseLive = cursorState === 'card-close' || cursorState === 'case-close'
+      if (isPillLive) content.style.fontSize = `${Math.round((isCloseLive ? 32 : 30) * liveScale)}px`
 
       // 2b. Pill blend spring — smooths blob ↔ pill transform transition
       const pillBlendTarg = isPillLive ? 1 : 0
