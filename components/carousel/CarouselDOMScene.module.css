@@ -171,41 +171,39 @@
   pointer-events: none;
 }
 
-.cardAboutWidget {
+.cardAboutBadge {
   position: absolute;
   bottom: 4cqw;
   left: 4cqw;
   right: 4cqw;
+  height: 26cqw;
   display: flex;
   flex-direction: row;
-  align-items: center;
+  align-items: stretch;
+  background: #ffffff;
+  border-radius: 5.5cqw;
+  overflow: hidden;
   z-index: 3;
   pointer-events: none;
 }
 
 .cardAboutPhoto {
-  width: 28cqw;
-  height: 28cqw;
-  border-radius: 5.5cqw;
+  width: 26cqw;
+  height: 100%;
   object-fit: cover;
   object-position: center top;
   flex-shrink: 0;
-  position: relative;
-  z-index: 1;
+  display: block;
 }
 
-.cardAboutBadge {
+.cardAboutBadgeRight {
   flex: 1;
   display: flex;
   flex-direction: column;
   gap: 2cqw;
-  background: #ffffff;
-  border-radius: 5.5cqw;
   padding: 3.5cqw;
-  margin-left: -3cqw;
-  position: relative;
-  z-index: 2;
   min-width: 0;
+  justify-content: center;
 }
 
 .cardAboutBadgeName {
