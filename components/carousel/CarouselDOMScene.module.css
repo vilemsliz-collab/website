@@ -131,41 +131,93 @@
   margin: 0;
 }
 
-/* ── About Me card overrides ── */
+/* ── About Me card ── */
 .cardAbout {
   background: #ffffff;
   color: #000000;
 }
 
-.cardNameWrap {
+.cardAboutQuote {
   position: absolute;
-  bottom: 0; left: 0; right: 0;
-  padding: 0 var(--space-6) var(--space-8);
+  top: var(--space-6);
+  left: var(--space-6);
+  font-family: var(--font-brand);
+  font-size: 72px;
+  font-weight: 900;
+  line-height: 0.75;
+  color: #000000;
+  z-index: 3;
+  pointer-events: none;
+  user-select: none;
+}
+
+.cardAboutHeadline {
+  position: absolute;
+  top: calc(var(--space-6) + 60px);
+  left: var(--space-6);
+  right: var(--space-6);
+  font-family: var(--font-brand);
+  font-size: clamp(32px, 8.5vw, 42px);
+  font-weight: 800;
+  font-variation-settings: 'wght' 800;
+  line-height: 1.1;
+  color: #000000;
+  margin: 0;
   z-index: 3;
   pointer-events: none;
 }
 
-.cardName {
+.cardAboutBadge {
+  position: absolute;
+  bottom: var(--space-5);
+  left: var(--space-5);
+  right: var(--space-5);
+  background: rgba(245, 245, 247, 0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 20px;
+  padding: var(--space-4) var(--space-5);
+  z-index: 3;
+  pointer-events: none;
+}
+
+.cardAboutBadgeTop {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.cardAboutPhoto {
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  object-fit: cover;
+  object-position: center top;
+  flex-shrink: 0;
+}
+
+.cardAboutBadgeName {
   font-family: var(--font-brand);
-  font-size: clamp(56px, 14vw, 88px);
+  font-size: clamp(42px, 11vw, 56px);
   font-weight: 700;
-  line-height: 1.05;
-  color: #000000;
-  margin: 0;
-  pointer-events: auto;
-}
-
-
-.cardAbout .cardText {
+  font-variation-settings: 'wght' 700;
+  line-height: 1;
   color: #000000;
 }
 
-.cardAbout .cardLine {
-  font-size: 12px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+.cardAboutBadgeLines {
+  display: flex;
+  gap: var(--space-6);
+  margin-top: var(--space-2);
+}
+
+.cardAboutBadgeLine {
+  font-family: var(--font-brand);
+  font-size: 13px;
+  font-weight: 700;
+  font-variation-settings: 'wght' 700;
   color: #000000;
-  display: inline-block;
+  letter-spacing: 0.01em;
 }
 
 /* ── Website card (dark inverted) ── */

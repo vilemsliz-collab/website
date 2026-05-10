@@ -363,7 +363,7 @@ export default function CarouselDOMScene({
               </>
             )}
 
-            {(card.isAbout || card.isWebsite) && (
+            {card.isWebsite && (
               <div className={styles.cardFrost}>
                 {card.video ? (
                   <video src={card.video} autoPlay muted loop playsInline className={styles.cardFrostMedia} aria-hidden />
@@ -376,12 +376,26 @@ export default function CarouselDOMScene({
 
             {card.isAbout ? (
               <>
-                <div className={styles.cardNameWrap}>
-                  <p className={styles.cardName}>{card.name}</p>
-                </div>
-                <div className={styles.cardText}>
-                  <p className={styles.cardLine}>{card.lines[0]}</p>
-                  <p className={styles.cardLine}>{card.lines[1]}</p>
+                <div className={styles.cardAboutQuote}>&ldquo;</div>
+                {card.headline && (
+                  <p className={styles.cardAboutHeadline}>
+                    {card.headline.split('\n').map((line, i) => (
+                      <span key={i}>{line}{i < card.headline!.split('\n').length - 1 && <br />}</span>
+                    ))}
+                  </p>
+                )}
+                <div className={styles.cardAboutBadge}>
+                  <div className={styles.cardAboutBadgeTop}>
+                    {card.img && (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={card.img} alt="" className={styles.cardAboutPhoto} />
+                    )}
+                    <span className={styles.cardAboutBadgeName}>{card.name}</span>
+                  </div>
+                  <div className={styles.cardAboutBadgeLines}>
+                    <span className={styles.cardAboutBadgeLine}>{card.lines[0]}</span>
+                    <span className={styles.cardAboutBadgeLine}>{card.lines[1]}</span>
+                  </div>
                 </div>
               </>
             ) : card.isWebsite ? (
