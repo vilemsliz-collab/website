@@ -384,12 +384,12 @@ export default function CarouselDOMScene({
                     ))}
                   </p>
                 )}
-                <div className={styles.cardAboutWidget}>
+                <div className={styles.cardAboutBadge}>
                   {card.img && (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img src={card.img} alt="" className={styles.cardAboutPhoto} />
                   )}
-                  <div className={styles.cardAboutBadge}>
+                  <div className={styles.cardAboutBadgeRight}>
                     <span className={styles.cardAboutBadgeName}>{card.name}</span>
                     <div className={styles.cardAboutBadgeLines}>
                       <span className={styles.cardAboutBadgeLine}>{card.lines[0]}</span>
