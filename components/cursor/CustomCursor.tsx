@@ -172,6 +172,7 @@ export default function CustomCursor({ tiltRef, configRef }: CursorProps) {
 
 
       const isPillState = state === 'card' || state === 'card-close' || state === 'case-close' || state === 'link'
+      body.classList.toggle(styles.bodyBlackPill, isPillState)
       content.style.fontSize = state === 'card-close' ? '40px' : state === 'case-close' ? '24px' : isPillState ? '32px' : '13px'
 
       if (t.label) {

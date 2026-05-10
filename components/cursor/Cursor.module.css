@@ -8,7 +8,7 @@
   will-change: transform;
 }
 
-/* ── Cursor body: centered on wrapper origin, clips shader canvas ── */
+/* ── Cursor body: centered on wrapper origin, clips inner layers ── */
 .body {
   position: absolute;
   /* translate(-50%,-50%) + blob transform applied via JS */
@@ -17,7 +17,7 @@
   /* border-radius applied via JS as min(w,h)/2 for pill/ellipse support */
 }
 
-/* ── Backdrop: background distortion layer (sits under shader canvas) ── */
+/* ── Backdrop: background distortion layer ── */
 .backdrop {
   position: absolute;
   inset: 0;
@@ -25,13 +25,17 @@
   /* backdrop-filter applied via JS — SVG feDisplacementMap liquid warp */
 }
 
-/* ── WebGL shader canvas — fills body ── */
-.canvas {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  display: block;
+/* ── Labeled hover pill: solid black fill, white text, no border/distortion.
+   Applied for card / link / card-close / case-close states. ── */
+.bodyBlackPill {
+  background: var(--gray-900);
+}
+.bodyBlackPill .backdrop,
+.bodyBlackPill .border {
+  display: none;
+}
+.bodyBlackPill .content {
+  color: var(--white);
 }
 
 /* ── Border ring — sits on top of canvas ── */
