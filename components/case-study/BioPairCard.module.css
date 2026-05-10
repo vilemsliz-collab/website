@@ -11,12 +11,12 @@
 
 .name {
   font-family: var(--font-brand);
-  font-size: var(--type-display-large-size);
-  line-height: var(--type-display-large-lh);
-  letter-spacing: var(--type-display-large-ls);
-  font-weight: 400;
-  font-variation-settings: 'wght' 400;
-  color: var(--gray-900);
+  font-size: 23px;
+  line-height: 32px;
+  letter-spacing: var(--type-body-large-ls);
+  font-weight: 500;
+  font-variation-settings: 'wght' 500;
+  color: var(--color-on-background);
   margin: 0;
 }
 
@@ -27,12 +27,12 @@
   letter-spacing: var(--type-body-large-ls);
   font-weight: 400;
   font-variation-settings: 'wght' 400;
-  color: var(--gray-700);
+  color: var(--gray-600);
   margin: 0;
 }
 
 @media (max-width: 768px) {
   .card { padding: var(--space-4); }
-  .name { font-size: var(--type-display-medium-size); line-height: var(--type-display-medium-lh); }
+  .name { font-size: 18px; line-height: 28px; }
   .bio  { font-size: 18px; line-height: 28px; }
 }

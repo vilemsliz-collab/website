@@ -148,7 +148,7 @@ export default function CaseStudyPage({ cs, isOverlay }: Props) {
           />
         )}
         {cs.layout === 'about' ? (
-          <SlotPairs pairs={cs.pairs} />
+          <SlotPairs pairs={cs.pairs} variant="about" />
         ) : (
           <>
             {cs.heroImg && <SlotHero src={cs.heroImg} />}

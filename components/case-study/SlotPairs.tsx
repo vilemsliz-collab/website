@@ -4,17 +4,18 @@ import StarAnimationCanvas from './StarAnimationCanvas'
 import BioPairCard from './BioPairCard'
 import s from './SlotPairs.module.css'
 
-function SlotPairRow({ pair, rowIndex }: { pair: string[]; rowIndex: number }) {
+function SlotPairRow({ pair, rowIndex, variant }: { pair: string[]; rowIndex: number; variant?: 'about' }) {
+  const slotClass = variant === 'about' ? s.pairSlotAbout : s.pairSlot
   return (
     <div id={`case-pairs-row-${rowIndex}`} data-element={`Pair row ${rowIndex + 1}`} className={s.pairRow} data-slot={`pair-row-${rowIndex}`}>
       {pair.length === 0 ? (
         <>
-          <div id={`case-pairs-${rowIndex}-0`} data-element={`Pair ${rowIndex + 1}-1`} className={s.pairSlot} data-slot={`pair-${rowIndex}-0`} />
-          <div id={`case-pairs-${rowIndex}-1`} data-element={`Pair ${rowIndex + 1}-2`} className={s.pairSlot} data-slot={`pair-${rowIndex}-1`} />
+          <div id={`case-pairs-${rowIndex}-0`} data-element={`Pair ${rowIndex + 1}-1`} className={slotClass} data-slot={`pair-${rowIndex}-0`} />
+          <div id={`case-pairs-${rowIndex}-1`} data-element={`Pair ${rowIndex + 1}-2`} className={slotClass} data-slot={`pair-${rowIndex}-1`} />
         </>
       ) : (
         pair.map((url, ii) => (
-          <div key={ii} id={`case-pairs-${rowIndex}-${ii}`} data-element={`Pair ${rowIndex + 1}-${ii + 1}`} className={pair.length === 1 ? s.pairSlotWide : s.pairSlot} data-slot={`pair-${rowIndex}-${ii}`}>
+          <div key={ii} id={`case-pairs-${rowIndex}-${ii}`} data-element={`Pair ${rowIndex + 1}-${ii + 1}`} className={pair.length === 1 ? s.pairSlotWide : slotClass} data-slot={`pair-${rowIndex}-${ii}`}>
             {url === '@bio-card' ? (
               <BioPairCard />
             ) : url === '@hp-animation' ? (
@@ -35,12 +36,12 @@ function SlotPairRow({ pair, rowIndex }: { pair: string[]; rowIndex: number }) {
   )
 }
 
-export default function SlotPairs({ pairs }: { pairs: string[][] }) {
+export default function SlotPairs({ pairs, variant }: { pairs: string[][]; variant?: 'about' }) {
   return (
     <div className={s.wrap}>
       <div id="case-pairs" data-element="Pairs" className={s.pairsSection}>
         {pairs.map((pair, pi) => (
-          <SlotPairRow key={pi} pair={pair} rowIndex={pi} />
+          <SlotPairRow key={pi} pair={pair} rowIndex={pi} variant={variant} />
         ))}
       </div>
     </div>
