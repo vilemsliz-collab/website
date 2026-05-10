@@ -189,7 +189,7 @@
 }
 
 .cardAboutPhoto {
-  width: 26cqw;
+  aspect-ratio: 1;
   height: 100%;
   border-radius: 4cqw;
   object-fit: cover;
