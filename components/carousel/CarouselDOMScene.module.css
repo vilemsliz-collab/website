@@ -189,12 +189,11 @@
 
 .cardAboutPhoto {
   width: 20cqw;
-  aspect-ratio: 1;
+  height: 20cqw;
   border-radius: 3cqw;
   object-fit: cover;
   object-position: center top;
   flex-shrink: 0;
-  align-self: stretch;
 }
 
 .cardAboutBadgeRight {
