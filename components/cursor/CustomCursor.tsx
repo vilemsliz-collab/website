@@ -55,18 +55,18 @@ export type CursorState =
 function getStateTarget(state: CursorState, label?: string) {
   switch (state) {
     case 'card': {
-      const w = label ? Math.min(Math.round((label.length * 9 + 52) * 1.7), 230) : 170
-      return { w, h: 56, label }
+      const w = label ? Math.min(Math.round((label.length * 9 + 52) * 1.46), 200) : 146
+      return { w, h: 48, label }
     }
     case 'link': {
-      const w = label ? Math.min(Math.round((label.length * 9 + 52) * 1.7), 230) : 170
-      return { w, h: 56, label }
+      const w = label ? Math.min(Math.round((label.length * 9 + 52) * 1.46), 200) : 146
+      return { w, h: 48, label }
     }
     case 'card-close': {
-      return { w: 72, h: 72, label: '×' }
+      return { w: 62, h: 62, label: '×' }
     }
     case 'case-close': {
-      return { w: 72, h: 72, label: '×' }
+      return { w: 62, h: 62, label: '×' }
     }
     case 'scroll-down':
     case 'scroll-up':   return { w: DEFAULT_W, h: 96,  label: undefined }
@@ -173,7 +173,7 @@ export default function CustomCursor({ tiltRef, configRef }: CursorProps) {
 
       const isPillState = state === 'card' || state === 'card-close' || state === 'case-close' || state === 'link'
       body.classList.toggle(styles.bodyBlackPill, isPillState)
-      content.style.fontSize = state === 'card-close' ? '40px' : state === 'case-close' ? '24px' : isPillState ? '32px' : '13px'
+      content.style.fontSize = state === 'card-close' ? '34px' : state === 'case-close' ? '20px' : isPillState ? '28px' : '13px'
 
       if (t.label) {
         content.textContent = t.label
