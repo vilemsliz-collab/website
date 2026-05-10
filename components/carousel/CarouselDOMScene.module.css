@@ -143,9 +143,11 @@
   top: 11.4cqw;
   left: 5.9cqw;
   font-family: var(--font-brand);
-  font-size: 30cqw;
-  font-weight: 900;
+  font-size: 42cqw;
   line-height: 0.75;
+  letter-spacing: -0.03em;
+  font-weight: var(--type-display-large-weight);
+  font-variation-settings: 'wght' var(--type-display-large-weight);
   color: #000000;
   z-index: 3;
   pointer-events: none;
