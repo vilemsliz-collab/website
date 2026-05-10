@@ -178,19 +178,19 @@
   right: 4cqw;
   display: flex;
   flex-direction: row;
-  align-items: stretch;
-  gap: 0;
+  align-items: center;
+  gap: 3.8cqw;
   background: #ffffff;
   border-radius: 5.5cqw;
-  overflow: hidden;
-  padding: 0;
+  padding: 3.5cqw;
   z-index: 3;
   pointer-events: none;
 }
 
 .cardAboutPhoto {
-  aspect-ratio: 1;
-  align-self: stretch;
+  width: 20cqw;
+  height: 20cqw;
+  border-radius: 3cqw;
   object-fit: cover;
   object-position: center top;
   flex-shrink: 0;
@@ -201,7 +201,6 @@
   display: flex;
   flex-direction: column;
   gap: 2cqw;
-  padding: 3.5cqw;
   min-width: 0;
 }
 
