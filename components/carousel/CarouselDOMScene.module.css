@@ -160,17 +160,12 @@
   font-size: var(--type-display-large-size);
   line-height: var(--type-display-large-lh);
   letter-spacing: var(--type-display-large-ls);
-  font-weight: 300;
-  font-variation-settings: 'wght' 300;
+  font-weight: var(--type-display-large-weight);
+  font-variation-settings: 'wght' var(--type-display-large-weight);
   color: #000000;
   margin: 0;
   z-index: 3;
   pointer-events: none;
-}
-
-.cardAboutHeadlineAccent {
-  font-weight: var(--type-display-large-weight);
-  font-variation-settings: 'wght' var(--type-display-large-weight);
 }
 
 .cardAboutBadge {

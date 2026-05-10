@@ -379,21 +379,9 @@ export default function CarouselDOMScene({
                 <div className={styles.cardAboutQuote}>&ldquo;</div>
                 {card.headline && (
                   <p className={styles.cardAboutHeadline}>
-                    {card.headline.split('\n').map((line, li) => {
-                      const lines = card.headline!.split('\n')
-                      const isLastLine = li === lines.length - 1
-                      if (isLastLine) {
-                        const words = line.split(' ')
-                        const last = words.pop()
-                        return (
-                          <span key={li}>
-                            {words.length > 0 && <>{words.join(' ')} </>}
-                            <span className={styles.cardAboutHeadlineAccent}>{last}</span>
-                          </span>
-                        )
-                      }
-                      return <span key={li}>{line}<br /></span>
-                    })}
+                    {card.headline.split('\n').map((line, li, arr) => (
+                      <span key={li}>{line}{li < arr.length - 1 && <br />}</span>
+                    ))}
                   </p>
                 )}
                 <div className={styles.cardAboutBadge}>
