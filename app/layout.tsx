@@ -1,9 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import { IBM_Plex_Mono, Google_Sans_Flex } from 'next/font/google'
 import '@/styles/globals.css'
-import LenisProvider from '@/components/LenisProvider'
-import CursorLiquidFilter from '@/components/cursor/CursorLiquidFilter'
-import { Agentation } from 'agentation'
+import RootShell from '@/components/RootShell'
 
 const ibmPlexMono = IBM_Plex_Mono({
   subsets: ['latin'],
@@ -44,9 +42,7 @@ export default function RootLayout({
         <link rel="preconnect" href="https://res.cloudinary.com" />
       </head>
       <body>
-        <CursorLiquidFilter />
-        <LenisProvider>{children}</LenisProvider>
-        {process.env.NODE_ENV === 'development' && <Agentation />}
+        <RootShell>{children}</RootShell>
       </body>
     </html>
   )

@@ -86,7 +86,7 @@ export default function MobileCaseShell({ children }: { children: React.ReactNod
           animate={isClosing ? { y: '100%' } : { y: 0 }}
           transition={TRANSITION}
           onAnimationComplete={() => {
-            if (isClosing) router.push('/portfolio')
+            if (isClosing) router.replace('/portfolio')
           }}
         >
           <CaseStudyMobileBar />
