@@ -183,6 +183,7 @@
   background: #ffffff;
   border-radius: 5.5cqw;
   overflow: hidden;
+  padding: 1.5cqw 0 1.5cqw 1.5cqw;
   z-index: 3;
   pointer-events: none;
 }
