@@ -378,11 +378,11 @@ export default function CarouselDOMScene({
               <>
                 <svg
                   className={styles.cardAboutQuote}
-                  viewBox="0 0 100 100"
+                  viewBox="0 28 65 32"
                   preserveAspectRatio="xMinYMin meet"
                   aria-hidden
                 >
-                  <text x="0" y="-25" dominantBaseline="text-before-edge">&ldquo;</text>
+                  <text x="0" y="0" dominantBaseline="text-before-edge">&ldquo;</text>
                 </svg>
                 {card.headline && (
                   <p className={styles.cardAboutHeadline}>
