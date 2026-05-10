@@ -176,6 +176,7 @@
   bottom: 4cqw;
   left: 4cqw;
   right: 4cqw;
+  height: 26cqw;
   display: flex;
   flex-direction: row;
   align-items: stretch;
@@ -187,8 +188,8 @@
 }
 
 .cardAboutPhoto {
-  aspect-ratio: 1;
-  align-self: stretch;
+  width: 26cqw;
+  height: 100%;
   object-fit: cover;
   object-position: center top;
   flex-shrink: 0;
