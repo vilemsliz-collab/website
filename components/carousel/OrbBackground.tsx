@@ -3,7 +3,7 @@
 import { useRef, useEffect } from 'react'
 
 // ── Physics constants (mirror orbs-v6) ──────────────────────────────────────
-const MAX_ORBS   = 6   // shader buffer always expects 6 slots
+const MAX_ORBS   = 20  // shader buffer size — must match shader array sizes
 const PPO        = 16
 const TOTAL_P    = MAX_ORBS * PPO
 const WB         = 0.15
@@ -40,11 +40,11 @@ struct Uniforms {
   resolution: vec2f,
   dpr: f32,
   blendMode: f32,
-  bb: array<vec4f, 6>,
+  bb: array<vec4f, 20>,
 }
 struct Colors {
-  light: array<vec4f, 6>,
-  deep:  array<vec4f, 6>,
+  light: array<vec4f, 20>,
+  deep:  array<vec4f, 20>,
 }
 
 @group(0) @binding(0) var<uniform> u: Uniforms;
@@ -61,10 +61,10 @@ struct Colors {
 
 @fragment fn fs(@builtin(position) fragCoord: vec4f) -> @location(0) vec4f {
   let p = fragCoord.xy / u.dpr;
-  var f: array<f32, 6>;
+  var f: array<f32, 20>;
   var grad = vec2f(0.0);
 
-  for (var k = 0u; k < 6u; k++) {
+  for (var k = 0u; k < 20u; k++) {
     let bb = u.bb[k];
     if (p.x < bb.x || p.x > bb.z || p.y < bb.y || p.y > bb.w) { continue; }
     for (var i = 0u; i < 16u; i++) {
@@ -83,7 +83,8 @@ struct Colors {
     }
   }
 
-  let tF = f[0] + f[1] + f[2] + f[3] + f[4] + f[5];
+  var tF: f32 = 0.0;
+  for (var k = 0u; k < 20u; k++) { tF += f[k]; }
 
   if (tF < 0.05) {
     return vec4f(textureSampleLevel(bgTex, bgSamp, p / u.resolution, 0.0).rgb, 1.0);
@@ -94,7 +95,7 @@ struct Colors {
 
   var tx = vec3f(1.0);
   var totalO: f32 = 0.0;
-  for (var k = 0u; k < 6u; k++) {
+  for (var k = 0u; k < 20u; k++) {
     let sat = smoothstep(0.85, 3.5, f[k]);
     let a   = smoothstep(0.45, 0.85, f[k]);
     let o   = a * (0.38 + 0.32 * sat);
@@ -149,21 +150,21 @@ export default function OrbBackground({ dark = false, numOrbs = DEFAULT_numOrbs,
       let H = canvas!.offsetHeight || 460
 
       // ── Buffers ────────────────────────────────────────────────────────────
-      const uBuf = new Float32Array(28)
-      for (let i = 0; i < 6; i++) {
+      const uBuf = new Float32Array(4 + MAX_ORBS * 4)
+      for (let i = 0; i < MAX_ORBS; i++) {
         uBuf[4+i*4] = -99999; uBuf[5+i*4] = -99999
         uBuf[6+i*4] = -99999; uBuf[7+i*4] = -99999
       }
-      const uniformBuf = device.createBuffer({ size: 112, usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST })
+      const uniformBuf = device.createBuffer({ size: uBuf.byteLength, usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST })
 
       const pBuf = new Float32Array(TOTAL_P * 3)
       for (let i = 0; i < TOTAL_P; i++) { pBuf[i*3] = -9999; pBuf[i*3+1] = -9999; pBuf[i*3+2] = 0.001 }
       const particleBuf = device.createBuffer({ size: pBuf.byteLength, usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST })
 
-      const cBuf = new Float32Array(48)
-      for (let i = 0; i < 6; i++) {
-        cBuf[i*4]    = 1;   cBuf[i*4+1]    = 1;   cBuf[i*4+2]    = 1;   cBuf[i*4+3]    = 0
-        cBuf[24+i*4] = 0.5; cBuf[24+i*4+1] = 0.5; cBuf[24+i*4+2] = 0.5; cBuf[24+i*4+3] = 0
+      const cBuf = new Float32Array(MAX_ORBS * 4 * 2)
+      for (let i = 0; i < MAX_ORBS; i++) {
+        cBuf[i*4]              = 1;   cBuf[i*4+1]              = 1;   cBuf[i*4+2]              = 1;   cBuf[i*4+3]              = 0
+        cBuf[MAX_ORBS*4+i*4]   = 0.5; cBuf[MAX_ORBS*4+i*4+1]   = 0.5; cBuf[MAX_ORBS*4+i*4+2]   = 0.5; cBuf[MAX_ORBS*4+i*4+3]   = 0
       }
       const colorBuf = device.createBuffer({ size: cBuf.byteLength, usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST })
 
@@ -232,12 +233,12 @@ export default function OrbBackground({ dark = false, numOrbs = DEFAULT_numOrbs,
       // ── Colors ─────────────────────────────────────────────────────────────
       let colorsDirty = true
       function setColor(i: number, l: readonly [number, number, number], d: readonly [number, number, number]) {
-        cBuf[i*4]    = l[0]; cBuf[i*4+1]    = l[1]; cBuf[i*4+2]    = l[2]; cBuf[i*4+3]    = 0
-        cBuf[24+i*4] = d[0]; cBuf[24+i*4+1] = d[1]; cBuf[24+i*4+2] = d[2]; cBuf[24+i*4+3] = 0
+        cBuf[i*4]                = l[0]; cBuf[i*4+1]                = l[1]; cBuf[i*4+2]                = l[2]; cBuf[i*4+3]                = 0
+        cBuf[MAX_ORBS*4+i*4]     = d[0]; cBuf[MAX_ORBS*4+i*4+1]     = d[1]; cBuf[MAX_ORBS*4+i*4+2]     = d[2]; cBuf[MAX_ORBS*4+i*4+3]     = 0
         colorsDirty = true
       }
       const PALETTES = dark ? PALETTES_DARK : PALETTES_LIGHT
-      for (let i = 0; i < numOrbs; i++) setColor(i, PALETTES[i].l, PALETTES[i].d)
+      for (let i = 0; i < numOrbs; i++) setColor(i, PALETTES[i % PALETTES.length].l, PALETTES[i % PALETTES.length].d)
       device.queue.writeBuffer(colorBuf, 0, cBuf)
       colorsDirty = false
 
