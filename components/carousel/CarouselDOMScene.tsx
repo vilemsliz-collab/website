@@ -401,7 +401,7 @@ export default function CarouselDOMScene({
               </>
             ) : card.isWebsite ? (
               <>
-                <OrbBackground dark />
+                <OrbBackground dark orbScale={0.72} />
                 <div className={styles.cardWebsiteText}>
                   <p className={styles.cardWebsiteLine}>{card.name}</p>
                   <p className={styles.cardWebsiteLine}>{card.lines[0]}</p>
