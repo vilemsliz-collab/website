@@ -1,25 +1,8 @@
 'use client'
 
 import { useEffect, useRef, type MutableRefObject } from 'react'
+import { ArrowTopRightIcon } from '@radix-ui/react-icons'
 import styles from './Cursor.module.css'
-
-// CSS.gg arrow-top-right — filled, sharp geometric.
-function ArrowTopRightIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      className={className}
-      aria-hidden
-    >
-      <path
-        d="M10.5253 5.49475L10.5206 7.49475L15.0782 7.50541L5.47473 17.0896L6.88752 18.5052L16.5173 8.89479L16.5065 13.5088L18.5065 13.5134L18.5253 5.51345L10.5253 5.49475Z"
-        fill="currentColor"
-      />
-    </svg>
-  )
-}
 
 // ── Config (live-tweakable via configRef) ─────────────────────────────────────
 export interface CursorConfig {
@@ -482,7 +465,7 @@ export default function CustomCursor({ tiltRef, configRef }: CursorProps) {
         <div ref={borderRef} className={styles.border} />
         <div ref={contentRef} className={styles.content}>
           <span ref={labelRef} className={styles.label} />
-          <ArrowTopRightIcon className={styles.iconArrow} />
+          <ArrowTopRightIcon className={styles.iconArrow} aria-hidden />
         </div>
       </div>
     </div>
