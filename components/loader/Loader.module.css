@@ -1,6 +1,6 @@
-@keyframes expand {
-  from { transform: translate(-50%, -50%) scale(0); opacity: 0; }
-  to   { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+@keyframes orbIn {
+  from { transform: scale(0); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
 }
 
 @keyframes nameIn {
@@ -23,15 +23,12 @@
   pointer-events: none;
 }
 
-.orb {
+.orbWrap {
   position: absolute;
-  width: 38vmin;
-  height: 38vmin;
-  border-radius: 50%;
-  filter: blur(18px);
-  transform: translate(-50%, -50%) scale(0);
+  inset: 0;
+  transform: scale(0);
   opacity: 0;
-  animation: expand 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: orbIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 .name {

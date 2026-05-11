@@ -14,7 +14,7 @@ const RING_SIZES  = [44, 40, 38, 36, 34, 32, 30, 28]
 const NI = INNER_SIZES.length
 const NR = RING_SIZES.length
 const ORB_SCALE  = 0.84
-const NUM_ORBS   = 4
+const NUM_ORBS   = 5
 
 // ── Per-mode palettes ────────────────────────────────────────────────────────
 // Light mode: cool blue-white tint, 50% desaturated toward gray
