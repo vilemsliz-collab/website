@@ -123,7 +123,7 @@ struct Colors {
 }
 `
 
-export default function OrbBackground({ dark = false, numOrbs = DEFAULT_numOrbs, orbScale = ORB_SCALE }: { dark?: boolean; numOrbs?: number; orbScale?: number }) {
+export default function OrbBackground({ dark = false, numOrbs = DEFAULT_numOrbs, orbScale = ORB_SCALE, responsive = false }: { dark?: boolean; numOrbs?: number; orbScale?: number; responsive?: boolean }) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
   useEffect(() => {
@@ -219,6 +219,9 @@ export default function OrbBackground({ dark = false, numOrbs = DEFAULT_numOrbs,
         })
       }
 
+      const orbs: OrbPhys[] = []
+      function effectiveScale() { return responsive ? orbScale * Math.min(W, H) / 460 : orbScale }
+
       function resize() {
         W = canvas!.offsetWidth  || 300
         H = canvas!.offsetHeight || 460
@@ -226,6 +229,7 @@ export default function OrbBackground({ dark = false, numOrbs = DEFAULT_numOrbs,
         canvas!.height = H * RDPR
         gpuCtx!.configure({ device, format: fmt, alphaMode: 'opaque' })
         rebuildBg()
+        if (responsive && orbs.length > 0) { const s = effectiveScale(); for (const o of orbs) setOrbScale(o, s) }
       }
       resize()
 
@@ -339,14 +343,13 @@ export default function OrbBackground({ dark = false, numOrbs = DEFAULT_numOrbs,
         }
       }
 
-      // ── Spawn 4 orbs ───────────────────────────────────────────────────────
-      const orbs: OrbPhys[] = []
+      // ── Spawn orbs ────────────────────────────────────────────────────────
       for (let i = 0; i < numOrbs; i++) {
         const col = i % 2, row = Math.floor(i / 2)
         const sx = W * (0.25 + 0.5 * col) + (Math.random() - 0.5) * W * 0.1
         const sy = H * (0.25 + 0.5 * row) + (Math.random() - 0.5) * H * 0.15
         const o = makeOrb(sx, sy)
-        setOrbScale(o, orbScale)
+        setOrbScale(o, effectiveScale())
         orbs.push(o)
       }
 
@@ -355,11 +358,15 @@ export default function OrbBackground({ dark = false, numOrbs = DEFAULT_numOrbs,
       ro.observe(canvas!)
 
       // ── Render loop ────────────────────────────────────────────────────────
+      let physFrame = 0
       function tick() {
         if (dead) return
+        if (document.hidden) { rafId = requestAnimationFrame(tick); return }
         const n = orbs.length
-        for (let i = 0; i < n; i++) stepOrb(orbs[i])
-        for (let i = 0; i < n; i++) for (let j = i + 1; j < n; j++) collide(orbs[i], orbs[j])
+        if (++physFrame % 2 === 0) {
+          for (let i = 0; i < n; i++) stepOrb(orbs[i])
+          for (let i = 0; i < n; i++) for (let j = i + 1; j < n; j++) collide(orbs[i], orbs[j])
+        }
 
         for (let i = 0; i < n; i++) {
           const ph = orbs[i], base = i * PPO * 3
