@@ -336,7 +336,7 @@ export default function CarouselDOMScene({
             style={(card.isAbout || card.isWebsite) ? undefined : { backgroundColor: card.bg }}
           >
             {card.isAbout
-              ? <OrbBackground orbScale={0.28} />
+              ? <OrbBackground orbScale={0.60} />
               : <div className={styles.cardCanvas} aria-hidden />
             }
 
