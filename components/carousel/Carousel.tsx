@@ -181,7 +181,7 @@ export default function Carousel() {
       loaderTimer = setTimeout(() => {
         setLoaderVisible(false)
         try { sessionStorage.setItem('carousel-loaded', '1') } catch {}
-      }, 3000)
+      }, 4000)
     }
 
     return () => {
