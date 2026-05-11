@@ -25,13 +25,13 @@
 
 .orb {
   position: absolute;
-  width: 80vmax;
-  height: 80vmax;
+  width: 38vmin;
+  height: 38vmin;
   border-radius: 50%;
-  filter: blur(48px);
+  filter: blur(18px);
   transform: translate(-50%, -50%) scale(0);
   opacity: 0;
-  animation: expand 0.75s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: expand 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 .name {

@@ -2,25 +2,33 @@
 import { useState, useEffect } from 'react'
 import s from './Loader.module.css'
 
-const COLORS = [
-  'rgba(210,215,235,0.80)',
-  'rgba(195,205,228,0.75)',
-  'rgba(225,225,238,0.70)',
-  'rgba(180,195,225,0.78)',
-  'rgba(215,220,240,0.72)',
+// Matches PALETTES_LIGHT from OrbBackground — light center, darker edge
+const PALETTES = [
+  { l: [235, 235, 240], d: [140, 140, 152] },
+  { l: [222, 222, 230], d: [117, 117, 130] },
+  { l: [230, 230, 235], d: [133, 133, 145] },
+  { l: [214, 214, 224], d: [107, 107, 122] },
+  { l: [228, 228, 237], d: [125, 125, 138] },
 ]
 
-interface OrbState { color: string; top: string; left: string; delay: string }
+function makeGradient(p: typeof PALETTES[0]) {
+  const [lr, lg, lb] = p.l
+  const [dr, dg, db] = p.d
+  return `radial-gradient(circle at 38% 32%, rgba(${lr},${lg},${lb},0.95) 0%, rgba(${dr},${dg},${db},0.55) 68%, transparent 100%)`
+}
+
+interface OrbState { gradient: string; top: string; left: string; delay: string }
 
 export default function Loader({ visible }: { visible: boolean }) {
   const [orbs, setOrbs] = useState<OrbState[]>([])
 
   useEffect(() => {
-    setOrbs(COLORS.map(color => ({
-      color,
-      top:   `${Math.round(5  + Math.random() * 85)}%`,
-      left:  `${Math.round(5  + Math.random() * 85)}%`,
-      delay: `${(Math.random() * 0.3).toFixed(2)}s`,
+    const shuffled = [...PALETTES].sort(() => Math.random() - 0.5)
+    setOrbs(shuffled.map(p => ({
+      gradient: makeGradient(p),
+      top:   `${Math.round(15 + Math.random() * 65)}%`,
+      left:  `${Math.round(12 + Math.random() * 70)}%`,
+      delay: `${(Math.random() * 0.25).toFixed(2)}s`,
     })))
   }, [])
 
@@ -30,7 +38,7 @@ export default function Loader({ visible }: { visible: boolean }) {
         <div
           key={i}
           className={s.orb}
-          style={{ top: orb.top, left: orb.left, animationDelay: orb.delay, background: orb.color }}
+          style={{ top: orb.top, left: orb.left, animationDelay: orb.delay, background: orb.gradient }}
         />
       ))}
       <p className={s.name}>Vilem</p>
