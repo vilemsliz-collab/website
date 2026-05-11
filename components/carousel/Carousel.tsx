@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useEffect, useCallback, useState } from 'react'
+import { useRef, useEffect, useLayoutEffect, useCallback, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import {
   PRESETS, CARDS, REVEAL, INPUT, TILT, GHOST, LIGHT,
@@ -175,9 +175,7 @@ export default function Carousel() {
     })
 
     let loaderTimer: ReturnType<typeof setTimeout> | null = null
-    if (typeof window !== 'undefined' && sessionStorage.getItem('carousel-loaded')) {
-      setLoaderVisible(false)
-    } else {
+    if (!sessionStorage.getItem('carousel-loaded')) {
       loaderTimer = setTimeout(() => {
         setLoaderVisible(false)
         try { sessionStorage.setItem('carousel-loaded', '1') } catch {}
@@ -192,6 +190,9 @@ export default function Carousel() {
 
   // ── React state (only for things that need re-render) ──
   const [loaderVisible, setLoaderVisible] = useState(true)
+  useLayoutEffect(() => {
+    if (sessionStorage.getItem('carousel-loaded')) setLoaderVisible(false)
+  }, [])
   const [caseOpenState, setCaseOpenState] = useState(false)
   const [ctrlOpen, setCtrlOpen] = useState(false)
 
