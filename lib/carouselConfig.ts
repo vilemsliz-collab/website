@@ -67,7 +67,6 @@ export interface CardData {
   isAbout?: boolean
   isWebsite?: boolean
   name?: string
-  headline?: string
 }
 
 export const PRESETS: Record<string, CarouselPreset> = {

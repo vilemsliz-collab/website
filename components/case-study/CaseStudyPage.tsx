@@ -133,8 +133,6 @@ export default function CaseStudyPage({ cs, isOverlay }: Props) {
 
       <div
         ref={pageRef}
-        id="case-study"
-        data-element="Case study page"
         className={styles.caseStudyPage}
         style={undefined}
       >

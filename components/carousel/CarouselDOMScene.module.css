@@ -71,7 +71,6 @@
   clip-path: inset(0 round var(--shape-card));
   overflow: hidden;
   will-change: transform, opacity;
-  container-type: inline-size;
 }
 
 /* ── Reserved shader canvas slot ── */
@@ -156,6 +155,7 @@
   pointer-events: auto;
 }
 
+
 .cardAbout .cardText {
   color: #000000;
 }
@@ -176,17 +176,17 @@
 
 .cardWebsiteText {
   position: absolute;
-  top: 0; left: 0; right: 0;
-  padding: var(--space-8) var(--space-8) 0;
+  bottom: 0; left: 0; right: 0;
+  padding: 0 var(--space-6) var(--space-10);
   z-index: 3;
   pointer-events: none;
 }
 
 .cardWebsiteLine {
   font-family: var(--font-brand);
-  font-size: 14.7cqw;
+  font-size: 52px;
   font-weight: 700;
-  line-height: 1.1;
+  line-height: 1.05;
   color: #ffffff;
   margin: 0;
 }

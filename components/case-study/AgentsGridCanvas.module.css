@@ -8,17 +8,17 @@
   position: relative;
   margin-top: var(--space-2);
   display: flex;
-  flex-direction: column;
-  align-items: stretch;
+  align-items: center;
+  justify-content: center;
 }
 
-/* ── Grid area ─────────────────────────────────────────────────────────────── */
-
-.gridArea {
-  flex: 1;
+.grid {
   position: relative;
-  overflow: hidden;
-  margin: var(--space-3);
+  width: 372px;
+  height: 372px;
+  transform-origin: center center;
+  font-family: var(--font-brand);
+  flex-shrink: 0;
 }
 
 .gradientMap {
@@ -44,22 +44,28 @@
   transform: translate3d(0, 0, 0);
 }
 
-/* ── Tiles ──────────────────────────────────────────────────────────────────── */
+.agentGrid {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(3, 118px);
+  grid-template-rows: repeat(3, 118px);
+  gap: 9px;
+}
 
 .tile {
-  position: absolute;
-  top: 0; left: 0;
+  width: 118px;
+  height: 118px;
+  position: relative;
   z-index: 1;
   cursor: pointer;
-  will-change: transform, opacity;
-  width:  var(--tile-size, 118px);
-  height: var(--tile-size, 118px);
+  will-change: transform;
 }
 
 .tilePerson {
-  background: #f2f5fa;
-  border-radius: calc(var(--tile-size, 118px) * 0.20);
+  border-radius: 24px;
   overflow: hidden;
+  background: #bfc7d9;
 }
 
 .tilePerson img {
@@ -68,83 +74,28 @@
   object-fit: cover;
   object-position: center top;
   display: block;
+  transition: transform 500ms cubic-bezier(.23, 1, .32, 1);
 }
 
+.tilePerson:hover img { transform: scale(1.10); }
+
 .tileAgent {
-  background: linear-gradient(135deg, #aaff00 0%, #00e05c 50%, #00ff2b 100%);
-  border-radius: calc(var(--tile-size, 118px) * 0.24);
+  border-radius: 28px;
+  background: #ffffff;
+  border: 3px solid #00e05c;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .tileAgentSvg {
+  width: 76px;
+  height: 76px;
+  color: #00e05c;
   display: block;
-  color: #ffffff;
-  flex-shrink: 0;
 }
-
-/* ── Controls ──────────────────────────────────────────────────────────────── */
-
-.controls {
-  height: 56px;
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  padding: 0 var(--space-6);
-  border-top: 1px solid var(--gray-100);
-}
-
-.count {
-  font-size: var(--type-label-small-size);
-  line-height: var(--type-label-small-lh);
-  color: var(--gray-500);
-  min-width: 20px;
-  text-align: right;
-  font-variant-numeric: tabular-nums;
-}
-
-.slider {
-  flex: 1;
-  appearance: none;
-  -webkit-appearance: none;
-  height: 2px;
-  background: linear-gradient(
-    to right,
-    #00e05c 0%,
-    #00e05c var(--pct, 0%),
-    var(--gray-200) var(--pct, 0%),
-    var(--gray-200) 100%
-  );
-  border-radius: var(--shape-pill);
-  outline: none;
-  cursor: pointer;
-}
-
-.slider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  background: #00e05c;
-  cursor: pointer;
-  box-shadow: 0 0 0 3px var(--color-background);
-}
-
-.slider::-moz-range-thumb {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  background: #00e05c;
-  border: 3px solid var(--color-background);
-  cursor: pointer;
-}
-
-
-/* ── Reduced motion ─────────────────────────────────────────────────────────── */
 
 @media (prefers-reduced-motion: reduce) {
-  .tile { will-change: auto !important; }
+  .tile { transition: none !important; will-change: auto !important; }
+  .tilePerson img { transition: none !important; }
 }
