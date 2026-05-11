@@ -1,3 +1,8 @@
+@keyframes expand {
+  from { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+  to   { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+}
+
 @keyframes nameIn {
   from { opacity: 0; }
   to   { opacity: 1; }
@@ -16,6 +21,17 @@
 .hidden {
   opacity: 0;
   pointer-events: none;
+}
+
+.orb {
+  position: absolute;
+  width: 110vmax;
+  height: 110vmax;
+  border-radius: 50%;
+  filter: blur(70px);
+  transform: translate(-50%, -50%) scale(0);
+  opacity: 0;
+  animation: expand 0.75s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 .name {
