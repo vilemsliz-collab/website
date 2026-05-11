@@ -96,7 +96,7 @@ export const PRESETS: Record<string, CarouselPreset> = {
     SCALE_ACTIVE: 1.10, SCALE_SPHERE: 0.79,
     OPACITY_MULT: 0.46, OPACITY_BASE: 1.00,
     FRICTION: 0.93, SPRING: 0.01,
-    Y_OFFSET: -50,
+    Y_OFFSET: -64,
   },
 }
 
