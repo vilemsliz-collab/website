@@ -46,3 +46,19 @@
   text-decoration: none;
 }
 .iconBtn:hover { opacity: 1; }
+
+@media (max-width: 767px) {
+  .bar {
+    padding: 5px 14px 5px 5px;
+    gap: 12px;
+    border-radius: 16px;
+  }
+  .cta {
+    font-size: var(--type-title-medium-size);
+    padding: 12px 16px;
+    border-radius: 12px;
+  }
+  .iconBtn {
+    padding: 4px;
+  }
+}

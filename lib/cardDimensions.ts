@@ -13,7 +13,7 @@ export interface CardDimensions {
 
 export function computeCardDimensions(viewportW: number, viewportH: number): CardDimensions {
   const isMobile = viewportW < BREAKPOINT_MOBILE
-  const hFactor  = isMobile ? 0.34 : 0.40
+  const hFactor  = isMobile ? 0.36 : 0.40
   const cardW    = Math.min(viewportW * 0.92, viewportH * hFactor)
   const cardH    = cardW * CARD_ASPECT
   return { cardW, cardH, isMobile, viewportW, viewportH }

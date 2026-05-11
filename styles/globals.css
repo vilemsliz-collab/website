@@ -22,6 +22,7 @@ body {
   -webkit-font-smoothing: antialiased;
   /* iOS Safari: prevent rubber-band from exposing a blank gap outside the viewport */
   overscroll-behavior: none;
+  overflow: hidden;
 }
 
 :root {
@@ -184,7 +185,7 @@ body {
 
   /* ── Shape — border-radius scale ── */
   --shape-sharp:   0px;
-  --shape-card:   32px;
+  --shape-card:   24px;
   --shape-sm:      8px;
   --shape-md:     12px;
   --shape-lg:     48px;
