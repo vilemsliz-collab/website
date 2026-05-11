@@ -175,10 +175,10 @@ export default function Carousel() {
     })
 
     let loaderTimer: ReturnType<typeof setTimeout> | null = null
-    if (!sessionStorage.getItem('carousel-loaded')) {
+    if (!sessionStorage.getItem('loader-v2')) {
       loaderTimer = setTimeout(() => {
         setLoaderVisible(false)
-        try { sessionStorage.setItem('carousel-loaded', '1') } catch {}
+        try { sessionStorage.setItem('loader-v2', '1') } catch {}
       }, 4000)
     }
 
@@ -191,7 +191,7 @@ export default function Carousel() {
   // ── React state (only for things that need re-render) ──
   const [loaderVisible, setLoaderVisible] = useState(true)
   useLayoutEffect(() => {
-    if (sessionStorage.getItem('carousel-loaded')) setLoaderVisible(false)
+    if (sessionStorage.getItem('loader-v2')) setLoaderVisible(false)
   }, [])
   const [caseOpenState, setCaseOpenState] = useState(false)
   const [ctrlOpen, setCtrlOpen] = useState(false)
