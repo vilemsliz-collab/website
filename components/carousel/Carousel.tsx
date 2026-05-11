@@ -175,7 +175,7 @@ export default function Carousel() {
     })
 
     let loaderTimer: ReturnType<typeof setTimeout> | null = null
-    loaderTimer = setTimeout(() => setLoaderVisible(false), 4000)
+    loaderTimer = setTimeout(() => setLoaderVisible(false), 2600)
 
     return () => {
       if (loaderTimer) clearTimeout(loaderTimer)
