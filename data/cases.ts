@@ -13,7 +13,6 @@ export interface CaseClaim {
 
 export interface CaseStudy {
   slug: string
-  password?: string
   title: string
   headlineDark: string
   headlineMuted: string
@@ -88,7 +87,6 @@ export const CASES: CaseStudy[] = [
   },
   {
     slug: '002',
-    password: 'WofWof',
     title: 'Generative systems, designed in code.',
     headlineDark: 'Generative systems,',
     headlineMuted: ' designed in code.',
