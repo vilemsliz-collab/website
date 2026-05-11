@@ -71,6 +71,7 @@
   clip-path: inset(0 round var(--shape-card));
   overflow: hidden;
   will-change: transform, opacity;
+  container-type: inline-size;
 }
 
 /* ── Reserved shader canvas slot ── */
@@ -131,41 +132,99 @@
   margin: 0;
 }
 
-/* ── About Me card overrides ── */
+/* ── About Me card ── */
 .cardAbout {
   background: #ffffff;
   color: #000000;
 }
 
-.cardNameWrap {
+.cardAboutHeadline {
   position: absolute;
-  bottom: 0; left: 0; right: 0;
-  padding: 0 var(--space-6) var(--space-8);
+  top: 11.4cqw;
+  left: 5.9cqw;
+  right: 5.9cqw;
+  font-family: var(--font-brand);
+  font-size: 14.7cqw;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  font-weight: var(--type-display-large-weight);
+  font-variation-settings: 'wght' var(--type-display-large-weight);
+  color: #000000;
+  margin: 0;
   z-index: 3;
   pointer-events: none;
 }
 
-.cardName {
+.cardAboutBadge {
+  position: absolute;
+  bottom: 4cqw;
+  left: 4cqw;
+  right: 4cqw;
+  height: 26cqw;
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  background: #ffffff;
+  border-radius: 5.5cqw;
+  overflow: hidden;
+  padding: 1.5cqw 0 1.5cqw 1.5cqw;
+  z-index: 3;
+  pointer-events: none;
+  isolation: isolate;
+}
+
+.cardAboutPhoto {
+  /* badge inner height = 26cqw - 1.5cqw top - 1.5cqw bottom = 23cqw; photo is square */
+  width: 23cqw;
+  height: 100%;
+  border-radius: 4cqw;
+  object-fit: cover;
+  object-position: center top;
+  flex-shrink: 0;
+  display: block;
+  transition: opacity 250ms ease, width 300ms ease;
+}
+
+.cardGroup[data-case-open='true'] .cardAboutPhoto {
+  opacity: 0;
+  width: 0;
+}
+
+.cardAboutBadgeRight {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3.5cqw;
+  padding: 3.5cqw;
+  min-width: 0;
+  justify-content: center;
+}
+
+.cardAboutBadgeName {
   font-family: var(--font-brand);
-  font-size: clamp(56px, 14vw, 88px);
-  font-weight: 700;
-  line-height: 1.05;
+  font-size: 9cqw;
+  line-height: 1;
+  font-weight: var(--type-display-large-weight);
+  font-variation-settings: 'wght' var(--type-display-large-weight);
   color: #000000;
-  margin: 0;
-  pointer-events: auto;
+  white-space: nowrap;
+  overflow: hidden;
 }
 
-
-.cardAbout .cardText {
-  color: #000000;
+.cardAboutBadgeLines {
+  display: flex;
+  gap: 5.5cqw;
 }
 
-.cardAbout .cardLine {
-  font-size: 12px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: #000000;
-  display: inline-block;
+.cardAboutBadgeLine {
+  font-family: var(--font-brand);
+  font-size: 3.8cqw;
+  line-height: 1;
+  letter-spacing: var(--type-body-large-ls);
+  font-weight: 500;
+  font-variation-settings: 'wght' 500;
+  color: var(--gray-600);
+  white-space: nowrap;
 }
 
 /* ── Website card (dark inverted) ── */
@@ -176,17 +235,17 @@
 
 .cardWebsiteText {
   position: absolute;
-  bottom: 0; left: 0; right: 0;
-  padding: 0 var(--space-6) var(--space-10);
+  top: 0; left: 0; right: 0;
+  padding: var(--space-8) var(--space-8) 0;
   z-index: 3;
   pointer-events: none;
 }
 
 .cardWebsiteLine {
   font-family: var(--font-brand);
-  font-size: 52px;
+  font-size: 14.7cqw;
   font-weight: 700;
-  line-height: 1.05;
+  line-height: 1.1;
   color: #ffffff;
   margin: 0;
 }

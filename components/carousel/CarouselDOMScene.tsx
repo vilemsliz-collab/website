@@ -252,6 +252,7 @@ export default function CarouselDOMScene({
         const cursorScaleVal = cursorLevel === 1 ? '1' : cursorLevel === 2 ? '0.667' : '0.444'
 
         if (t.isActive) {
+          group.dataset.caseOpen = caseOpen.current ? 'true' : 'false'
           if (caseOpen.current) {
             group.dataset.cursor = 'card-close'
             delete group.dataset.cursorLabel
@@ -262,6 +263,7 @@ export default function CarouselDOMScene({
             group.dataset.cursorScale = cursorScaleVal
           }
         } else {
+          delete group.dataset.caseOpen
           group.dataset.cursor = 'card'
           group.dataset.cursorLabel = card.isAbout ? labelRef.current : 'open'
           group.dataset.cursorScale = cursorScaleVal
@@ -363,7 +365,7 @@ export default function CarouselDOMScene({
               </>
             )}
 
-            {(card.isAbout || card.isWebsite) && (
+            {card.isWebsite && (
               <div className={styles.cardFrost}>
                 {card.video ? (
                   <video src={card.video} autoPlay muted loop playsInline className={styles.cardFrostMedia} aria-hidden />
@@ -376,12 +378,25 @@ export default function CarouselDOMScene({
 
             {card.isAbout ? (
               <>
-                <div className={styles.cardNameWrap}>
-                  <p className={styles.cardName}>{card.name}</p>
-                </div>
-                <div className={styles.cardText}>
-                  <p className={styles.cardLine}>{card.lines[0]}</p>
-                  <p className={styles.cardLine}>{card.lines[1]}</p>
+                {card.headline && (
+                  <p className={styles.cardAboutHeadline}>
+                    {card.headline.split('\n').map((line, li, arr) => (
+                      <span key={li}>{line}{li < arr.length - 1 && <br />}</span>
+                    ))}
+                  </p>
+                )}
+                <div className={styles.cardAboutBadge}>
+                  {card.img && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={card.img} alt="" className={styles.cardAboutPhoto} />
+                  )}
+                  <div className={styles.cardAboutBadgeRight}>
+                    <span className={styles.cardAboutBadgeName}>{card.name}</span>
+                    <div className={styles.cardAboutBadgeLines}>
+                      <span className={styles.cardAboutBadgeLine}>{card.lines[0]}</span>
+                      <span className={styles.cardAboutBadgeLine}>{card.lines[1]}</span>
+                    </div>
+                  </div>
                 </div>
               </>
             ) : card.isWebsite ? (
