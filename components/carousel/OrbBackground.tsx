@@ -13,7 +13,7 @@ const INNER_SIZES = [72, 64, 58, 52, 48, 42, 38]
 const RING_SIZES  = [44, 40, 38, 36, 34, 32, 30, 28]
 const NI = INNER_SIZES.length
 const NR = RING_SIZES.length
-const ORB_SCALE  = 0.7
+const ORB_SCALE  = 0.77
 const NUM_ORBS   = 4
 
 // ── Per-mode palettes ────────────────────────────────────────────────────────
