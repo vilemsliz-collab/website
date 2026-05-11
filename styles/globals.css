@@ -5,7 +5,6 @@ html {
      (including behind Safari chrome when viewport-fit=cover is active) */
   height: -webkit-fill-available;
   height: 100%;
-  overflow: hidden;
 }
 
 body {
@@ -186,7 +185,7 @@ body {
 
   /* ── Shape — border-radius scale ── */
   --shape-sharp:   0px;
-  --shape-card:   24px;
+  --shape-card:   32px;
   --shape-sm:      8px;
   --shape-md:     12px;
   --shape-lg:     48px;
