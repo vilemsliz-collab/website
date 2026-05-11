@@ -348,6 +348,7 @@ export default function AgentsGridCanvas() {
   useEffect(() => {
     const gridArea = gridAreaRef.current
     if (!gridArea) return
+    if (window.matchMedia('(hover: none)').matches) return  // no hover on touch
 
     const off: (() => void)[] = []
     let staggerIds: ReturnType<typeof setTimeout>[] = []
@@ -367,6 +368,10 @@ export default function AgentsGridCanvas() {
         const pos = cellPos(lay, tile.col, tile.row)
         hoverTarget.current = { x: pos.x + lay.tileSize / 2, y: pos.y + lay.tileSize / 2 }
 
+        const st = clamp(0, 1, (countRef.current - 9) / 81)
+        const staggerMs  = 30 - 25 * st   // 30ms at n=9 → 5ms at n=90
+        const pushPx     = 16 - 12 * st   // 16px at n=9 → 4px at n=90
+
         snap.forEach(other => {
           const sp = springsMap.current.get(other.id)
           if (!sp) return
@@ -380,9 +385,9 @@ export default function AgentsGridCanvas() {
             sp.hscale.setTarget(1)
             const mag = Math.sqrt(dc * dc + dr * dr)
             staggerIds.push(setTimeout(() => {
-              sp.hsx.setTarget((dc / mag) * 16)
-              sp.hsy.setTarget((dr / mag) * 16)
-            }, dist * 30))
+              sp.hsx.setTarget((dc / mag) * pushPx)
+              sp.hsy.setTarget((dr / mag) * pushPx)
+            }, dist * staggerMs))
           }
         })
       }
@@ -426,14 +431,6 @@ export default function AgentsGridCanvas() {
   const handleCountChange = useCallback((n: number) => {
     setTileCount(n)
     setTiles(prev => makeArrangement(n, prev))
-  }, [])
-
-  const handleRandomize = useCallback(() => {
-    // Fade out all, then rebuild
-    springsMap.current.forEach(sp => sp.opacity.setTarget(0))
-    setTimeout(() => {
-      setTiles(makeArrangement(countRef.current, undefined, 'randomize'))
-    }, 220)
   }, [])
 
   // ── Render ────────────────────────────────────────────────────────────────
@@ -499,11 +496,9 @@ export default function AgentsGridCanvas() {
             min={1}
             max={90}
             value={tileCount}
+            style={{ '--pct': `${((tileCount - 1) / 89) * 100}%` } as React.CSSProperties}
             onChange={e => handleCountChange(Number(e.target.value))}
           />
-          <button className={s.randomizeBtn} onClick={handleRandomize}>
-            Randomize
-          </button>
         </div>
       </div>
     </>
