@@ -14,7 +14,7 @@ const RING_SIZES  = [44, 40, 38, 36, 34, 32, 30, 28]
 const NI = INNER_SIZES.length
 const NR = RING_SIZES.length
 const ORB_SCALE  = 0.84
-const NUM_ORBS   = 5
+const DEFAULT_numOrbs = 4
 
 // ── Per-mode palettes ────────────────────────────────────────────────────────
 // Light mode: cool blue-white tint, 50% desaturated toward gray
@@ -23,6 +23,7 @@ const PALETTES_LIGHT: Array<{ l: [number, number, number]; d: [number, number, n
   { l: [0.87, 0.87, 0.90], d: [0.46, 0.46, 0.51] },
   { l: [0.90, 0.90, 0.92], d: [0.52, 0.52, 0.57] },
   { l: [0.84, 0.84, 0.88], d: [0.42, 0.42, 0.48] },
+  { l: [0.89, 0.89, 0.93], d: [0.50, 0.50, 0.56] },
 ]
 // Dark mode: dark blue-black tones, 50% desaturated toward gray
 const PALETTES_DARK: Array<{ l: [number, number, number]; d: [number, number, number] }> = [
@@ -30,6 +31,7 @@ const PALETTES_DARK: Array<{ l: [number, number, number]; d: [number, number, nu
   { l: [0.21, 0.22, 0.28], d: [0.13, 0.13, 0.17] },
   { l: [0.23, 0.24, 0.31], d: [0.14, 0.14, 0.19] },
   { l: [0.19, 0.20, 0.26], d: [0.12, 0.12, 0.16] },
+  { l: [0.22, 0.23, 0.30], d: [0.13, 0.14, 0.18] },
 ]
 
 // ── WGSL shader (identical to orbs-v6) ──────────────────────────────────────
@@ -121,7 +123,7 @@ struct Colors {
 }
 `
 
-export default function OrbBackground({ dark = false }: { dark?: boolean }) {
+export default function OrbBackground({ dark = false, numOrbs = DEFAULT_numOrbs }: { dark?: boolean; numOrbs?: number }) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
   useEffect(() => {
@@ -235,7 +237,7 @@ export default function OrbBackground({ dark = false }: { dark?: boolean }) {
         colorsDirty = true
       }
       const PALETTES = dark ? PALETTES_DARK : PALETTES_LIGHT
-      for (let i = 0; i < NUM_ORBS; i++) setColor(i, PALETTES[i].l, PALETTES[i].d)
+      for (let i = 0; i < numOrbs; i++) setColor(i, PALETTES[i].l, PALETTES[i].d)
       device.queue.writeBuffer(colorBuf, 0, cBuf)
       colorsDirty = false
 
@@ -339,7 +341,7 @@ export default function OrbBackground({ dark = false }: { dark?: boolean }) {
 
       // ── Spawn 4 orbs ───────────────────────────────────────────────────────
       const orbs: OrbPhys[] = []
-      for (let i = 0; i < NUM_ORBS; i++) {
+      for (let i = 0; i < numOrbs; i++) {
         const col = i % 2, row = Math.floor(i / 2)
         const sx = W * (0.25 + 0.5 * col) + (Math.random() - 0.5) * W * 0.1
         const sy = H * (0.25 + 0.5 * row) + (Math.random() - 0.5) * H * 0.15
