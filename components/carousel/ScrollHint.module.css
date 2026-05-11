@@ -5,7 +5,7 @@
 
 .wrapper {
   position: fixed;
-  bottom: 172px;
+  bottom: 132px;
   left: var(--carousel-cx, 50%);
   transform: translateX(-50%);
   pointer-events: none;
