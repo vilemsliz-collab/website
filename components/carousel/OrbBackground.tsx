@@ -3,7 +3,7 @@
 import { useRef, useEffect } from 'react'
 
 // ── Physics constants (mirror orbs-v6) ──────────────────────────────────────
-const MAX_ORBS   = 20  // shader buffer size — must match shader array sizes
+const MAX_ORBS   = 6   // shader buffer size — must match shader array sizes
 const PPO        = 16
 const TOTAL_P    = MAX_ORBS * PPO
 const WB         = 0.15
@@ -40,11 +40,11 @@ struct Uniforms {
   resolution: vec2f,
   dpr: f32,
   blendMode: f32,
-  bb: array<vec4f, 20>,
+  bb: array<vec4f, 6>,
 }
 struct Colors {
-  light: array<vec4f, 20>,
-  deep:  array<vec4f, 20>,
+  light: array<vec4f, 6>,
+  deep:  array<vec4f, 6>,
 }
 
 @group(0) @binding(0) var<uniform> u: Uniforms;
@@ -61,10 +61,10 @@ struct Colors {
 
 @fragment fn fs(@builtin(position) fragCoord: vec4f) -> @location(0) vec4f {
   let p = fragCoord.xy / u.dpr;
-  var f: array<f32, 20>;
+  var f: array<f32, 6>;
   var grad = vec2f(0.0);
 
-  for (var k = 0u; k < 20u; k++) {
+  for (var k = 0u; k < 6u; k++) {
     let bb = u.bb[k];
     if (p.x < bb.x || p.x > bb.z || p.y < bb.y || p.y > bb.w) { continue; }
     for (var i = 0u; i < 16u; i++) {
@@ -83,8 +83,7 @@ struct Colors {
     }
   }
 
-  var tF: f32 = 0.0;
-  for (var k = 0u; k < 20u; k++) { tF += f[k]; }
+  let tF = f[0] + f[1] + f[2] + f[3] + f[4] + f[5];
 
   if (tF < 0.05) {
     return vec4f(textureSampleLevel(bgTex, bgSamp, p / u.resolution, 0.0).rgb, 1.0);
@@ -95,7 +94,7 @@ struct Colors {
 
   var tx = vec3f(1.0);
   var totalO: f32 = 0.0;
-  for (var k = 0u; k < 20u; k++) {
+  for (var k = 0u; k < 6u; k++) {
     let sat = smoothstep(0.85, 3.5, f[k]);
     let a   = smoothstep(0.45, 0.85, f[k]);
     let o   = a * (0.38 + 0.32 * sat);
