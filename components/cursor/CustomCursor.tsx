@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, type MutableRefObject } from 'react'
+import { ArrowUpRight } from 'lucide-react'
 import styles from './Cursor.module.css'
 
 // ── Config (live-tweakable via configRef) ─────────────────────────────────────
@@ -55,18 +56,15 @@ export type CursorState =
 function getStateTarget(state: CursorState, label?: string) {
   switch (state) {
     case 'card': {
-      const w = label ? Math.min(Math.round((label.length * 9 + 52) * 1.5), 210) : 156
-      return { w, h: 72, label }
+      return { w: 72, h: 72, label }
     }
     case 'link': {
-      const w = label ? Math.min(Math.round((label.length * 9 + 52) * 1.5), 210) : 156
-      return { w, h: 72, label }
+      const w = label ? Math.min(Math.round((label.length * 9 + 52) * 1.58), 215) : 158
+      return { w, h: 52, label }
     }
-    case 'card-close': {
-      return { w: 72, h: 72, label: '×' }
-    }
+    case 'card-close':
     case 'case-close': {
-      return { w: 72, h: 72, label: '×' }
+      return { w: 68, h: 68, label: '×' }
     }
     case 'scroll-down':
     case 'scroll-up':   return { w: DEFAULT_W, h: 96,  label: undefined }
@@ -89,6 +87,7 @@ export default function CustomCursor({ tiltRef, configRef }: CursorProps) {
   const backdropRef = useRef<HTMLDivElement>(null)
   const borderRef   = useRef<HTMLDivElement>(null)
   const contentRef  = useRef<HTMLDivElement>(null)
+  const labelRef    = useRef<HTMLSpanElement>(null)
 
   useEffect(() => {
     // No custom cursor on touch devices — they already have no pointer,
@@ -100,7 +99,8 @@ export default function CustomCursor({ tiltRef, configRef }: CursorProps) {
     const backdrop = backdropRef.current
     const border   = borderRef.current
     const content  = contentRef.current
-    if (!wrapper || !body || !backdrop || !border || !content) return
+    const labelEl  = labelRef.current
+    if (!wrapper || !body || !backdrop || !border || !content || !labelEl) return
 
     document.body.style.cursor = 'none'
 
@@ -172,14 +172,14 @@ export default function CustomCursor({ tiltRef, configRef }: CursorProps) {
 
 
       const isPillState = state === 'card' || state === 'card-close' || state === 'case-close' || state === 'link'
-      content.style.fontSize = state === 'card-close' ? '40px' : state === 'case-close' ? '24px' : isPillState ? '32px' : '13px'
+      const isIconState = state === 'card'
+      const isCloseState = state === 'card-close' || state === 'case-close'
+      body.classList.toggle(styles.bodyBlackPill, isPillState)
+      content.classList.toggle(styles.contentIcon, isIconState)
+      content.style.fontSize = isCloseState ? '32px' : isPillState ? '30px' : '13px'
 
-      if (t.label) {
-        content.textContent = t.label
-      } else {
-        content.textContent = ''
-      }
-      content.style.opacity = t.label ? '1' : '0'
+      labelEl.textContent = !isIconState && t.label ? t.label : ''
+      content.style.opacity = (isIconState || t.label) ? '1' : '0'
     }
 
     const spawnScrollRing = (expandHorizontal: boolean) => {
@@ -245,7 +245,8 @@ export default function CustomCursor({ tiltRef, configRef }: CursorProps) {
       const rW = Math.max(1, Math.round(curW))
       const rH = Math.max(1, Math.round(curH))
       const isPillLive = cursorState === 'card' || cursorState === 'link' || cursorState === 'card-close' || cursorState === 'case-close'
-      if (isPillLive) content.style.fontSize = `${Math.round((cursorState === 'card-close' ? 40 : cursorState === 'case-close' ? 24 : 32) * liveScale)}px`
+      const isCloseLive = cursorState === 'card-close' || cursorState === 'case-close'
+      if (isPillLive) content.style.fontSize = `${Math.round((isCloseLive ? 32 : 30) * liveScale)}px`
 
       // 2b. Pill blend spring — smooths blob ↔ pill transform transition
       const pillBlendTarg = isPillLive ? 1 : 0
@@ -389,16 +390,19 @@ export default function CustomCursor({ tiltRef, configRef }: CursorProps) {
       const total = Math.hypot(e.deltaX, e.deltaY)
       if (total < 1) return
 
-      const delta = Math.max(adx, ady)
+      // No scroll-driven cursor behavior when hovering a pill (card / link / close):
+      // skip ring spawn, axis elongation, and scroll-state switching entirely.
+      const isPillLive = cursorState === 'card' || cursorState === 'card-close' || cursorState === 'case-close' || cursorState === 'link'
+      if (isPillLive) return
+
       const forceH = !!document.elementFromPoint(mouseX, mouseY)?.closest('[data-cursor-scroll-h]')
       const isHorizontal = forceH || adx > ady
 
       const cfg = configRef?.current ?? DEFAULT_CURSOR_CONFIG
-      const isPillLive = cursorState === 'card' || cursorState === 'card-close' || cursorState === 'case-close' || cursorState === 'link'
 
       const minInterval = cfg.scrollIntervalBase
       const nowMs = performance.now()
-      const expandH = isPillLive || isHorizontal
+      const expandH = isHorizontal
       if (expandH !== lastExpandHorizontal) {
         clearScrollRings()
         lastExpandHorizontal = expandH
@@ -406,21 +410,6 @@ export default function CustomCursor({ tiltRef, configRef }: CursorProps) {
       if (nowMs - lastRingTime > minInterval) {
         lastRingTime = nowMs
         spawnScrollRing(expandH)
-      }
-
-      if (isPillLive) {
-        // Pill+scroll: keep the pill visible, bump the elongation impulse along
-        // the scroll axis. Rings are spawned above, sized to the pill by spawnScrollRing.
-        const cap = 60
-        scrollKick = Math.min(1.2, scrollKick + Math.min(delta, cap) * cfg.scrollKickAmp / 1000)
-        if (isHorizontal) {
-          scrollAxisX = e.deltaX > 0 ? 1 : -1
-          scrollAxisY = 0
-        } else {
-          scrollAxisX = 0
-          scrollAxisY = e.deltaY > 0 ? 1 : -1
-        }
-        return
       }
 
       if (scrollTimer) clearTimeout(scrollTimer)
@@ -474,7 +463,10 @@ export default function CustomCursor({ tiltRef, configRef }: CursorProps) {
       <div ref={bodyRef} className={styles.body}>
         <div ref={backdropRef} className={styles.backdrop} />
         <div ref={borderRef} className={styles.border} />
-        <div ref={contentRef} className={styles.content} />
+        <div ref={contentRef} className={styles.content}>
+          <span ref={labelRef} className={styles.label} />
+          <ArrowUpRight className={styles.iconArrow} aria-hidden />
+        </div>
       </div>
     </div>
   )
