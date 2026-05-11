@@ -123,7 +123,7 @@ struct Colors {
 }
 `
 
-export default function OrbBackground({ dark = false, numOrbs = DEFAULT_numOrbs }: { dark?: boolean; numOrbs?: number }) {
+export default function OrbBackground({ dark = false, numOrbs = DEFAULT_numOrbs, orbScale = ORB_SCALE }: { dark?: boolean; numOrbs?: number; orbScale?: number }) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
   useEffect(() => {
@@ -346,7 +346,7 @@ export default function OrbBackground({ dark = false, numOrbs = DEFAULT_numOrbs 
         const sx = W * (0.25 + 0.5 * col) + (Math.random() - 0.5) * W * 0.1
         const sy = H * (0.25 + 0.5 * row) + (Math.random() - 0.5) * H * 0.15
         const o = makeOrb(sx, sy)
-        setOrbScale(o, ORB_SCALE)
+        setOrbScale(o, orbScale)
         orbs.push(o)
       }
 
