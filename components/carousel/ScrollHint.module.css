@@ -5,7 +5,11 @@
 
 .wrapper {
   position: fixed;
-  bottom: 132px;
+  /* exact midpoint between card bottom and ActionBar top — derived from:
+     card-bottom-from-bottom = 50dvh + 64px (Y_OFFSET) − card-height × 0.55 (SCALE_ACTIVE 1.10)
+     actionbar-top-from-bottom = 98px (24px bottom + 74px height)
+     center = average of the two */
+  bottom: calc(25dvh + 81px - var(--card-height) * 0.275);
   left: var(--carousel-cx, 50%);
   transform: translateX(-50%);
   pointer-events: none;
