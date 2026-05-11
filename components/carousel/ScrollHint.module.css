@@ -1,6 +1,6 @@
-@keyframes ringBurst {
-  0%   { width: 28px; height: 28px; opacity: 0.55; }
-  100% { width: 116px; height: 28px; opacity: 0; }
+@keyframes pulse {
+  0%, 100% { opacity: 0.45; }
+  50%       { opacity: 0.85; }
 }
 
 .wrapper {
@@ -8,9 +8,6 @@
   bottom: 120px;
   left: var(--carousel-cx, 50%);
   transform: translateX(-50%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
   pointer-events: none;
   opacity: 0;
   transition: opacity 0.25s ease;
@@ -22,38 +19,15 @@
   transition: opacity 0.55s ease;
 }
 
-.pill {
-  width: 116px;
-  height: 28px;
-  border-radius: var(--shape-pill);
-  border: 1.5px solid var(--gray-400);
-  position: relative;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.ring {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  border-radius: var(--shape-pill);
-  border: 1.5px solid var(--gray-400);
-  animation: ringBurst 1800ms cubic-bezier(0, 0, 0.3, 1) infinite;
-}
-
 .label {
   font-family: var(--font-brand);
   font-size: 11px;
   font-weight: 400;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--gray-400);
-  margin: 8px 0 0;
-  text-align: center;
+  color: var(--gray-500);
   white-space: nowrap;
+  animation: pulse 2400ms ease-in-out infinite;
 }
 
 @media (max-width: 767px) {
