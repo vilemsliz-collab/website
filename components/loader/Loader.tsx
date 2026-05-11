@@ -6,7 +6,7 @@ export default function Loader({ visible }: { visible: boolean }) {
   return (
     <div className={`${s.loader} ${visible ? '' : s.hidden}`} aria-hidden={!visible}>
       <div className={s.orbWrap}>
-        <OrbBackground numOrbs={3} orbScale={7} />
+        <OrbBackground numOrbs={3} orbScale={5} />
       </div>
       <p className={s.name}>Vilem</p>
     </div>
