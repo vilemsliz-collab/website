@@ -4,23 +4,6 @@
   height: 100%;
 }
 
-/* ── Site nav ── */
-.siteNav {
-  position: fixed;
-  top: calc(20px + env(safe-area-inset-top));
-  left: calc(24px + env(safe-area-inset-left));
-  display: flex; gap: 20px;
-  font-family: var(--font-mono, 'IBM Plex Mono', monospace);
-  font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;
-  z-index: 100;
-}
-.siteNav a {
-  color: var(--color-outline); text-decoration: none;
-  transition: color 0.2s;
-}
-.siteNav a:hover { color: var(--color-on-surface); }
-.navActive { color: var(--color-on-surface) !important; }
-
 /* ── Carousel stage ── */
 .carouselStage {
   position: fixed;
@@ -99,7 +82,6 @@
     right: 0;
     border-radius: 0;
   }
-  .siteNav { display: none; }
 }
 
 /* ── Case panel cursor blocker ── */

@@ -17,6 +17,7 @@ import DevPanel, { type GlassConfig } from './DevPanel'
 import CarouselDOMScene from './CarouselDOMScene'
 import ScrollHint from './ScrollHint'
 import Loader from '@/components/loader/Loader'
+import ActionBar from './ActionBar'
 
 const N = CARDS.length
 
@@ -641,12 +642,7 @@ export default function Carousel() {
            Inside .casePanel the layer boundary blocks iframe sampling. ── */}
       <div className={styles.casePanelBlur} aria-hidden />
 
-      {/* ── Site nav ── */}
-      <nav className={styles.siteNav}>
-        <a href="/portfolio" className={styles.navActive} data-cursor="link" data-cursor-label="Portfolio">Portfolio</a>
-        <a href="/card" data-cursor="link" data-cursor-label="Card + Cursor">Card + Cursor</a>
-        <a href="/design-system" data-cursor="link" data-cursor-label="Design System">Design System</a>
-      </nav>
+      <ActionBar />
 
       {/* ── Dev panel ── */}
       <DevPanel
