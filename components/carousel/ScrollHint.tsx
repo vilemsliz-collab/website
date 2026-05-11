@@ -8,7 +8,6 @@ export default function ScrollHint({ visible }: { visible: boolean }) {
           <div key={delay} className={styles.ring} style={{ animationDelay: `${delay}ms` }} />
         ))}
       </div>
-      <p className={styles.label}>Scroll to spin</p>
     </div>
   )
 }

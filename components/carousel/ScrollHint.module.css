@@ -12,17 +12,16 @@
   bottom: calc(25dvh + 81px - var(--card-height) * 0.275);
   left: var(--carousel-cx, 50%);
   transform: translateX(-50%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  pointer-events: none;
+  /* Match ActionBar icon color + opacity so currentColor cascades to pill/rings. */
+  color: var(--color-on-surface);
   opacity: 0;
   transition: opacity 0.25s ease;
+  pointer-events: none;
   z-index: 20;
 }
 
 .wrapper.visible {
-  opacity: 1;
+  opacity: 0.65;
   transition: opacity 0.55s ease;
 }
 
@@ -30,12 +29,9 @@
   width: 116px;
   height: 28px;
   border-radius: var(--shape-pill);
-  border: 1.5px solid var(--gray-400);
+  border: 1.5px solid currentColor;
   position: relative;
   overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 .ring {
@@ -44,20 +40,8 @@
   left: 50%;
   transform: translate(-50%, -50%);
   border-radius: var(--shape-pill);
-  border: 1.5px solid var(--gray-400);
+  border: 1.5px solid currentColor;
   animation: ringBurst 1800ms cubic-bezier(0, 0, 0.3, 1) infinite;
-}
-
-.label {
-  font-family: var(--font-brand);
-  font-size: 14px;
-  font-weight: 400;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--gray-500);
-  margin: 8px 0 0;
-  text-align: center;
-  white-space: nowrap;
 }
 
 @media (max-width: 767px) {
