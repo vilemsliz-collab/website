@@ -465,7 +465,7 @@ export default function CustomCursor({ tiltRef, configRef }: CursorProps) {
         <div ref={borderRef} className={styles.border} />
         <div ref={contentRef} className={styles.content}>
           <span ref={labelRef} className={styles.label} />
-          <ArrowRightUp className={styles.iconArrow} weight="Broken" aria-hidden />
+          <ArrowRightUp className={styles.iconArrow} weight="LineDuotone" aria-hidden />
         </div>
       </div>
     </div>

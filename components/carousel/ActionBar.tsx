@@ -24,7 +24,7 @@ export default function ActionBar() {
         Contact me
       </a>
       <a href="/cv.pdf" className={s.iconBtn} aria-label="Download CV">
-        <FileText size={22} weight="Broken" aria-hidden />
+        <FileText size={22} weight="LineDuotone" aria-hidden />
       </a>
       <a
         href="https://linkedin.com/in/vilemsliz"
