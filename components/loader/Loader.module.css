@@ -1,8 +1,3 @@
-@keyframes orbIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
-
 @keyframes nameIn {
   from { opacity: 0; }
   to   { opacity: 1; }
@@ -23,13 +18,6 @@
   pointer-events: none;
 }
 
-.orbWrap {
-  position: absolute;
-  inset: 0;
-  opacity: 0;
-  animation: orbIn 0.5s ease forwards;
-}
-
 .name {
   position: absolute;
   top: 50%;
@@ -45,6 +33,4 @@
   opacity: 0;
   animation: nameIn 0.6s ease forwards;
   animation-delay: 0.3s;
-  z-index: 1;
-  mix-blend-mode: multiply;
 }
