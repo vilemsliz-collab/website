@@ -252,7 +252,6 @@ export default function CarouselDOMScene({
         const cursorScaleVal = cursorLevel === 1 ? '1' : cursorLevel === 2 ? '0.667' : '0.444'
 
         if (t.isActive) {
-          group.dataset.caseOpen = caseOpen.current ? 'true' : 'false'
           if (caseOpen.current) {
             group.dataset.cursor = 'card-close'
             delete group.dataset.cursorLabel
@@ -263,7 +262,6 @@ export default function CarouselDOMScene({
             group.dataset.cursorScale = cursorScaleVal
           }
         } else {
-          delete group.dataset.caseOpen
           group.dataset.cursor = 'card'
           group.dataset.cursorLabel = card.isAbout ? labelRef.current : 'open'
           group.dataset.cursorScale = cursorScaleVal

@@ -170,22 +170,6 @@
   padding: 1.5cqw 0 1.5cqw 1.5cqw;
   z-index: 3;
   pointer-events: none;
-  isolation: isolate;
-  transition: opacity 350ms ease;
-}
-
-@keyframes badgeFadeIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
-
-.cardGroup[data-active='true'] .cardAboutBadge {
-  animation: badgeFadeIn 500ms ease both;
-}
-
-.cardGroup[data-case-open='true'] .cardAboutBadge {
-  opacity: 0;
-  transition: opacity 250ms ease;
 }
 
 .cardAboutPhoto {
