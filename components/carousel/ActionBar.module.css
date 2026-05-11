@@ -1,7 +1,7 @@
 .bar {
   position: fixed;
-  bottom: calc(32px + env(safe-area-inset-bottom));
-  left: 50%;
+  bottom: calc(24px + env(safe-area-inset-bottom));
+  left: var(--carousel-cx, 50%);
   transform: translateX(-50%);
   z-index: 100;
   display: flex;
@@ -27,9 +27,9 @@
   border-radius: calc(var(--shape-card) - 10px);
   padding: 16px 36px;
   font-family: var(--font-brand, 'Google Sans Flex', sans-serif);
-  font-size: var(--title-large-size);
-  font-weight: 300;
-  line-height: var(--title-large-line-height);
+  font-size: var(--type-title-large-size);
+  font-weight: var(--type-title-large-weight);
+  line-height: var(--type-title-large-lh);
   text-decoration: none;
   transition: opacity 0.2s;
 }

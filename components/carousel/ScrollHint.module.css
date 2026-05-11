@@ -1,11 +1,11 @@
 @keyframes ringBurst {
-  0%   { width: 34px; height: 34px; opacity: 0.55; }
-  100% { width: 138px; height: 34px; opacity: 0; }
+  0%   { width: 28px; height: 28px; opacity: 0.55; }
+  100% { width: 116px; height: 28px; opacity: 0; }
 }
 
 .wrapper {
   position: fixed;
-  bottom: var(--space-10, 40px);
+  bottom: 120px;
   left: var(--carousel-cx, 50%);
   transform: translateX(-50%);
   display: flex;
@@ -23,8 +23,8 @@
 }
 
 .pill {
-  width: 138px;
-  height: 34px;
+  width: 116px;
+  height: 28px;
   border-radius: var(--shape-pill);
   border: 1.5px solid var(--gray-400);
   position: relative;
