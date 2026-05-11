@@ -20,21 +20,29 @@ class Spring {
 
 type AgentIcon  = 'triaging' | 'intake' | 'risk' | 'custom'
 type TileEntry  = { id: number; type: 'person' | 'agent'; icon?: AgentIcon; col: number; row: number }
-type GridLayout = { cols: number; rows: number; tileSize: number; gap: number; totalCells: number }
 type TileSprings = {
-  sx: Spring; sy: Spring          // FLIP + idle offset (springs to 0)
-  scale: Spring; opacity: Spring  // appear / disappear
-  hsx: Spring; hsy: Spring        // hover push offset
-  hscale: Spring                  // hover scale
+  opacity: Spring  // 0→1 on enter (k=300, d=40)
+  hsx: Spring      // hover push x
+  hsy: Spring      // hover push y
+  hscale: Spring   // hover scale
 }
+type RenderLayout = { tileSize: number; gap: number; offsetX: number; offsetY: number }
 
 // ── Constants ────────────────────────────────────────────────────────────────
 
-const BLOB_COLORS   = ['#aaff00','#00e05c','#00e05c','#00ff2b','#00ff2b','#aaff00','#00e05c','#00ff2b','#00e05c'] as const
+const BLOB_COLORS = ['#aaff00','#00e05c','#00e05c','#00ff2b','#00ff2b','#aaff00','#00e05c','#00ff2b','#00e05c'] as const
 const ICONS: AgentIcon[] = ['triaging', 'intake', 'risk', 'custom']
-const GRAD_SCALE    = 4
-const BLOB_R        = 13
+const GRAD_SCALE   = 4
+const BLOB_R       = 13
 const INITIAL_COUNT = 9
+const DIRS = [[-1,0],[1,0],[0,-1],[0,1]] as const
+
+// Perfect 3×3 seed — center tile first, then cross, then corners
+const INIT_ORDER = [
+  {col:1,row:1},
+  {col:0,row:1},{col:2,row:1},{col:1,row:0},{col:1,row:2},
+  {col:0,row:0},{col:2,row:0},{col:0,row:2},{col:2,row:2},
+] as const
 
 // ── Pure helpers ─────────────────────────────────────────────────────────────
 
@@ -48,74 +56,149 @@ function shuffle<T>(arr: T[]): T[] {
   return arr
 }
 
-function computeLayout(count: number, availW: number, availH: number): GridLayout {
-  if (availW <= 0 || availH <= 0) return { cols: 3, rows: 3, tileSize: 50, gap: 5, totalCells: 9 }
-  const targetCells = Math.ceil(count * 1.3)
-  let cols = Math.max(1, Math.ceil(Math.sqrt(targetCells * (availW / availH))))
-
-  for (let attempt = 0; attempt < 10; attempt++) {
-    const rows    = Math.ceil(targetCells / cols)
-    const gap     = clamp(3, 9, Math.floor(Math.min(availW, availH) * 0.015))
-    const tsW     = Math.floor((availW - gap * (cols - 1)) / cols)
-    const tsH     = rows > 0 ? Math.floor((availH - gap * (rows - 1)) / rows) : tsW
-    const tileSize = Math.min(tsW, tsH)
-    if (tileSize >= 8) return { cols, rows, tileSize, gap, totalCells: cols * rows }
-    cols++
+function computeGridLayout(tiles: TileEntry[], availW: number, availH: number): RenderLayout {
+  const GAP = 9
+  if (!tiles.length || availW <= 0 || availH <= 0) {
+    return { tileSize: 118, gap: GAP, offsetX: 0, offsetY: 0 }
   }
-  // fallback: single row
-  const gap = 4
-  const tileSize = Math.max(8, Math.floor((availW - gap * (count - 1)) / count))
-  return { cols: count, rows: 1, tileSize, gap, totalCells: count }
+  const minC = Math.min(...tiles.map(t => t.col))
+  const maxC = Math.max(...tiles.map(t => t.col))
+  const minR = Math.min(...tiles.map(t => t.row))
+  const maxR = Math.max(...tiles.map(t => t.row))
+  const spanC = maxC - minC + 1, spanR = maxR - minR + 1
+  const tsW = Math.floor((availW - GAP * (spanC - 1)) / spanC)
+  const tsH = Math.floor((availH - GAP * (spanR - 1)) / spanR)
+  const tileSize = clamp(8, 118, Math.min(tsW, tsH))
+  const clW = spanC * (tileSize + GAP) - GAP
+  const clH = spanR * (tileSize + GAP) - GAP
+  return {
+    tileSize, gap: GAP,
+    offsetX: (availW - clW) / 2 - minC * (tileSize + GAP),
+    offsetY: (availH - clH) / 2 - minR * (tileSize + GAP),
+  }
 }
 
-function cellPos(layout: GridLayout, col: number, row: number) {
-  return { x: col * (layout.tileSize + layout.gap), y: row * (layout.tileSize + layout.gap) }
+function cellPos(layout: RenderLayout, col: number, row: number) {
+  return {
+    x: layout.offsetX + col * (layout.tileSize + layout.gap),
+    y: layout.offsetY + row * (layout.tileSize + layout.gap),
+  }
 }
 
+// ratio: lerp 0.33→0.17 as n goes 1→90 (absolute count grows, ratio shrinks)
 function computeAgentCount(n: number): number {
-  return Math.max(0, Math.round(n * 0.33 * (1 - n / 90)))
+  const t = clamp(0, 1, (n - 1) / 89)
+  return Math.max(0, Math.round(n * (0.33 - 0.16 * t)))
+}
+
+function occupiedSet(tiles: TileEntry[]): Set<string> {
+  return new Set(tiles.map(t => `${t.col},${t.row}`))
+}
+
+function getFrontier(tiles: TileEntry[]): {col: number; row: number}[] {
+  const occ = occupiedSet(tiles)
+  const result = new Map<string, {col: number; row: number}>()
+  tiles.forEach(t => {
+    DIRS.forEach(([dc, dr]) => {
+      const key = `${t.col + dc},${t.row + dr}`
+      if (!occ.has(key)) result.set(key, {col: t.col + dc, row: t.row + dr})
+    })
+  })
+  return [...result.values()]
+}
+
+function getEdge(tiles: TileEntry[]): TileEntry[] {
+  const occ = occupiedSet(tiles)
+  return tiles.filter(t =>
+    DIRS.some(([dc, dr]) => !occ.has(`${t.col + dc},${t.row + dr}`))
+  )
 }
 
 let _nextId = 1
 
-function makeArrangement(count: number, layout: GridLayout, prevTiles?: TileEntry[]): TileEntry[] {
-  const nAgents = computeAgentCount(count)
-  const nPeople = count - nAgents
+function makeArrangement(count: number, prevTiles?: TileEntry[], mode?: 'randomize'): TileEntry[] {
+  if (!prevTiles || mode === 'randomize') {
+    // Fresh arrangement — grow from INIT_ORDER seed
+    const nAgents = computeAgentCount(count)
+    const pool: {type: 'person'|'agent'; icon?: AgentIcon}[] = []
+    for (let i = 0; i < count - nAgents; i++) pool.push({type: 'person'})
+    for (let i = 0; i < nAgents; i++) pool.push({type: 'agent', icon: ICONS[i % 4]})
+    shuffle(pool)
 
-  const pool: { type: 'person' | 'agent'; icon?: AgentIcon }[] = []
-  for (let i = 0; i < nPeople; i++) pool.push({ type: 'person' })
-  for (let i = 0; i < nAgents; i++) pool.push({ type: 'agent', icon: ICONS[i % 4] })
-  shuffle(pool)
+    const positions: {col: number; row: number}[] = []
+    const occ = new Set<string>()
 
-  const allCells = Array.from({ length: layout.totalCells }, (_, i) => i)
-  shuffle(allCells)
-  const chosen = allCells.slice(0, count).sort((a, b) => a - b)
+    // Seed with INIT_ORDER
+    const seedCount = Math.min(count, 9)
+    for (let i = 0; i < seedCount; i++) {
+      positions.push(INIT_ORDER[i])
+      occ.add(`${INIT_ORDER[i].col},${INIT_ORDER[i].row}`)
+    }
 
-  const prevIds = prevTiles?.map(t => t.id) ?? []
+    // Expand frontier for count > 9
+    for (let i = seedCount; i < count; i++) {
+      const frontier = [...new Map(
+        positions.flatMap(p =>
+          DIRS.map(([dc, dr]) => {
+            const key = `${p.col+dc},${p.row+dr}`
+            return occ.has(key) ? null : [key, {col: p.col+dc, row: p.row+dr}] as [string, {col:number;row:number}]
+          }).filter(Boolean) as [string, {col:number;row:number}][]
+        )
+      ).values()]
+      if (!frontier.length) break
+      const cell = frontier[Math.floor(Math.random() * frontier.length)]
+      positions.push(cell)
+      occ.add(`${cell.col},${cell.row}`)
+    }
 
-  return chosen.map((cellIndex, i) => ({
-    id:   prevIds[i] ?? _nextId++,
-    type: pool[i].type,
-    icon: pool[i].icon,
-    col:  cellIndex % layout.cols,
-    row:  Math.floor(cellIndex / layout.cols),
-  }))
+    return positions.slice(0, count).map((pos, i) => ({
+      id: _nextId++, type: pool[i].type, icon: pool[i].icon, col: pos.col, row: pos.row,
+    }))
+  }
+
+  if (count > prevTiles.length) {
+    // Grow: add frontier cells, assign types to maintain target ratio
+    const currentAgents = prevTiles.filter(t => t.type === 'agent').length
+    const targetAgents  = computeAgentCount(count)
+    const toAdd    = count - prevTiles.length
+    const addAgents = clamp(0, toAdd, targetAgents - currentAgents)
+    const newPool: {type: 'person'|'agent'; icon?: AgentIcon}[] = []
+    for (let i = 0; i < toAdd - addAgents; i++) newPool.push({type: 'person'})
+    for (let i = 0; i < addAgents; i++) newPool.push({type: 'agent', icon: ICONS[(currentAgents + i) % 4]})
+    shuffle(newPool)
+
+    let tiles = prevTiles
+    for (let i = 0; i < toAdd; i++) {
+      const frontier = getFrontier(tiles)
+      if (!frontier.length) break
+      const cell = frontier[Math.floor(Math.random() * frontier.length)]
+      tiles = [...tiles, {id: _nextId++, ...newPool[i], col: cell.col, row: cell.row}]
+    }
+    return tiles
+  }
+
+  if (count < prevTiles.length) {
+    // Shrink: remove edge tiles
+    let tiles = [...prevTiles]
+    while (tiles.length > count) {
+      const edge = getEdge(tiles)
+      if (!edge.length) break
+      const victim = edge[Math.floor(Math.random() * edge.length)]
+      tiles = tiles.filter(t => t !== victim)
+    }
+    return tiles
+  }
+
+  return prevTiles
 }
 
 function makeSprings(): TileSprings {
-  const sp: TileSprings = {
-    sx:      new Spring(180, 28),
-    sy:      new Spring(180, 28),
-    scale:   new Spring(140, 22),
-    opacity: new Spring(80,  18),
+  return {
+    opacity: new Spring(300, 40),
     hsx:     new Spring(160, 40),
     hsy:     new Spring(160, 40),
     hscale:  new Spring(100, 40),
   }
-  sp.scale.value   = sp.scale.target   = 1
-  sp.opacity.value = sp.opacity.target = 1
-  sp.hscale.value  = sp.hscale.target  = 1
-  return sp
 }
 
 // ── Component ─────────────────────────────────────────────────────────────────
@@ -127,7 +210,7 @@ export default function AgentsGridCanvas() {
   const blobRefs     = useRef<HTMLDivElement[]>([])
   const tileRefs     = useRef<Map<number, HTMLDivElement>>(new Map())
   const springsMap   = useRef<Map<number, TileSprings>>(new Map())
-  const layoutRef    = useRef<GridLayout | null>(null)
+  const layoutRef    = useRef<RenderLayout>({ tileSize: 118, gap: 9, offsetX: 0, offsetY: 0 })
   const tilesRef     = useRef<TileEntry[]>([])
   const countRef     = useRef(INITIAL_COUNT)
   const containerRef = useRef({ w: 0, h: 0 })
@@ -136,67 +219,32 @@ export default function AgentsGridCanvas() {
   const rafRef       = useRef(0)
   const lastTime     = useRef(0)
   const isVisible    = useRef(true)
-  const pendingFlip  = useRef<Map<number, { x: number; y: number }> | null>(null)
 
-  const initLayout = computeLayout(INITIAL_COUNT, 900, 500)
-  const [layout,    setLayout]    = useState<GridLayout>(initLayout)
-  const [tiles,     setTiles]     = useState<TileEntry[]>(() => makeArrangement(INITIAL_COUNT, initLayout))
+  const [tiles,     setTiles]     = useState<TileEntry[]>(() => makeArrangement(INITIAL_COUNT))
   const [tileCount, setTileCount] = useState(INITIAL_COUNT)
 
-  // Keep refs in sync with state
-  useEffect(() => { layoutRef.current = layout }, [layout])
-  useEffect(() => { tilesRef.current  = tiles  }, [tiles])
-  useEffect(() => { countRef.current  = tileCount }, [tileCount])
-
-  // ── Step 1: ensure springs exist for every tile after a render ────────────
+  // ── Sync tiles ref + create/prune springs synchronously before paint ──────
   useLayoutEffect(() => {
+    tilesRef.current = tiles
+    countRef.current = tileCount
+
     tiles.forEach(tile => {
       if (!springsMap.current.has(tile.id)) {
-        springsMap.current.set(tile.id, makeSprings())
+        const sp = makeSprings()
+        sp.opacity.value = 0   // fade in
+        sp.hscale.value  = sp.hscale.target = 1
+        springsMap.current.set(tile.id, sp)
       }
     })
-    // Prune stale springs
     const live = new Set(tiles.map(t => t.id))
     springsMap.current.forEach((_, id) => { if (!live.has(id)) springsMap.current.delete(id) })
-  }, [tiles])
-
-  // ── Step 2: apply FLIP offsets after DOM update ───────────────────────────
-  useLayoutEffect(() => {
-    const snapshot = pendingFlip.current
-    if (!snapshot) return
-    pendingFlip.current = null
-
-    const gridArea = gridAreaRef.current
-    const layout   = layoutRef.current
-    if (!gridArea || !layout) return
-    const gridRect = gridArea.getBoundingClientRect()
-
-    tiles.forEach(tile => {
-      const sp = springsMap.current.get(tile.id)
-      if (!sp) return
-      const pos   = cellPos(layout, tile.col, tile.row)
-      const newX  = gridRect.left + pos.x
-      const newY  = gridRect.top  + pos.y
-      const oldPos = snapshot.get(tile.id)
-
-      if (oldPos) {
-        // FLIP: start at old screen position, spring to new
-        sp.sx.value = oldPos.x - newX;  sp.sx.target = 0;  sp.sx.velocity = 0
-        sp.sy.value = oldPos.y - newY;  sp.sy.target = 0;  sp.sy.velocity = 0
-      } else {
-        // New tile: pop in
-        sp.scale.value = 0.6;  sp.scale.target  = 1;  sp.scale.velocity  = 0
-        sp.opacity.value = 0;  sp.opacity.target = 1;  sp.opacity.velocity = 0
-      }
-    })
-  }, [tiles])
+  }, [tiles, tileCount])
 
   // ── RAF loop (mounted once) ───────────────────────────────────────────────
   useEffect(() => {
     const wrapper = wrapperRef.current!
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
-    // Gradient blob state — lives inside this closure
     const mapX = new Spring(28, 9)
     const mapY = new Spring(28, 9)
     mapX.value = mapX.target = 450
@@ -217,27 +265,30 @@ export default function AgentsGridCanvas() {
       lastTime.current = now
       const tw  = now / 1000
       const TAU = Math.PI * 2
-      const lay = layoutRef.current
       const { w: availW, h: availH } = containerRef.current
+      const currentTiles = tilesRef.current
+
+      // Recompute layout each frame from current tiles + container
+      const layout = computeGridLayout(currentTiles, availW, availH)
+      layoutRef.current = layout
+
+      // Push tile size to CSS for width/height/border-radius
+      const ga = gridAreaRef.current
+      if (ga) ga.style.setProperty('--tile-size', `${layout.tileSize}px`)
 
       // ── Tiles ──
-      if (lay) {
-        tilesRef.current.forEach(tile => {
-          const el = tileRefs.current.get(tile.id)
-          const sp = springsMap.current.get(tile.id)
-          if (!el || !sp) return
-          sp.sx.tick(dt); sp.sy.tick(dt)
-          sp.scale.tick(dt); sp.opacity.tick(dt)
-          sp.hsx.tick(dt); sp.hsy.tick(dt); sp.hscale.tick(dt)
+      currentTiles.forEach(tile => {
+        const el = tileRefs.current.get(tile.id)
+        const sp = springsMap.current.get(tile.id)
+        if (!el || !sp) return
+        sp.opacity.tick(dt); sp.hsx.tick(dt); sp.hsy.tick(dt); sp.hscale.tick(dt)
 
-          const pos = cellPos(lay, tile.col, tile.row)
-          const tx  = pos.x + sp.sx.value + sp.hsx.value
-          const ty  = pos.y + sp.sy.value + sp.hsy.value
-          const sc  = sp.scale.value * sp.hscale.value
-          el.style.transform = `translate3d(${tx.toFixed(2)}px,${ty.toFixed(2)}px,0) scale(${sc.toFixed(4)})`
-          el.style.opacity   = sp.opacity.value.toFixed(3)
-        })
-      }
+        const pos = cellPos(layout, tile.col, tile.row)
+        const tx  = pos.x + sp.hsx.value
+        const ty  = pos.y + sp.hsy.value
+        el.style.transform = `translate3d(${tx.toFixed(2)}px,${ty.toFixed(2)}px,0) scale(${sp.hscale.value.toFixed(4)})`
+        el.style.opacity   = sp.opacity.value.toFixed(3)
+      })
 
       // ── Gradient blobs ──
       const wander = Math.min(availW, availH) * 0.45
@@ -287,14 +338,6 @@ export default function AgentsGridCanvas() {
     const ro = new ResizeObserver(entries => {
       const { width: w, height: h } = entries[0].contentRect
       containerRef.current = { w, h }
-      const newLayout = computeLayout(countRef.current, w, h)
-      layoutRef.current = newLayout
-      setLayout(newLayout)
-      // Re-seat tiles if grid dimensions changed (out-of-bounds guard)
-      setTiles(prev => {
-        const oob = prev.some(t => t.col >= newLayout.cols || t.row >= newLayout.rows)
-        return oob ? makeArrangement(countRef.current, newLayout, prev) : prev
-      })
     })
     ro.observe(gridArea)
     return () => ro.disconnect()
@@ -308,7 +351,7 @@ export default function AgentsGridCanvas() {
     const off: (() => void)[] = []
     let staggerIds: ReturnType<typeof setTimeout>[] = []
     let resetId:    ReturnType<typeof setTimeout> | null = null
-    const snap = tilesRef.current  // stable snapshot of current tiles
+    const snap = tilesRef.current
 
     snap.forEach(tile => {
       const el = tileRefs.current.get(tile.id)
@@ -320,10 +363,8 @@ export default function AgentsGridCanvas() {
         isHovering.current = true
 
         const lay = layoutRef.current
-        if (lay) {
-          const pos = cellPos(lay, tile.col, tile.row)
-          hoverTarget.current = { x: pos.x + lay.tileSize / 2, y: pos.y + lay.tileSize / 2 }
-        }
+        const pos = cellPos(lay, tile.col, tile.row)
+        hoverTarget.current = { x: pos.x + lay.tileSize / 2, y: pos.y + lay.tileSize / 2 }
 
         snap.forEach(other => {
           const sp = springsMap.current.get(other.id)
@@ -380,42 +421,21 @@ export default function AgentsGridCanvas() {
     }
   }, [tiles])
 
-  // ── Helpers to capture positions and update state ─────────────────────────
-  function snapPositions() {
-    const lay = layoutRef.current
-    const ga  = gridAreaRef.current
-    if (!lay || !ga) return
-    const rect = ga.getBoundingClientRect()
-    const snap = new Map<number, { x: number; y: number }>()
-    tilesRef.current.forEach(tile => {
-      const pos = cellPos(lay, tile.col, tile.row)
-      snap.set(tile.id, { x: rect.left + pos.x, y: rect.top + pos.y })
-    })
-    pendingFlip.current = snap
-  }
-
+  // ── Handlers ─────────────────────────────────────────────────────────────
   const handleCountChange = useCallback((n: number) => {
-    snapPositions()
-    const { w, h } = containerRef.current
-    const newLayout = computeLayout(n, w, h)
-    layoutRef.current = newLayout
     setTileCount(n)
-    setLayout(newLayout)
-    setTiles(makeArrangement(n, newLayout, tilesRef.current))
+    setTiles(prev => makeArrangement(n, prev))
   }, [])
 
   const handleRandomize = useCallback(() => {
-    snapPositions()
-    const lay = layoutRef.current
-    if (!lay) return
-    setTiles(makeArrangement(countRef.current, lay, tilesRef.current))
+    // Fade out all, then rebuild
+    springsMap.current.forEach(sp => sp.opacity.setTarget(0))
+    setTimeout(() => {
+      setTiles(makeArrangement(countRef.current, undefined, 'randomize'))
+    }, 220)
   }, [])
 
   // ── Render ────────────────────────────────────────────────────────────────
-  const radius    = Math.round(layout.tileSize * 0.20)
-  const radiusAgt = Math.round(layout.tileSize * 0.24)
-  const iconSize  = Math.round(layout.tileSize * 0.64)
-
   return (
     <>
       <svg width="0" height="0" style={{ position: 'absolute' }} aria-hidden="true">
@@ -448,16 +468,10 @@ export default function AgentsGridCanvas() {
         ref={wrapperRef}
         className={s.wrapper}
       >
-        {/* Grid area */}
         <div ref={gridAreaRef} className={s.gridArea}>
           <div ref={gradRef} className={s.gradientMap} aria-hidden="true">
             {BLOB_COLORS.map((color, i) => (
-              <div
-                key={i}
-                ref={el => { if (el) blobRefs.current[i] = el }}
-                className={s.blob}
-                style={{ background: color }}
-              />
+              <div key={i} ref={el => { if (el) blobRefs.current[i] = el }} className={s.blob} style={{ background: color }} />
             ))}
           </div>
 
@@ -466,14 +480,9 @@ export default function AgentsGridCanvas() {
               key={tile.id}
               ref={el => { if (el) tileRefs.current.set(tile.id, el); else tileRefs.current.delete(tile.id) }}
               className={tile.type === 'person' ? `${s.tile} ${s.tilePerson}` : `${s.tile} ${s.tileAgent}`}
-              style={{
-                width:        layout.tileSize,
-                height:       layout.tileSize,
-                borderRadius: tile.type === 'agent' ? radiusAgt : radius,
-              }}
             >
               {tile.type === 'agent' && tile.icon && (
-                <svg width={iconSize} height={iconSize} viewBox="0 0 76 76" className={s.tileAgentSvg} aria-hidden="true">
+                <svg width="64%" height="64%" viewBox="0 0 76 76" className={s.tileAgentSvg} aria-hidden="true">
                   <use href={`#ag-${tile.icon}`} />
                 </svg>
               )}
@@ -481,7 +490,6 @@ export default function AgentsGridCanvas() {
           ))}
         </div>
 
-        {/* Controls */}
         <div className={s.controls}>
           <span className={s.count}>{tileCount}</span>
           <input

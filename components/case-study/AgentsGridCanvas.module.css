@@ -10,7 +10,6 @@
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  justify-content: flex-start;
 }
 
 /* ── Grid area ─────────────────────────────────────────────────────────────── */
@@ -45,7 +44,7 @@
   transform: translate3d(0, 0, 0);
 }
 
-/* ── Tiles (absolutely positioned) ─────────────────────────────────────────── */
+/* ── Tiles ──────────────────────────────────────────────────────────────────── */
 
 .tile {
   position: absolute;
@@ -53,11 +52,14 @@
   z-index: 1;
   cursor: pointer;
   will-change: transform, opacity;
+  width:  var(--tile-size, 118px);
+  height: var(--tile-size, 118px);
 }
 
 .tilePerson {
+  background: #f2f5fa;
+  border-radius: calc(var(--tile-size, 118px) * 0.20);
   overflow: hidden;
-  background: #bfc7d9;
 }
 
 .tilePerson img {
@@ -66,14 +68,11 @@
   object-fit: cover;
   object-position: center top;
   display: block;
-  transition: transform 500ms cubic-bezier(.23, 1, .32, 1);
 }
 
-.tilePerson:hover img { transform: scale(1.10); }
-
 .tileAgent {
-  background: #ffffff;
-  border: 3px solid #00e05c;
+  background: linear-gradient(135deg, #aaff00 0%, #00e05c 50%, #00ff2b 100%);
+  border-radius: calc(var(--tile-size, 118px) * 0.24);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -81,7 +80,7 @@
 
 .tileAgentSvg {
   display: block;
-  color: #00e05c;
+  color: #ffffff;
   flex-shrink: 0;
 }
 
@@ -159,5 +158,4 @@
 
 @media (prefers-reduced-motion: reduce) {
   .tile { will-change: auto !important; }
-  .tilePerson img { transition: none !important; }
 }
