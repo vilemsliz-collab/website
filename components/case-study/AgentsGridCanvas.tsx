@@ -231,8 +231,9 @@ export default function AgentsGridCanvas() {
     tiles.forEach(tile => {
       if (!springsMap.current.has(tile.id)) {
         const sp = makeSprings()
-        sp.opacity.value = 0   // fade in
-        sp.hscale.value  = sp.hscale.target = 1
+        sp.opacity.value  = 0
+        sp.opacity.target = 1
+        sp.hscale.value   = sp.hscale.target = 1
         springsMap.current.set(tile.id, sp)
       }
     })
