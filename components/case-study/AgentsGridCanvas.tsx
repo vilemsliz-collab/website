@@ -1,9 +1,9 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useState, useEffect, useLayoutEffect, useRef, useCallback } from 'react'
 import s from './AgentsGridCanvas.module.css'
 
-// ── Spring ──────────────────────────────────────────────────────────────────
+// ── Spring ───────────────────────────────────────────────────────────────────
 
 class Spring {
   value = 0; target = 0; velocity = 0
@@ -14,59 +14,193 @@ class Spring {
     this.velocity += f * dt
     this.value    += this.velocity * dt
   }
-  get settled() {
-    return Math.abs(this.value - this.target) < 0.001 && Math.abs(this.velocity) < 0.001
+}
+
+// ── Types ────────────────────────────────────────────────────────────────────
+
+type AgentIcon  = 'triaging' | 'intake' | 'risk' | 'custom'
+type TileEntry  = { id: number; type: 'person' | 'agent'; icon?: AgentIcon; col: number; row: number }
+type GridLayout = { cols: number; rows: number; tileSize: number; gap: number; totalCells: number }
+type TileSprings = {
+  sx: Spring; sy: Spring          // FLIP + idle offset (springs to 0)
+  scale: Spring; opacity: Spring  // appear / disappear
+  hsx: Spring; hsy: Spring        // hover push offset
+  hscale: Spring                  // hover scale
+}
+
+// ── Constants ────────────────────────────────────────────────────────────────
+
+const BLOB_COLORS   = ['#aaff00','#00e05c','#00e05c','#00ff2b','#00ff2b','#aaff00','#00e05c','#00ff2b','#00e05c'] as const
+const ICONS: AgentIcon[] = ['triaging', 'intake', 'risk', 'custom']
+const GRAD_SCALE    = 4
+const BLOB_R        = 13
+const INITIAL_COUNT = 9
+
+// ── Pure helpers ─────────────────────────────────────────────────────────────
+
+function clamp(min: number, max: number, v: number) { return Math.max(min, Math.min(max, v)) }
+
+function shuffle<T>(arr: T[]): T[] {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[arr[i], arr[j]] = [arr[j], arr[i]]
   }
+  return arr
 }
 
-// ── Constants ───────────────────────────────────────────────────────────────
+function computeLayout(count: number, availW: number, availH: number): GridLayout {
+  if (availW <= 0 || availH <= 0) return { cols: 3, rows: 3, tileSize: 50, gap: 5, totalCells: 9 }
+  const targetCells = Math.ceil(count * 1.3)
+  let cols = Math.max(1, Math.ceil(Math.sqrt(targetCells * (availW / availH))))
 
-const GRID_W      = 372
-const GRID_H      = 372
-const TILE_PITCH  = 127   // 118px tile + 9px gap
-const TILE_HALF   = 59    // 118 / 2
-const WANDER_AMP  = GRID_W * 0.38
-const GRAD_SCALE  = 4
-const BLOB_R      = 13    // 26px div → visually ~50px apparent radius after blur + scale
-const BLOB_COLORS = ['#aaff00','#00e05c','#00e05c','#00ff2b','#00ff2b','#aaff00','#00e05c','#00ff2b','#00e05c'] as const
-
-const CFG = { hoverScale: 1.05, pushPx: 16, stagger: 30, hoverK: 100, hoverD: 40, moveK: 160, moveD: 40 }
-
-type AgentIcon = 'triaging' | 'intake' | 'risk' | 'custom'
-type TileData  = { kind: 'person' } | { kind: 'agent'; icon: AgentIcon }
-
-const TILES: TileData[] = [
-  { kind: 'person'                  }, { kind: 'agent', icon: 'triaging' }, { kind: 'person'                },
-  { kind: 'agent', icon: 'intake'   }, { kind: 'person'                  }, { kind: 'agent', icon: 'risk'   },
-  { kind: 'person'                  }, { kind: 'agent', icon: 'custom'   }, { kind: 'person'                },
-]
-
-function manhattan(ar: number, ac: number, br: number, bc: number) {
-  return Math.abs(ar - br) + Math.abs(ac - bc)
+  for (let attempt = 0; attempt < 10; attempt++) {
+    const rows    = Math.ceil(targetCells / cols)
+    const gap     = clamp(3, 9, Math.floor(Math.min(availW, availH) * 0.015))
+    const tsW     = Math.floor((availW - gap * (cols - 1)) / cols)
+    const tsH     = rows > 0 ? Math.floor((availH - gap * (rows - 1)) / rows) : tsW
+    const tileSize = Math.min(tsW, tsH)
+    if (tileSize >= 8) return { cols, rows, tileSize, gap, totalCells: cols * rows }
+    cols++
+  }
+  // fallback: single row
+  const gap = 4
+  const tileSize = Math.max(8, Math.floor((availW - gap * (count - 1)) / count))
+  return { cols: count, rows: 1, tileSize, gap, totalCells: count }
 }
 
-// ── Component ───────────────────────────────────────────────────────────────
+function cellPos(layout: GridLayout, col: number, row: number) {
+  return { x: col * (layout.tileSize + layout.gap), y: row * (layout.tileSize + layout.gap) }
+}
+
+function computeAgentCount(n: number): number {
+  return Math.max(0, Math.round(n * 0.33 * (1 - n / 90)))
+}
+
+let _nextId = 1
+
+function makeArrangement(count: number, layout: GridLayout, prevTiles?: TileEntry[]): TileEntry[] {
+  const nAgents = computeAgentCount(count)
+  const nPeople = count - nAgents
+
+  const pool: { type: 'person' | 'agent'; icon?: AgentIcon }[] = []
+  for (let i = 0; i < nPeople; i++) pool.push({ type: 'person' })
+  for (let i = 0; i < nAgents; i++) pool.push({ type: 'agent', icon: ICONS[i % 4] })
+  shuffle(pool)
+
+  const allCells = Array.from({ length: layout.totalCells }, (_, i) => i)
+  shuffle(allCells)
+  const chosen = allCells.slice(0, count).sort((a, b) => a - b)
+
+  const prevIds = prevTiles?.map(t => t.id) ?? []
+
+  return chosen.map((cellIndex, i) => ({
+    id:   prevIds[i] ?? _nextId++,
+    type: pool[i].type,
+    icon: pool[i].icon,
+    col:  cellIndex % layout.cols,
+    row:  Math.floor(cellIndex / layout.cols),
+  }))
+}
+
+function makeSprings(): TileSprings {
+  const sp: TileSprings = {
+    sx:      new Spring(180, 28),
+    sy:      new Spring(180, 28),
+    scale:   new Spring(140, 22),
+    opacity: new Spring(80,  18),
+    hsx:     new Spring(160, 40),
+    hsy:     new Spring(160, 40),
+    hscale:  new Spring(100, 40),
+  }
+  sp.scale.value   = sp.scale.target   = 1
+  sp.opacity.value = sp.opacity.target = 1
+  sp.hscale.value  = sp.hscale.target  = 1
+  return sp
+}
+
+// ── Component ─────────────────────────────────────────────────────────────────
 
 export default function AgentsGridCanvas() {
-  const wrapperRef = useRef<HTMLDivElement>(null)
-  const gridRef    = useRef<HTMLDivElement>(null)
-  const gradRef    = useRef<HTMLDivElement>(null)
-  const tileRefs   = useRef<HTMLDivElement[]>([])
-  const blobRefs   = useRef<HTMLDivElement[]>([])
+  const wrapperRef   = useRef<HTMLDivElement>(null)
+  const gridAreaRef  = useRef<HTMLDivElement>(null)
+  const gradRef      = useRef<HTMLDivElement>(null)
+  const blobRefs     = useRef<HTMLDivElement[]>([])
+  const tileRefs     = useRef<Map<number, HTMLDivElement>>(new Map())
+  const springsMap   = useRef<Map<number, TileSprings>>(new Map())
+  const layoutRef    = useRef<GridLayout | null>(null)
+  const tilesRef     = useRef<TileEntry[]>([])
+  const countRef     = useRef(INITIAL_COUNT)
+  const containerRef = useRef({ w: 0, h: 0 })
+  const isHovering   = useRef(false)
+  const hoverTarget  = useRef<{ x: number; y: number } | null>(null)
+  const rafRef       = useRef(0)
+  const lastTime     = useRef(0)
+  const isVisible    = useRef(true)
+  const pendingFlip  = useRef<Map<number, { x: number; y: number }> | null>(null)
 
+  const initLayout = computeLayout(INITIAL_COUNT, 900, 500)
+  const [layout,    setLayout]    = useState<GridLayout>(initLayout)
+  const [tiles,     setTiles]     = useState<TileEntry[]>(() => makeArrangement(INITIAL_COUNT, initLayout))
+  const [tileCount, setTileCount] = useState(INITIAL_COUNT)
+
+  // Keep refs in sync with state
+  useEffect(() => { layoutRef.current = layout }, [layout])
+  useEffect(() => { tilesRef.current  = tiles  }, [tiles])
+  useEffect(() => { countRef.current  = tileCount }, [tileCount])
+
+  // ── Step 1: ensure springs exist for every tile after a render ────────────
+  useLayoutEffect(() => {
+    tiles.forEach(tile => {
+      if (!springsMap.current.has(tile.id)) {
+        springsMap.current.set(tile.id, makeSprings())
+      }
+    })
+    // Prune stale springs
+    const live = new Set(tiles.map(t => t.id))
+    springsMap.current.forEach((_, id) => { if (!live.has(id)) springsMap.current.delete(id) })
+  }, [tiles])
+
+  // ── Step 2: apply FLIP offsets after DOM update ───────────────────────────
+  useLayoutEffect(() => {
+    const snapshot = pendingFlip.current
+    if (!snapshot) return
+    pendingFlip.current = null
+
+    const gridArea = gridAreaRef.current
+    const layout   = layoutRef.current
+    if (!gridArea || !layout) return
+    const gridRect = gridArea.getBoundingClientRect()
+
+    tiles.forEach(tile => {
+      const sp = springsMap.current.get(tile.id)
+      if (!sp) return
+      const pos   = cellPos(layout, tile.col, tile.row)
+      const newX  = gridRect.left + pos.x
+      const newY  = gridRect.top  + pos.y
+      const oldPos = snapshot.get(tile.id)
+
+      if (oldPos) {
+        // FLIP: start at old screen position, spring to new
+        sp.sx.value = oldPos.x - newX;  sp.sx.target = 0;  sp.sx.velocity = 0
+        sp.sy.value = oldPos.y - newY;  sp.sy.target = 0;  sp.sy.velocity = 0
+      } else {
+        // New tile: pop in
+        sp.scale.value = 0.6;  sp.scale.target  = 1;  sp.scale.velocity  = 0
+        sp.opacity.value = 0;  sp.opacity.target = 1;  sp.opacity.velocity = 0
+      }
+    })
+  }, [tiles])
+
+  // ── RAF loop (mounted once) ───────────────────────────────────────────────
   useEffect(() => {
     const wrapper = wrapperRef.current!
-    const grid    = gridRef.current!
-    const blobEls = blobRefs.current
-    const tileEls = tileRefs.current
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
-    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-
-    // ── Gradient springs ──────────────────────────────────────────────────
+    // Gradient blob state — lives inside this closure
     const mapX = new Spring(28, 9)
     const mapY = new Spring(28, 9)
-    mapX.value = mapX.target = GRID_W / 2
-    mapY.value = mapY.target = GRID_H / 2
+    mapX.value = mapX.target = 450
+    mapY.value = mapY.target = 250
 
     const spots = Array.from({ length: 9 }, (_, i) => {
       const sprX = new Spring(12, 5)
@@ -78,140 +212,209 @@ export default function AgentsGridCanvas() {
       return { sprX, sprY, nextRetarget: 0 }
     })
 
-    // ── Tile springs ──────────────────────────────────────────────────────
-    const tileSprings = TILES.map(() => {
-      const hover = new Spring(CFG.hoverK, CFG.hoverD)
-      hover.value = 1; hover.target = 1
-      return { hover, sx: new Spring(CFG.moveK, CFG.moveD), sy: new Spring(CFG.moveK, CFG.moveD) }
-    })
-
-    let isHovering = false
-    let isVisible  = true
-    let rafId      = 0
-    let lastTime   = 0
-
-    // ── RAF loop ──────────────────────────────────────────────────────────
     function loop(now: number) {
-      const dt = lastTime === 0 ? 1 / 60 : Math.max(1 / 240, Math.min(1 / 30, (now - lastTime) / 1000))
-      lastTime = now
+      const dt  = lastTime.current === 0 ? 1 / 60 : clamp(1 / 240, 1 / 30, (now - lastTime.current) / 1000)
+      lastTime.current = now
       const tw  = now / 1000
       const TAU = Math.PI * 2
+      const lay = layoutRef.current
+      const { w: availW, h: availH } = containerRef.current
 
-      tileSprings.forEach(({ hover, sx, sy }, i) => {
-        hover.tick(dt); sx.tick(dt); sy.tick(dt)
-        const el = tileEls[i]
-        if (el) el.style.transform = `translate(${sx.value.toFixed(2)}px,${sy.value.toFixed(2)}px) scale(${hover.value.toFixed(4)})`
-      })
+      // ── Tiles ──
+      if (lay) {
+        tilesRef.current.forEach(tile => {
+          const el = tileRefs.current.get(tile.id)
+          const sp = springsMap.current.get(tile.id)
+          if (!el || !sp) return
+          sp.sx.tick(dt); sp.sy.tick(dt)
+          sp.scale.tick(dt); sp.opacity.tick(dt)
+          sp.hsx.tick(dt); sp.hsy.tick(dt); sp.hscale.tick(dt)
 
-      if (!isHovering) {
-        mapX.setTarget(GRID_W / 2 + Math.sin(tw * 0.13 * TAU) * WANDER_AMP)
-        mapY.setTarget(GRID_H / 2 + Math.sin(tw * 0.097 * TAU + 1.3) * WANDER_AMP)
+          const pos = cellPos(lay, tile.col, tile.row)
+          const tx  = pos.x + sp.sx.value + sp.hsx.value
+          const ty  = pos.y + sp.sy.value + sp.hsy.value
+          const sc  = sp.scale.value * sp.hscale.value
+          el.style.transform = `translate3d(${tx.toFixed(2)}px,${ty.toFixed(2)}px,0) scale(${sc.toFixed(4)})`
+          el.style.opacity   = sp.opacity.value.toFixed(3)
+        })
+      }
+
+      // ── Gradient blobs ──
+      const wander = Math.min(availW, availH) * 0.45
+      if (!isHovering.current) {
+        mapX.setTarget(availW / 2 + Math.sin(tw * 0.13 * TAU) * wander)
+        mapY.setTarget(availH / 2 + Math.sin(tw * 0.097 * TAU + 1.3) * wander)
+      } else if (hoverTarget.current) {
+        mapX.setTarget(hoverTarget.current.x)
+        mapY.setTarget(hoverTarget.current.y)
       }
       mapX.tick(dt); mapY.tick(dt)
 
-      const ampPulse = 90 + Math.sin(tw * 0.11 * TAU + 0.7) * 15
+      const amp = wander * 0.35 * (1 + Math.sin(tw * 0.11 * TAU + 0.7) * 0.15)
       spots.forEach((sp, i) => {
         if (tw > sp.nextRetarget) {
-          sp.sprX.setTarget((Math.random() - 0.5) * 2 * ampPulse)
-          sp.sprY.setTarget((Math.random() - 0.5) * 2 * ampPulse)
+          sp.sprX.setTarget((Math.random() - 0.5) * 2 * amp)
+          sp.sprY.setTarget((Math.random() - 0.5) * 2 * amp)
           sp.nextRetarget = tw + 3 + Math.random() * 5
         }
         sp.sprX.tick(dt); sp.sprY.tick(dt)
         const bx = (mapX.value + sp.sprX.value - BLOB_R) / GRAD_SCALE
         const by = (mapY.value + sp.sprY.value - BLOB_R) / GRAD_SCALE
-        const el = blobEls[i]
+        const el = blobRefs.current[i]
         if (el) el.style.transform = `translate3d(${bx.toFixed(2)}px,${by.toFixed(2)}px,0)`
       })
 
-      rafId = requestAnimationFrame(loop)
+      rafRef.current = requestAnimationFrame(loop)
     }
 
-    // ── Hover interactions ─────────────────────────────────────────────────
+    const io = new IntersectionObserver(entries => {
+      const v = entries[0].isIntersecting
+      if (v === isVisible.current) return
+      isVisible.current = v
+      if (v) { lastTime.current = 0; rafRef.current = requestAnimationFrame(loop) }
+      else { cancelAnimationFrame(rafRef.current); rafRef.current = 0 }
+    }, { threshold: 0 })
+    io.observe(wrapper)
+
+    if (!reduced) rafRef.current = requestAnimationFrame(loop)
+    return () => { cancelAnimationFrame(rafRef.current); io.disconnect() }
+  }, [])
+
+  // ── ResizeObserver ────────────────────────────────────────────────────────
+  useEffect(() => {
+    const gridArea = gridAreaRef.current
+    if (!gridArea) return
+    const ro = new ResizeObserver(entries => {
+      const { width: w, height: h } = entries[0].contentRect
+      containerRef.current = { w, h }
+      const newLayout = computeLayout(countRef.current, w, h)
+      layoutRef.current = newLayout
+      setLayout(newLayout)
+      // Re-seat tiles if grid dimensions changed (out-of-bounds guard)
+      setTiles(prev => {
+        const oob = prev.some(t => t.col >= newLayout.cols || t.row >= newLayout.rows)
+        return oob ? makeArrangement(countRef.current, newLayout, prev) : prev
+      })
+    })
+    ro.observe(gridArea)
+    return () => ro.disconnect()
+  }, [])
+
+  // ── Hover interactions — re-bound whenever tiles change ──────────────────
+  useEffect(() => {
+    const gridArea = gridAreaRef.current
+    if (!gridArea) return
+
     const off: (() => void)[] = []
     let staggerIds: ReturnType<typeof setTimeout>[] = []
     let resetId:    ReturnType<typeof setTimeout> | null = null
+    const snap = tilesRef.current  // stable snapshot of current tiles
 
-    TILES.forEach((_, i) => {
-      const row = Math.floor(i / 3)
-      const col = i % 3
-      const el  = tileEls[i]
+    snap.forEach(tile => {
+      const el = tileRefs.current.get(tile.id)
       if (!el) return
 
       const onEnter = () => {
         staggerIds.forEach(clearTimeout); staggerIds = []
         if (resetId) { clearTimeout(resetId); resetId = null }
-        isHovering = true
-        mapX.setTarget(col * TILE_PITCH + TILE_HALF)
-        mapY.setTarget(row * TILE_PITCH + TILE_HALF)
+        isHovering.current = true
 
-        tileSprings.forEach((sp, j) => {
-          sp.hover.velocity = 0; sp.sx.velocity = 0; sp.sy.velocity = 0
-          const d = manhattan(row, col, Math.floor(j / 3), j % 3)
-          if (d === 0) {
-            sp.hover.setTarget(CFG.hoverScale)
-            sp.sx.setTarget(0); sp.sy.setTarget(0)
+        const lay = layoutRef.current
+        if (lay) {
+          const pos = cellPos(lay, tile.col, tile.row)
+          hoverTarget.current = { x: pos.x + lay.tileSize / 2, y: pos.y + lay.tileSize / 2 }
+        }
+
+        snap.forEach(other => {
+          const sp = springsMap.current.get(other.id)
+          if (!sp) return
+          const dr = other.row - tile.row
+          const dc = other.col - tile.col
+          const dist = Math.abs(dr) + Math.abs(dc)
+          if (dist === 0) {
+            sp.hscale.setTarget(1.05)
+            sp.hsx.setTarget(0); sp.hsy.setTarget(0)
           } else {
-            sp.hover.setTarget(1)
-            const dx = (j % 3) - col
-            const dy = Math.floor(j / 3) - row
-            const mag = Math.sqrt(dx * dx + dy * dy)
+            sp.hscale.setTarget(1)
+            const mag = Math.sqrt(dc * dc + dr * dr)
             staggerIds.push(setTimeout(() => {
-              sp.sx.setTarget((dx / mag) * CFG.pushPx)
-              sp.sy.setTarget((dy / mag) * CFG.pushPx)
-            }, d * CFG.stagger))
+              sp.hsx.setTarget((dc / mag) * 16)
+              sp.hsy.setTarget((dr / mag) * 16)
+            }, dist * 30))
           }
         })
       }
+
       el.addEventListener('mouseenter', onEnter)
       off.push(() => el.removeEventListener('mouseenter', onEnter))
     })
 
     const onLeave = () => {
       staggerIds.forEach(clearTimeout); staggerIds = []
-      tileSprings.forEach(sp => { sp.hover.setTarget(1); sp.sx.setTarget(0); sp.sy.setTarget(0) })
-      isHovering = false
+      snap.forEach(tile => {
+        const sp = springsMap.current.get(tile.id)
+        if (!sp) return
+        sp.hscale.setTarget(1); sp.hsx.setTarget(0); sp.hsy.setTarget(0)
+      })
+      isHovering.current = false
+      hoverTarget.current = null
       resetId = setTimeout(() => {
-        tileSprings.forEach(sp => {
-          sp.hover.value = 1; sp.hover.target = 1; sp.hover.velocity = 0
-          sp.sx.value = 0;    sp.sx.target = 0;    sp.sx.velocity = 0
-          sp.sy.value = 0;    sp.sy.target = 0;    sp.sy.velocity = 0
+        snap.forEach(tile => {
+          const sp = springsMap.current.get(tile.id)
+          if (!sp) return
+          sp.hscale.value = 1; sp.hscale.target = 1; sp.hscale.velocity = 0
+          sp.hsx.value    = 0; sp.hsx.target    = 0; sp.hsx.velocity    = 0
+          sp.hsy.value    = 0; sp.hsy.target    = 0; sp.hsy.velocity    = 0
         })
-        tileEls.forEach(el => { if (el) el.style.transform = '' })
         resetId = null
       }, 500)
     }
-    grid.addEventListener('mouseleave', onLeave)
-    off.push(() => grid.removeEventListener('mouseleave', onLeave))
 
-    // ── ResizeObserver — scale grid down to fit box if needed ─────────────
-    const ro = new ResizeObserver(entries => {
-      const { width: w, height: h } = entries[0].contentRect
-      const scale = Math.min(1, w / GRID_W, h / GRID_H)
-      grid.style.transform = scale < 1 ? `scale(${scale.toFixed(4)})` : ''
-    })
-    ro.observe(wrapper)
-
-    // ── IntersectionObserver ───────────────────────────────────────────────
-    const io = new IntersectionObserver(entries => {
-      const visible = entries[0].isIntersecting
-      if (visible === isVisible) return
-      isVisible = visible
-      if (visible) { lastTime = 0; rafId = requestAnimationFrame(loop) }
-      else { cancelAnimationFrame(rafId); rafId = 0 }
-    }, { threshold: 0 })
-    io.observe(wrapper)
-
-    if (!reducedMotion) rafId = requestAnimationFrame(loop)
+    gridArea.addEventListener('mouseleave', onLeave)
+    off.push(() => gridArea.removeEventListener('mouseleave', onLeave))
 
     return () => {
-      cancelAnimationFrame(rafId)
       staggerIds.forEach(clearTimeout)
       if (resetId) clearTimeout(resetId)
-      ro.disconnect()
-      io.disconnect()
       off.forEach(fn => fn())
     }
+  }, [tiles])
+
+  // ── Helpers to capture positions and update state ─────────────────────────
+  function snapPositions() {
+    const lay = layoutRef.current
+    const ga  = gridAreaRef.current
+    if (!lay || !ga) return
+    const rect = ga.getBoundingClientRect()
+    const snap = new Map<number, { x: number; y: number }>()
+    tilesRef.current.forEach(tile => {
+      const pos = cellPos(lay, tile.col, tile.row)
+      snap.set(tile.id, { x: rect.left + pos.x, y: rect.top + pos.y })
+    })
+    pendingFlip.current = snap
+  }
+
+  const handleCountChange = useCallback((n: number) => {
+    snapPositions()
+    const { w, h } = containerRef.current
+    const newLayout = computeLayout(n, w, h)
+    layoutRef.current = newLayout
+    setTileCount(n)
+    setLayout(newLayout)
+    setTiles(makeArrangement(n, newLayout, tilesRef.current))
   }, [])
+
+  const handleRandomize = useCallback(() => {
+    snapPositions()
+    const lay = layoutRef.current
+    if (!lay) return
+    setTiles(makeArrangement(countRef.current, lay, tilesRef.current))
+  }, [])
+
+  // ── Render ────────────────────────────────────────────────────────────────
+  const radius    = Math.round(layout.tileSize * 0.20)
+  const radiusAgt = Math.round(layout.tileSize * 0.24)
+  const iconSize  = Math.round(layout.tileSize * 0.64)
 
   return (
     <>
@@ -245,29 +448,53 @@ export default function AgentsGridCanvas() {
         ref={wrapperRef}
         className={s.wrapper}
       >
-        <div ref={gridRef} className={s.grid}>
+        {/* Grid area */}
+        <div ref={gridAreaRef} className={s.gridArea}>
           <div ref={gradRef} className={s.gradientMap} aria-hidden="true">
             {BLOB_COLORS.map((color, i) => (
-              <div key={i} ref={el => { if (el) blobRefs.current[i] = el }} className={s.blob} style={{ background: color }} />
-            ))}
-          </div>
-          <div className={s.agentGrid}>
-            {TILES.map((tile, i) => (
               <div
                 key={i}
-                ref={el => { if (el) tileRefs.current[i] = el }}
-                data-row={Math.floor(i / 3)}
-                data-col={i % 3}
-                className={tile.kind === 'person' ? `${s.tile} ${s.tilePerson}` : `${s.tile} ${s.tileAgent}`}
-              >
-                {tile.kind === 'agent' && (
-                  <svg width="76" height="76" viewBox="0 0 76 76" className={s.tileAgentSvg} aria-hidden="true">
-                    <use href={`#ag-${tile.icon}`} />
-                  </svg>
-                )}
-              </div>
+                ref={el => { if (el) blobRefs.current[i] = el }}
+                className={s.blob}
+                style={{ background: color }}
+              />
             ))}
           </div>
+
+          {tiles.map(tile => (
+            <div
+              key={tile.id}
+              ref={el => { if (el) tileRefs.current.set(tile.id, el); else tileRefs.current.delete(tile.id) }}
+              className={tile.type === 'person' ? `${s.tile} ${s.tilePerson}` : `${s.tile} ${s.tileAgent}`}
+              style={{
+                width:        layout.tileSize,
+                height:       layout.tileSize,
+                borderRadius: tile.type === 'agent' ? radiusAgt : radius,
+              }}
+            >
+              {tile.type === 'agent' && tile.icon && (
+                <svg width={iconSize} height={iconSize} viewBox="0 0 76 76" className={s.tileAgentSvg} aria-hidden="true">
+                  <use href={`#ag-${tile.icon}`} />
+                </svg>
+              )}
+            </div>
+          ))}
+        </div>
+
+        {/* Controls */}
+        <div className={s.controls}>
+          <span className={s.count}>{tileCount}</span>
+          <input
+            className={s.slider}
+            type="range"
+            min={1}
+            max={90}
+            value={tileCount}
+            onChange={e => handleCountChange(Number(e.target.value))}
+          />
+          <button className={s.randomizeBtn} onClick={handleRandomize}>
+            Randomize
+          </button>
         </div>
       </div>
     </>

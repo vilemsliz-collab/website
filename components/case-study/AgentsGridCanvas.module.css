@@ -8,17 +8,18 @@
   position: relative;
   margin-top: var(--space-2);
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
 }
 
-.grid {
+/* ── Grid area ─────────────────────────────────────────────────────────────── */
+
+.gridArea {
+  flex: 1;
   position: relative;
-  width: 372px;
-  height: 372px;
-  transform-origin: center center;
-  font-family: var(--font-brand);
-  flex-shrink: 0;
+  overflow: hidden;
+  margin: var(--space-3);
 }
 
 .gradientMap {
@@ -44,26 +45,17 @@
   transform: translate3d(0, 0, 0);
 }
 
-.agentGrid {
-  position: relative;
-  z-index: 1;
-  display: grid;
-  grid-template-columns: repeat(3, 118px);
-  grid-template-rows: repeat(3, 118px);
-  gap: 9px;
-}
+/* ── Tiles (absolutely positioned) ─────────────────────────────────────────── */
 
 .tile {
-  width: 118px;
-  height: 118px;
-  position: relative;
+  position: absolute;
+  top: 0; left: 0;
   z-index: 1;
   cursor: pointer;
-  will-change: transform;
+  will-change: transform, opacity;
 }
 
 .tilePerson {
-  border-radius: 24px;
   overflow: hidden;
   background: #bfc7d9;
 }
@@ -80,7 +72,6 @@
 .tilePerson:hover img { transform: scale(1.10); }
 
 .tileAgent {
-  border-radius: 28px;
   background: #ffffff;
   border: 3px solid #00e05c;
   display: flex;
@@ -89,13 +80,84 @@
 }
 
 .tileAgentSvg {
-  width: 76px;
-  height: 76px;
-  color: #00e05c;
   display: block;
+  color: #00e05c;
+  flex-shrink: 0;
 }
 
+/* ── Controls ──────────────────────────────────────────────────────────────── */
+
+.controls {
+  height: 56px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 0 var(--space-6);
+  border-top: 1px solid var(--gray-100);
+}
+
+.count {
+  font-size: var(--type-label-small-size);
+  line-height: var(--type-label-small-lh);
+  color: var(--gray-500);
+  min-width: 20px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.slider {
+  flex: 1;
+  appearance: none;
+  -webkit-appearance: none;
+  height: 2px;
+  background: var(--gray-200);
+  border-radius: var(--shape-pill);
+  outline: none;
+  cursor: pointer;
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--color-on-background);
+  cursor: pointer;
+}
+
+.slider::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--color-on-background);
+  border: none;
+  cursor: pointer;
+}
+
+.randomizeBtn {
+  font-family: var(--font-brand);
+  font-size: var(--type-label-medium-size);
+  letter-spacing: var(--type-label-medium-ls);
+  color: var(--gray-700);
+  background: none;
+  border: 1px solid var(--gray-200);
+  border-radius: var(--shape-pill);
+  padding: var(--space-1) var(--space-4);
+  cursor: pointer;
+  transition: border-color 150ms ease, color 150ms ease;
+  white-space: nowrap;
+}
+
+.randomizeBtn:hover {
+  border-color: var(--gray-500);
+  color: var(--color-on-background);
+}
+
+/* ── Reduced motion ─────────────────────────────────────────────────────────── */
+
 @media (prefers-reduced-motion: reduce) {
-  .tile { transition: none !important; will-change: auto !important; }
+  .tile { will-change: auto !important; }
   .tilePerson img { transition: none !important; }
 }
