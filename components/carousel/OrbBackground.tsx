@@ -17,19 +17,19 @@ const ORB_SCALE  = 0.7
 const NUM_ORBS   = 4
 
 // ── Per-mode palettes ────────────────────────────────────────────────────────
-// Light mode: cool blue-white tint matching #ffffff→#e5e7f0 background
+// Light mode: cool blue-white tint, 50% desaturated toward gray
 const PALETTES_LIGHT: Array<{ l: [number, number, number]; d: [number, number, number] }> = [
-  { l: [0.91, 0.91, 0.95], d: [0.54, 0.54, 0.62] },
-  { l: [0.86, 0.86, 0.92], d: [0.44, 0.44, 0.55] },
-  { l: [0.89, 0.89, 0.94], d: [0.50, 0.50, 0.60] },
-  { l: [0.83, 0.83, 0.90], d: [0.40, 0.40, 0.52] },
+  { l: [0.92, 0.92, 0.94], d: [0.55, 0.55, 0.59] },
+  { l: [0.87, 0.87, 0.90], d: [0.46, 0.46, 0.51] },
+  { l: [0.90, 0.90, 0.92], d: [0.52, 0.52, 0.57] },
+  { l: [0.84, 0.84, 0.88], d: [0.42, 0.42, 0.48] },
 ]
-// Dark mode: dark blue-black tones matching #1e1f2a→#0d0e18 background
+// Dark mode: dark blue-black tones, 50% desaturated toward gray
 const PALETTES_DARK: Array<{ l: [number, number, number]; d: [number, number, number] }> = [
-  { l: [0.22, 0.24, 0.38], d: [0.13, 0.14, 0.24] },
-  { l: [0.18, 0.20, 0.33], d: [0.11, 0.12, 0.20] },
-  { l: [0.20, 0.22, 0.36], d: [0.12, 0.13, 0.22] },
-  { l: [0.16, 0.18, 0.30], d: [0.10, 0.11, 0.18] },
+  { l: [0.25, 0.26, 0.33], d: [0.15, 0.16, 0.21] },
+  { l: [0.21, 0.22, 0.28], d: [0.13, 0.13, 0.17] },
+  { l: [0.23, 0.24, 0.31], d: [0.14, 0.14, 0.19] },
+  { l: [0.19, 0.20, 0.26], d: [0.12, 0.12, 0.16] },
 ]
 
 // ── WGSL shader (identical to orbs-v6) ──────────────────────────────────────
