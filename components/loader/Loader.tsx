@@ -3,11 +3,11 @@ import { useState, useEffect } from 'react'
 import s from './Loader.module.css'
 
 const COLORS = [
-  'rgba(235,235,240,0.72)',
-  'rgba(220,220,230,0.65)',
-  'rgba(230,230,237,0.60)',
-  'rgba(212,212,226,0.68)',
-  'rgba(225,225,235,0.70)',
+  'rgba(210,215,235,0.80)',
+  'rgba(195,205,228,0.75)',
+  'rgba(225,225,238,0.70)',
+  'rgba(180,195,225,0.78)',
+  'rgba(215,220,240,0.72)',
 ]
 
 interface OrbState { color: string; top: string; left: string; delay: string }

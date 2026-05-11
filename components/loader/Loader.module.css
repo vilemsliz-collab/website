@@ -25,10 +25,10 @@
 
 .orb {
   position: absolute;
-  width: 110vmax;
-  height: 110vmax;
+  width: 80vmax;
+  height: 80vmax;
   border-radius: 50%;
-  filter: blur(70px);
+  filter: blur(48px);
   transform: translate(-50%, -50%) scale(0);
   opacity: 0;
   animation: expand 0.75s cubic-bezier(0.16, 1, 0.3, 1) forwards;
