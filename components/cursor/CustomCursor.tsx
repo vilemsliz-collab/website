@@ -390,16 +390,19 @@ export default function CustomCursor({ tiltRef, configRef }: CursorProps) {
       const total = Math.hypot(e.deltaX, e.deltaY)
       if (total < 1) return
 
-      const delta = Math.max(adx, ady)
+      // No scroll-driven cursor behavior when hovering a pill (card / link / close):
+      // skip ring spawn, axis elongation, and scroll-state switching entirely.
+      const isPillLive = cursorState === 'card' || cursorState === 'card-close' || cursorState === 'case-close' || cursorState === 'link'
+      if (isPillLive) return
+
       const forceH = !!document.elementFromPoint(mouseX, mouseY)?.closest('[data-cursor-scroll-h]')
       const isHorizontal = forceH || adx > ady
 
       const cfg = configRef?.current ?? DEFAULT_CURSOR_CONFIG
-      const isPillLive = cursorState === 'card' || cursorState === 'card-close' || cursorState === 'case-close' || cursorState === 'link'
 
       const minInterval = cfg.scrollIntervalBase
       const nowMs = performance.now()
-      const expandH = isPillLive || isHorizontal
+      const expandH = isHorizontal
       if (expandH !== lastExpandHorizontal) {
         clearScrollRings()
         lastExpandHorizontal = expandH
@@ -407,21 +410,6 @@ export default function CustomCursor({ tiltRef, configRef }: CursorProps) {
       if (nowMs - lastRingTime > minInterval) {
         lastRingTime = nowMs
         spawnScrollRing(expandH)
-      }
-
-      if (isPillLive) {
-        // Pill+scroll: keep the pill visible, bump the elongation impulse along
-        // the scroll axis. Rings are spawned above, sized to the pill by spawnScrollRing.
-        const cap = 60
-        scrollKick = Math.min(1.2, scrollKick + Math.min(delta, cap) * cfg.scrollKickAmp / 1000)
-        if (isHorizontal) {
-          scrollAxisX = e.deltaX > 0 ? 1 : -1
-          scrollAxisY = 0
-        } else {
-          scrollAxisX = 0
-          scrollAxisY = e.deltaY > 0 ? 1 : -1
-        }
-        return
       }
 
       if (scrollTimer) clearTimeout(scrollTimer)
