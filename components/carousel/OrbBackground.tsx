@@ -16,13 +16,20 @@ const NR = RING_SIZES.length
 const ORB_SCALE  = 0.7
 const NUM_ORBS   = 4
 
-// ── Grayscale palettes for each orb ─────────────────────────────────────────
-const PALETTES: Array<{ l: [number, number, number]; d: [number, number, number] }> = [
-  { l: [0.92, 0.92, 0.92], d: [0.56, 0.56, 0.56] },
-  { l: [0.80, 0.80, 0.80], d: [0.36, 0.36, 0.36] },
-  { l: [0.88, 0.88, 0.88], d: [0.48, 0.48, 0.48] },
-  { l: [0.75, 0.75, 0.75], d: [0.30, 0.30, 0.30] },
-  { l: [0.85, 0.85, 0.85], d: [0.42, 0.42, 0.42] },
+// ── Per-mode palettes ────────────────────────────────────────────────────────
+// Light mode: cool blue-white tint matching #ffffff→#e5e7f0 background
+const PALETTES_LIGHT: Array<{ l: [number, number, number]; d: [number, number, number] }> = [
+  { l: [0.91, 0.91, 0.95], d: [0.54, 0.54, 0.62] },
+  { l: [0.86, 0.86, 0.92], d: [0.44, 0.44, 0.55] },
+  { l: [0.89, 0.89, 0.94], d: [0.50, 0.50, 0.60] },
+  { l: [0.83, 0.83, 0.90], d: [0.40, 0.40, 0.52] },
+]
+// Dark mode: dark blue-black tones matching #1e1f2a→#0d0e18 background
+const PALETTES_DARK: Array<{ l: [number, number, number]; d: [number, number, number] }> = [
+  { l: [0.22, 0.24, 0.38], d: [0.13, 0.14, 0.24] },
+  { l: [0.18, 0.20, 0.33], d: [0.11, 0.12, 0.20] },
+  { l: [0.20, 0.22, 0.36], d: [0.12, 0.13, 0.22] },
+  { l: [0.16, 0.18, 0.30], d: [0.10, 0.11, 0.18] },
 ]
 
 // ── WGSL shader (identical to orbs-v6) ──────────────────────────────────────
@@ -227,6 +234,7 @@ export default function OrbBackground({ dark = false }: { dark?: boolean }) {
         cBuf[24+i*4] = d[0]; cBuf[24+i*4+1] = d[1]; cBuf[24+i*4+2] = d[2]; cBuf[24+i*4+3] = 0
         colorsDirty = true
       }
+      const PALETTES = dark ? PALETTES_DARK : PALETTES_LIGHT
       for (let i = 0; i < NUM_ORBS; i++) setColor(i, PALETTES[i].l, PALETTES[i].d)
       device.queue.writeBuffer(colorBuf, 0, cBuf)
       colorsDirty = false
