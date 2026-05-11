@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef, type MutableRefObject } from 'react'
-import { ArrowUpRight } from 'lucide-react'
+import { ArrowUpRight } from '@phosphor-icons/react'
 import styles from './Cursor.module.css'
 
 // ── Config (live-tweakable via configRef) ─────────────────────────────────────
@@ -465,7 +465,7 @@ export default function CustomCursor({ tiltRef, configRef }: CursorProps) {
         <div ref={borderRef} className={styles.border} />
         <div ref={contentRef} className={styles.content}>
           <span ref={labelRef} className={styles.label} />
-          <ArrowUpRight className={styles.iconArrow} aria-hidden />
+          <ArrowUpRight className={styles.iconArrow} weight="regular" aria-hidden />
         </div>
       </div>
     </div>

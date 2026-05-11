@@ -1,6 +1,6 @@
 'use client'
 
-import { FileText } from 'lucide-react'
+import { FileText } from '@phosphor-icons/react'
 import s from './ActionBar.module.css'
 
 function LinkedInIcon() {
@@ -24,7 +24,7 @@ export default function ActionBar() {
         Contact me
       </a>
       <a href="/cv.pdf" className={s.iconBtn} aria-label="Download CV">
-        <FileText size={22} strokeWidth={1.5} aria-hidden />
+        <FileText size={22} weight="regular" aria-hidden />
       </a>
       <a
         href="https://linkedin.com/in/vilemsliz"
