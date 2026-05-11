@@ -5,6 +5,7 @@ html {
      (including behind Safari chrome when viewport-fit=cover is active) */
   height: -webkit-fill-available;
   height: 100%;
+  overflow: hidden;
 }
 
 body {
