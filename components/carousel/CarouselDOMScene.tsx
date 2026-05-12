@@ -378,20 +378,24 @@ export default function CarouselDOMScene({
 
             {card.isAbout ? (
               <>
-                {card.headline && (
-                  <p className={styles.cardAboutHeadline}>
-                    {card.headline.split('\n').map((line, li, arr) => (
-                      <span key={li}>{line}{li < arr.length - 1 && <br />}</span>
-                    ))}
-                  </p>
-                )}
+                {card.headline && (() => {
+                  const lines = card.headline.split('\n')
+                  return (
+                    <p className={styles.cardAboutHeadline}>
+                      {lines[0]}
+                      {card.name && (<><br /><span className={styles.cardAboutHeadlineName}>{card.name}</span></>)}
+                      {lines.slice(1).map((line, li) => (
+                        <span key={li}><br />{line}</span>
+                      ))}
+                    </p>
+                  )
+                })()}
                 <div className={styles.cardAboutBadge}>
                   {card.img && (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img src={card.img} alt="" className={styles.cardAboutPhoto} />
                   )}
                   <div className={styles.cardAboutBadgeRight}>
-                    <span className={styles.cardAboutBadgeName}>{card.name}</span>
                     <div className={styles.cardAboutBadgeLines}>
                       <span className={styles.cardAboutBadgeLine}>{card.lines[0]}</span>
                       <span className={styles.cardAboutBadgeLine}>{card.lines[1]}</span>

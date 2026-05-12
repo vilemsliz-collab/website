@@ -215,15 +215,11 @@
   justify-content: center;
 }
 
-.cardAboutBadgeName {
-  font-family: var(--font-brand);
-  font-size: 9cqw;
-  line-height: 1;
+/* Name when inlined inside the headline — matches headline size. */
+.cardAboutHeadlineName {
+  font-size: 14.7cqw;
   font-weight: var(--type-display-large-weight);
   font-variation-settings: 'wght' var(--type-display-large-weight);
-  color: #000000;
-  white-space: nowrap;
-  overflow: hidden;
 }
 
 .cardAboutBadgeLines {
