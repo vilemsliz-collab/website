@@ -383,7 +383,7 @@ export default function CarouselDOMScene({
                   return (
                     <p className={styles.cardAboutHeadline}>
                       {lines[0]}
-                      {card.name && (<><br />{card.name}</>)}
+                      {card.name && (<><br /><span className={styles.cardAboutHeadlineName}>{card.name}</span></>)}
                       {lines.slice(1).map((line, li) => (
                         <span key={li}><br />{line}</span>
                       ))}

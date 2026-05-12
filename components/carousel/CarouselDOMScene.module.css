@@ -215,6 +215,13 @@
   justify-content: center;
 }
 
+/* Name when inlined inside the headline — matches headline size. */
+.cardAboutHeadlineName {
+  font-size: 14.7cqw;
+  font-weight: var(--type-display-large-weight);
+  font-variation-settings: 'wght' var(--type-display-large-weight);
+}
+
 .cardAboutBadgeLines {
   display: flex;
   gap: 5.5cqw;
