@@ -30,13 +30,6 @@ export default function StarAnimationCanvas() {
   const paramsRef = useRef(params)
   useEffect(() => { paramsRef.current = params }, [params])
 
-  // Apply hue rotation live via CSS filter (combined with the existing blur).
-  useEffect(() => {
-    const grad = gradRef.current
-    if (!grad) return
-    grad.style.filter = `blur(15px) hue-rotate(${params.hue}deg)`
-  }, [params.hue])
-
   useEffect(() => {
     const box  = boxRef.current!
     const grad = gradRef.current!
@@ -56,11 +49,11 @@ export default function StarAnimationCanvas() {
     const spots = Array.from({ length: SPOT_COUNT }, (_, i) => {
       const sprX = new Spring(2.5, 1.4)
       const sprY = new Spring(2.5, 1.4)
-      const a = (i / SPOT_COUNT) * Math.PI * 2
-      const r = 35 + Math.random() * 25
-      sprX.value = sprX.target = Math.cos(a) * r
-      sprY.value = sprY.target = Math.sin(a) * r
-      return { sprX, sprY, nextRetarget: 0 }
+      const phase = (i / SPOT_COUNT) * Math.PI * 2   // base angle on the ring
+      const wobble = (Math.random() - 0.5) * 0.18    // ±0.18 rad jitter per blob
+      sprX.value = sprX.target = 0
+      sprY.value = sprY.target = 0
+      return { sprX, sprY, phase, wobble }
     })
 
     let hoverPoint: { x: number; y: number } | null = null
@@ -79,9 +72,10 @@ export default function StarAnimationCanvas() {
     function loop(now: number) {
       const dt  = lastT === 0 ? 1 / 60 : Math.max(1 / 240, Math.min(1 / 30, (now - lastT) / 1000))
       lastT = now
-      const speed = paramsRef.current.speed
-      const t   = (now / 1000) * speed
-      const TAU = Math.PI * 2
+      const t   = now / 1000
+
+      const p = paramsRef.current
+      const rotRad = (p.rotation * Math.PI) / 180   // deg/s → rad/s
 
       const cx = boxW / 2
       const cy = boxH / 2
@@ -96,17 +90,20 @@ export default function StarAnimationCanvas() {
       mapX.tick(dt)
       mapY.tick(dt)
 
-      const spread = paramsRef.current.spread
-      const amp = boxW * spread + Math.sin(t * 0.11 * TAU + 0.7) * boxW * 0.06
+      const radius = boxW * 0.31
+      const angle  = t * rotRad
       const blobEls = blobRefs.current
       spots.forEach((sp, i) => {
-        if (t > sp.nextRetarget) {
-          sp.sprX.setTarget((Math.random() - 0.5) * 2 * amp)
-          sp.sprY.setTarget((Math.random() - 0.5) * 2 * amp)
-          sp.nextRetarget = t + 6 + Math.random() * 9
-        }
+        // Live physics — read each frame so slider changes apply immediately.
+        sp.sprX.k = sp.sprY.k = p.stiffness
+        sp.sprX.d = sp.sprY.d = p.damping
+
+        const a = sp.phase + angle + sp.wobble
+        sp.sprX.setTarget(Math.cos(a) * radius)
+        sp.sprY.setTarget(Math.sin(a) * radius)
         sp.sprX.tick(dt)
         sp.sprY.tick(dt)
+
         const bx = (mapX.value + sp.sprX.value - BLOB_R) / GRAD_SCALE
         const by = (mapY.value + sp.sprY.value - BLOB_R) / GRAD_SCALE
         const el = blobEls[i]

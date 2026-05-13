@@ -3,15 +3,15 @@
 import { createContext, useContext, useState, type ReactNode } from 'react'
 
 export interface AnimationParams {
-  spread: number   // amp multiplier — how far blobs scatter (0.1–0.6)
-  speed: number    // time multiplier (0.2–2.5)
-  hue: number      // CSS hue-rotate degrees (0–360)
+  rotation: number    // degrees per second around center (0–180)
+  stiffness: number   // spring k — how fast blobs chase their target (0.5–10)
+  damping: number     // spring d — how much they oscillate (0.3–4)
 }
 
 export const DEFAULT_PARAMS: AnimationParams = {
-  spread: 0.31,
-  speed: 1.0,
-  hue: 0,
+  rotation: 30,
+  stiffness: 2.5,
+  damping: 1.4,
 }
 
 interface CtxValue {

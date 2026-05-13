@@ -4,7 +4,7 @@ import { useAnimationControls } from './AnimationControls'
 import s from './AnimationSlidersCanvas.module.css'
 
 interface SliderConfig {
-  key: 'spread' | 'speed' | 'hue'
+  key: 'rotation' | 'stiffness' | 'damping'
   label: string
   min: number
   max: number
@@ -13,9 +13,9 @@ interface SliderConfig {
 }
 
 const SLIDERS: SliderConfig[] = [
-  { key: 'spread', label: 'Spread', min: 0.1,  max: 0.6,  step: 0.01, format: v => v.toFixed(2) },
-  { key: 'speed',  label: 'Speed',  min: 0.2,  max: 2.5,  step: 0.05, format: v => `${v.toFixed(2)}×` },
-  { key: 'hue',    label: 'Hue',    min: 0,    max: 360,  step: 1,    format: v => `${Math.round(v)}°` },
+  { key: 'rotation',  label: 'Rotation',  min: 0,   max: 180, step: 1,    format: v => `${Math.round(v)}°/s` },
+  { key: 'stiffness', label: 'Stiffness', min: 0.5, max: 10,  step: 0.1,  format: v => v.toFixed(1) },
+  { key: 'damping',   label: 'Damping',   min: 0.3, max: 4,   step: 0.05, format: v => v.toFixed(2) },
 ]
 
 export default function AnimationSlidersCanvas() {
