@@ -30,6 +30,7 @@ export interface CaseStudy {
   resultsImg?: string
   impactLabel?: string
   impact?: string
+  impactVideo?: string
   pairs: string[][]
   pairsBottom?: string[][]
   widget?: string
@@ -137,6 +138,7 @@ export const CASES: CaseStudy[] = [
     resultsImg: 'https://res.cloudinary.com/duee5dfom/image/upload/q_auto,f_auto/v1778670430/10_dark_light_color_mwznxm.png',
     impactLabel: 'Impact',
     impact: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Edit me via Agentation feedback when ready.',
+    impactVideo: 'https://res.cloudinary.com/duee5dfom/video/upload/v1778713377/4-3_1_bkwecw.mp4',
   },
   {
     slug: '004',

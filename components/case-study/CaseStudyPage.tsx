@@ -183,6 +183,11 @@ export default function CaseStudyPage({ cs, isOverlay }: Props) {
                 <p className={styles.caseStudyBody}>{cs.impact}</p>
               </div>
             )}
+            {cs.impactVideo && (
+              <div id="case-impact-media" data-element="Impact media" className={styles.caseStudyImpactMedia}>
+                <video src={cs.impactVideo} autoPlay muted loop playsInline />
+              </div>
+            )}
             <SlotPairs pairs={cs.pairs} />
           </>
         )}
