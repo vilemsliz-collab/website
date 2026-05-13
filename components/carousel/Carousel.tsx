@@ -188,6 +188,12 @@ export default function Carousel() {
   const [caseOpenState, setCaseOpenState] = useState(false)
   const [ctrlOpen, setCtrlOpen] = useState(false)
 
+  // Mirror caseOpenState to a body data attribute so RootShell can hide the
+  // top-window Agentation toolbar (it would otherwise overlap the iframe's).
+  useEffect(() => {
+    document.body.dataset.caseOpen = caseOpenState ? 'true' : 'false'
+  }, [caseOpenState])
+
   const isMobile = () => navigator.maxTouchPoints > 0
 
   // ── Case panel content switch ──

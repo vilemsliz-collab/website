@@ -12,15 +12,30 @@ import { Agentation } from 'agentation'
 // references it by id and expects it to exist on every document.
 export default function RootShell({ children }: { children: React.ReactNode }) {
   const [mode, setMode] = useState<'unknown' | 'top' | 'iframe'>('unknown')
+  const [caseOpen, setCaseOpen] = useState(false)
+
   useEffect(() => {
     setMode(window.self === window.top ? 'top' : 'iframe')
   }, [])
+
+  // Watch body[data-case-open] (set by Carousel) so the top-window Agentation
+  // can step aside when a case study is open — otherwise its toolbar overlaps
+  // the iframe's own Agentation toolbar and the user can't reach it.
+  useEffect(() => {
+    const read = () => setCaseOpen(document.body.dataset.caseOpen === 'true')
+    read()
+    const obs = new MutationObserver(read)
+    obs.observe(document.body, { attributes: true, attributeFilter: ['data-case-open'] })
+    return () => obs.disconnect()
+  }, [])
+
+  const showAgentation = mode === 'iframe' || (mode === 'top' && !caseOpen)
 
   return (
     <>
       <CursorLiquidFilter />
       {mode === 'top' ? <LenisProvider>{children}</LenisProvider> : <>{children}</>}
-      <Agentation />
+      {showAgentation && <Agentation />}
     </>
   )
 }
