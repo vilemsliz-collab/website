@@ -120,17 +120,14 @@ export const CASES: CaseStudy[] = [
     pairs: [
       [
         'https://res.cloudinary.com/duee5dfom/image/upload/q_auto/f_auto/v1776898866/Frame_1000005674_cryrlh.png',
-        '/wrike-ai-carousel/index.html',
+        'https://res.cloudinary.com/duee5dfom/video/upload/q_auto/f_auto/v1778660810/Scene_2_grgyb1.mp4',
       ],
       [
         'https://res.cloudinary.com/duee5dfom/image/upload/q_auto/f_auto/v1776898865/Frame_1000005657_sw5nt5.png',
         'https://res.cloudinary.com/duee5dfom/image/upload/q_auto/f_auto/v1776898865/Frame_1000005638_daacf6.png',
       ],
     ],
-    pairsBottom: [
-      ['@hp-animation', '@star-animation'],
-      ['', 'https://res.cloudinary.com/duee5dfom/video/upload/q_auto/f_auto/v1778660810/Scene_2_grgyb1.mp4'],
-    ],
+    pairsBottom: [['@hp-animation', '@star-animation']],
     widget: '@agents-grid',
   },
   {
