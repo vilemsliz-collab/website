@@ -15,7 +15,9 @@ export default function RootShell({ children }: { children: React.ReactNode }) {
   const [caseOpen, setCaseOpen] = useState(false)
 
   useEffect(() => {
-    setMode(window.self === window.top ? 'top' : 'iframe')
+    const m = window.self === window.top ? 'top' : 'iframe'
+    setMode(m)
+    document.documentElement.dataset.shellMode = m
   }, [])
 
   // Watch body[data-case-open] (set by Carousel) so the top-window Agentation
