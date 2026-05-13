@@ -24,7 +24,7 @@ export default function SlotTimeline() {
   return (
     <div className={s.wrap}>
       <div id="case-timeline" data-element="Process timeline" className={s.chart}>
-        <span data-element="Process heading" className={s.heading}>Process</span>
+        <span data-element="Process heading" className={s.heading}>Roadmap</span>
         <div className={s.plot}>
           <div className={s.gridLines} aria-hidden="true">
             {Array.from({ length: TOTAL_COLS - 1 }).map((_, i) => (

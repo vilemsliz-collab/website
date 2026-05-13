@@ -31,6 +31,8 @@ export interface CaseStudy {
   impactLabel?: string
   impact?: string
   impactVideo?: string
+  reflectionLabel?: string
+  reflection?: string
   pairs: string[][]
   pairsBottom?: string[][]
   widget?: string
@@ -134,6 +136,8 @@ export const CASES: CaseStudy[] = [
     impactLabel: 'Impact',
     impact: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Edit me via Agentation feedback when ready.',
     impactVideo: 'https://res.cloudinary.com/duee5dfom/video/upload/f_auto,q_auto/v1778713377/4-3_1_bkwecw.mp4',
+    reflectionLabel: 'Reflection',
+    reflection: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Edit me via Agentation feedback when ready.',
   },
   {
     slug: '004',

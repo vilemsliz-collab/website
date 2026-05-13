@@ -188,6 +188,12 @@ export default function CaseStudyPage({ cs, isOverlay }: Props) {
                 <video src={cs.impactVideo} autoPlay muted loop playsInline />
               </div>
             )}
+            {cs.reflection && (
+              <div id="case-reflection" data-element="Reflection" className={`${styles.caseStudyChallenge} ${styles.caseStudyTextInset}`}>
+                <span className={styles.caseStudyRoleLabel}>{cs.reflectionLabel ?? 'Reflection'}</span>
+                <p className={styles.caseStudyBody}>{cs.reflection}</p>
+              </div>
+            )}
             {cs.pairs.length > 0 && <SlotPairs pairs={cs.pairs} />}
           </>
         )}
