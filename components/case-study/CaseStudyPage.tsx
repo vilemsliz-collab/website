@@ -188,7 +188,7 @@ export default function CaseStudyPage({ cs, isOverlay }: Props) {
                 <video src={cs.impactVideo} autoPlay muted loop playsInline />
               </div>
             )}
-            <SlotPairs pairs={cs.pairs} />
+            {cs.pairs.length > 0 && <SlotPairs pairs={cs.pairs} />}
           </>
         )}
       </div>

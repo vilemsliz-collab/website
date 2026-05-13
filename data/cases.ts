@@ -124,12 +124,7 @@ export const CASES: CaseStudy[] = [
     mediaImg: 'https://res.cloudinary.com/duee5dfom/image/upload/q_auto/f_auto/v1776899106/Frame_1000005676_avin8a.png',
     mediaVideo: 'https://res.cloudinary.com/duee5dfom/video/upload/q_auto/f_auto/v1777116988/Final_Wrike_Copilot_Promo_Compressed_HB_1__2_gyxj2u.mp4',
     mediaCaption: 'Three separate product teams were shipping UI at different speeds with no shared vocabulary.',
-    pairs: [
-      [
-        'https://res.cloudinary.com/duee5dfom/image/upload/q_auto/f_auto/v1776898865/Frame_1000005657_sw5nt5.png',
-        'https://res.cloudinary.com/duee5dfom/image/upload/q_auto/f_auto/v1776898865/Frame_1000005638_daacf6.png',
-      ],
-    ],
+    pairs: [],
     pairsBottom: [['@hp-animation', '@star-animation']],
     widget: '@agents-grid',
     solutionImg: 'https://res.cloudinary.com/duee5dfom/image/upload/q_auto,f_auto/v1778664477/Slide_16_9_-_1_dtuhgg.png',
