@@ -37,7 +37,7 @@ export default function StarAnimationCanvas() {
       const { width, height } = entries[0].contentRect
       boxW = width; boxH = height
       mapX.value = mapX.target = boxW / 2
-      mapY.value = mapY.target = boxH * 0.62
+      mapY.value = mapY.target = boxH / 2
     })
     ro.observe(box)
 
@@ -71,16 +71,14 @@ export default function StarAnimationCanvas() {
       const TAU = Math.PI * 2
 
       const cx = boxW / 2
-      const cy = boxH * 0.62
-      const wx = cx + Math.sin(t * 0.06  * TAU) * boxW * 0.17
-      const wy = cy - Math.sin(t * 0.045 * TAU + 1.3) * boxH * 0.10
+      const cy = boxH / 2
 
       if (hoverPoint) {
-        mapX.setTarget(wx * 0.35 + hoverPoint.x * 0.65)
-        mapY.setTarget(wy * 0.35 + hoverPoint.y * 0.65)
+        mapX.setTarget(cx * 0.35 + hoverPoint.x * 0.65)
+        mapY.setTarget(cy * 0.35 + hoverPoint.y * 0.65)
       } else {
-        mapX.setTarget(wx)
-        mapY.setTarget(wy)
+        mapX.setTarget(cx)
+        mapY.setTarget(cy)
       }
       mapX.tick(dt)
       mapY.tick(dt)

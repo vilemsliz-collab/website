@@ -24,6 +24,7 @@ export interface CaseStudy {
   mediaImg?: string
   mediaVideo?: string
   mediaCaption: string
+  solutionImg?: string
   pairs: string[][]
   pairsBottom?: string[][]
   widget?: string
@@ -129,6 +130,7 @@ export const CASES: CaseStudy[] = [
     ],
     pairsBottom: [['@hp-animation', '@star-animation']],
     widget: '@agents-grid',
+    solutionImg: 'https://res.cloudinary.com/duee5dfom/image/upload/q_auto/f_auto/v1778662601/Slide_16_9_-_1_dtuhgg.png',
   },
   {
     slug: '004',
