@@ -1,6 +1,7 @@
 'use client'
 
 import { useAnimationControls } from './AnimationControls'
+import StarAnimationCanvas from './StarAnimationCanvas'
 import s from './AnimationSlidersCanvas.module.css'
 
 interface SliderConfig {
@@ -23,23 +24,28 @@ export default function AnimationSlidersCanvas() {
 
   return (
     <div className={s.panel}>
-      <div className={s.heading}>Tweak the animation</div>
-      {SLIDERS.map(c => (
-        <div key={c.key} className={s.row}>
-          <span className={s.label}>{c.label}</span>
-          <input
-            type="range"
-            min={c.min}
-            max={c.max}
-            step={c.step}
-            value={params[c.key]}
-            onChange={e => setParam(c.key, +e.target.value)}
-            className={s.slider}
-            aria-label={c.label}
-          />
-          <span className={s.value}>{c.format(params[c.key])}</span>
-        </div>
-      ))}
+      <div className={s.stage}>
+        <StarAnimationCanvas />
+      </div>
+      <div className={s.controls}>
+        <div className={s.heading}>Tweak the animation</div>
+        {SLIDERS.map(c => (
+          <div key={c.key} className={s.row}>
+            <span className={s.label}>{c.label}</span>
+            <input
+              type="range"
+              min={c.min}
+              max={c.max}
+              step={c.step}
+              value={params[c.key]}
+              onChange={e => setParam(c.key, +e.target.value)}
+              className={s.slider}
+              aria-label={c.label}
+            />
+            <span className={s.value}>{c.format(params[c.key])}</span>
+          </div>
+        ))}
+      </div>
     </div>
   )
 }
