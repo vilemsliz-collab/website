@@ -1,10 +1,20 @@
 import Image from 'next/image'
 import s from './SlotSolutionMedia.module.css'
 
-export default function SlotSolutionMedia({ src }: { src: string }) {
+interface Props {
+  src: string
+  id?: string
+  dataElement?: string
+}
+
+export default function SlotSolutionMedia({
+  src,
+  id = 'case-solution-media',
+  dataElement = 'Solution media',
+}: Props) {
   return (
     <div className={s.wrap}>
-      <div id="case-solution-media" data-element="Solution media" className={s.media}>
+      <div id={id} data-element={dataElement} className={s.media}>
         <Image src={src} alt="" fill sizes="100vw" style={{ objectFit: 'cover' }} />
       </div>
     </div>

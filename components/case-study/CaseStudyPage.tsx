@@ -174,6 +174,9 @@ export default function CaseStudyPage({ cs, isOverlay }: Props) {
                 <p className={styles.caseStudyBody}>{cs.results}</p>
               </div>
             )}
+            {cs.resultsImg && (
+              <SlotSolutionMedia src={cs.resultsImg} id="case-results-media" dataElement="Results media" />
+            )}
             <SlotPairs pairs={cs.pairs} />
           </>
         )}
