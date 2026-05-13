@@ -20,7 +20,7 @@ export default function RootShell({ children }: { children: React.ReactNode }) {
     <>
       <CursorLiquidFilter />
       {mode === 'top' ? <LenisProvider>{children}</LenisProvider> : <>{children}</>}
-      {mode === 'top' && process.env.NODE_ENV === 'development' && <Agentation />}
+      <Agentation />
     </>
   )
 }
