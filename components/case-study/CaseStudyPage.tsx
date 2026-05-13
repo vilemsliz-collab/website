@@ -9,7 +9,6 @@ import SlotTimeline from './SlotTimeline'
 import SlotPairs from './SlotPairs'
 import SlotSolutionMedia from './SlotSolutionMedia'
 import AgentsGridCanvas from './AgentsGridCanvas'
-import { AnimationControlsProvider } from './AnimationControls'
 
 function CaseStudyMetaRow({ claims, roleBody }: { claims: CaseStudy['claims']; roleBody: string }) {
   const [cur, setCur] = useState(0)
@@ -128,7 +127,7 @@ export default function CaseStudyPage({ cs, isOverlay }: Props) {
   }, [])
 
   return (
-    <AnimationControlsProvider>
+    <>
       {!isIframe && !isOverlay && (
         <a className={styles.caseStudyBackLink} href="/portfolio" data-cursor="link" data-cursor-label="Portfolio">← portfolio</a>
       )}
@@ -179,6 +178,6 @@ export default function CaseStudyPage({ cs, isOverlay }: Props) {
           </>
         )}
       </div>
-    </AnimationControlsProvider>
+    </>
   )
 }
