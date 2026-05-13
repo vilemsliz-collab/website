@@ -80,7 +80,6 @@ export default function Carousel() {
   const stageTouch  = useRef<number | null>(null)
   const stageMouse  = useRef<number | null>(null)
   const hasDraggedRef = useRef(false)
-  const mouseDownX    = useRef<number | null>(null)
   const swipeStartX = useRef<number | null>(null)
   const splitRafId  = useRef<number | null>(null)
   const gyroHandler = useRef<((e: Event) => void) | null>(null)
@@ -415,26 +414,10 @@ export default function Carousel() {
         tiltTy.current = (e.clientX / dims.current.viewportW - 0.5) * 2 * tiltCfg.current.max
         tiltTx.current = -(e.clientY / dims.current.viewportH - 0.5) * 2 * tiltCfg.current.max
       }
-      // Drag
-      if (stageMouse.current !== null && !rafId.current) {
-        const dragK = 1 / (dims.current.viewportW * inputRef.current.touchSens)
-        const dPos  = -(e.clientX - stageMouse.current) * dragK
-        if (Math.abs(e.clientX - stageMouse.current) > 4) hasDraggedRef.current = true
-        velY.current   = velY.current * 0.5 + dPos * 0.5
-        posY.current  += dPos
-        stageMouse.current = e.clientX
-      }
     }
     function onMouseLeave() { if (!isMobile()) { tiltTx.current = 0; tiltTy.current = baseTiltY.current } }
-    function onMouseDown(e: MouseEvent) { stageMouse.current = e.clientX; mouseDownX.current = e.clientX; hasDraggedRef.current = false; dismissScrollHint() }
-    function onMouseUp(e: MouseEvent) {
-      if (stageMouse.current !== null) {
-        if (mouseDownX.current !== null && Math.abs(e.clientX - mouseDownX.current) < 10) velY.current = 0
-        kick()
-      }
-      stageMouse.current = null
-      mouseDownX.current = null
-    }
+    function onMouseDown(e: MouseEvent) { hasDraggedRef.current = false; dismissScrollHint() }
+    function onMouseUp() { kick() }
 
     // Touch
     function onTouchStart(e: TouchEvent) {
