@@ -177,6 +177,12 @@ export default function CaseStudyPage({ cs, isOverlay }: Props) {
             {cs.resultsImg && (
               <SlotSolutionMedia src={cs.resultsImg} id="case-results-media" dataElement="Results media" />
             )}
+            {cs.impact && (
+              <div id="case-impact" data-element="Impact" className={`${styles.caseStudyChallenge} ${styles.caseStudyTextInset}`}>
+                <span className={styles.caseStudyRoleLabel}>{cs.impactLabel ?? 'Impact'}</span>
+                <p className={styles.caseStudyBody}>{cs.impact}</p>
+              </div>
+            )}
             <SlotPairs pairs={cs.pairs} />
           </>
         )}
