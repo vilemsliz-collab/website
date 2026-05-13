@@ -3,6 +3,7 @@
 import { useEffect, useRef } from 'react'
 import Image from 'next/image'
 import s from './StarAnimationCanvas.module.css'
+import { useAnimationControls } from './AnimationControls'
 
 class Spring {
   value = 0; target = 0; velocity = 0
@@ -24,6 +25,17 @@ export default function StarAnimationCanvas() {
   const boxRef  = useRef<HTMLDivElement>(null)
   const gradRef = useRef<HTMLDivElement>(null)
   const blobRefs = useRef<HTMLDivElement[]>([])
+
+  const { params } = useAnimationControls()
+  const paramsRef = useRef(params)
+  useEffect(() => { paramsRef.current = params }, [params])
+
+  // Apply hue rotation live via CSS filter (combined with the existing blur).
+  useEffect(() => {
+    const grad = gradRef.current
+    if (!grad) return
+    grad.style.filter = `blur(15px) hue-rotate(${params.hue}deg)`
+  }, [params.hue])
 
   useEffect(() => {
     const box  = boxRef.current!
@@ -67,7 +79,8 @@ export default function StarAnimationCanvas() {
     function loop(now: number) {
       const dt  = lastT === 0 ? 1 / 60 : Math.max(1 / 240, Math.min(1 / 30, (now - lastT) / 1000))
       lastT = now
-      const t   = now / 1000
+      const speed = paramsRef.current.speed
+      const t   = (now / 1000) * speed
       const TAU = Math.PI * 2
 
       const cx = boxW / 2
@@ -83,7 +96,8 @@ export default function StarAnimationCanvas() {
       mapX.tick(dt)
       mapY.tick(dt)
 
-      const amp = boxW * 0.31 + Math.sin(t * 0.11 * TAU + 0.7) * boxW * 0.06
+      const spread = paramsRef.current.spread
+      const amp = boxW * spread + Math.sin(t * 0.11 * TAU + 0.7) * boxW * 0.06
       const blobEls = blobRefs.current
       spots.forEach((sp, i) => {
         if (t > sp.nextRetarget) {

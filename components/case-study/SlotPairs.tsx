@@ -2,6 +2,7 @@ import Image from 'next/image'
 import HpAnimationCanvas from './HpAnimationCanvas'
 import StarAnimationCanvas from './StarAnimationCanvas'
 import BioPairCard from './BioPairCard'
+import AnimationSlidersCanvas from './AnimationSlidersCanvas'
 import s from './SlotPairs.module.css'
 
 function SlotPairRow({ pair, rowIndex, variant }: { pair: string[]; rowIndex: number; variant?: 'about' }) {
@@ -22,6 +23,8 @@ function SlotPairRow({ pair, rowIndex, variant }: { pair: string[]; rowIndex: nu
               <HpAnimationCanvas />
             ) : url === '@star-animation' ? (
               <StarAnimationCanvas />
+            ) : url === '@animation-sliders' ? (
+              <AnimationSlidersCanvas />
             ) : url.includes('/video/') ? (
               <video src={url} autoPlay muted loop playsInline style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
             ) : url.endsWith('.html') ? (
