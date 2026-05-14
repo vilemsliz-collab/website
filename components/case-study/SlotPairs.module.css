@@ -50,5 +50,15 @@
 }
 
 @media (max-width: 768px) {
-  .pairRow { flex-direction: column; }
+  .pairRow {
+    flex-direction: column;
+  }
+  /* Force full-width stacked items so flex: 1 in column mode doesn't leave
+     them computing degenerate widths. Aspect-ratio drives the height. */
+  .pairSlot,
+  .pairSlotAbout,
+  .pairSlotWide {
+    flex: none;
+    width: 100%;
+  }
 }

@@ -95,6 +95,16 @@
   display: block;
 }
 
+@media (max-width: 768px) {
+  /* Smaller centered frame instead of edge-to-edge; the component's own
+     ResizeObserver scales the 372×372 grid down via transform to fit. */
+  .wrapper {
+    max-width: 280px;
+    aspect-ratio: 1 / 1;
+    margin: var(--space-2) auto 0;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .tile { transition: none !important; will-change: auto !important; }
   .tilePerson img { transition: none !important; }
