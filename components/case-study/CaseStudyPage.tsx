@@ -7,6 +7,7 @@ import SlotHero from './SlotHero'
 import SlotMedia from './SlotMedia'
 import SlotTimeline from './SlotTimeline'
 import SlotPairs from './SlotPairs'
+import SlotPairsCollapsible from './SlotPairsCollapsible'
 import SlotSolutionMedia from './SlotSolutionMedia'
 import AgentsGridCanvas from './AgentsGridCanvas'
 
@@ -162,7 +163,11 @@ export default function CaseStudyPage({ cs, isOverlay }: Props) {
             </div>
             <SlotTimeline />
             {cs.widget === '@agents-grid' && <AgentsGridCanvas />}
-            {cs.pairsBottom && <SlotPairs pairs={cs.pairsBottom} />}
+            {cs.pairsBottom && (
+              cs.pairsBottomCollapsible
+                ? <SlotPairsCollapsible pairs={cs.pairsBottom} />
+                : <SlotPairs pairs={cs.pairsBottom} />
+            )}
             <div id="case-solution" data-element="Solution" className={`${styles.caseStudyChallenge} ${styles.caseStudyTextInset}`}>
               <span className={styles.caseStudyRoleLabel}>Solution</span>
               <p className={styles.caseStudyBody}>{cs.solution}</p>
