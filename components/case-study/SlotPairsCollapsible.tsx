@@ -4,6 +4,31 @@ import { useRef, useState } from 'react'
 import SlotPairs from './SlotPairs'
 import s from './SlotPairsCollapsible.module.css'
 
+function ToggleButton({
+  open,
+  onClick,
+  label,
+  innerRef,
+}: {
+  open: boolean
+  onClick: () => void
+  label: string
+  innerRef?: React.RefObject<HTMLButtonElement>
+}) {
+  return (
+    <button
+      ref={innerRef}
+      type="button"
+      className={s.btn}
+      onClick={onClick}
+      aria-expanded={open}
+    >
+      <span className={s.btnLabel}>{label}</span>
+      <span className={s.btnIcon} data-open={open} aria-hidden>+</span>
+    </button>
+  )
+}
+
 export default function SlotPairsCollapsible({ pairs }: { pairs: string[][] }) {
   const [open, setOpen] = useState(false)
   const closeBtnRef = useRef<HTMLButtonElement>(null)
@@ -12,27 +37,17 @@ export default function SlotPairsCollapsible({ pairs }: { pairs: string[][] }) {
     const next = !open
     setOpen(next)
     if (next) {
-      // Wait for the expand animation to make the close button reachable,
-      // then bring the bottom of the section (close button) into view.
       window.setTimeout(() => {
         closeBtnRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
       }, 480)
     }
   }
 
+  const label = open ? 'Hide interactive demos' : 'Show interactive demos'
+
   return (
     <div className={s.wrap} data-open={open}>
-      <button
-        type="button"
-        className={s.openBtn}
-        onClick={toggle}
-        aria-expanded={open}
-      >
-        <span className={s.openLabel}>
-          {open ? 'Hide interactive demos' : 'Show interactive demos'}
-        </span>
-        <span className={s.openIcon} data-open={open} aria-hidden>+</span>
-      </button>
+      <ToggleButton open={open} onClick={toggle} label={label} />
       <div className={s.collapse} data-open={open}>
         <div className={s.inner}>
           <div className={s.section}>
@@ -40,17 +55,7 @@ export default function SlotPairsCollapsible({ pairs }: { pairs: string[][] }) {
               <SlotPairs pairs={pairs} />
             </div>
           </div>
-          <button
-            ref={closeBtnRef}
-            type="button"
-            className={s.closeBtn}
-            onClick={toggle}
-            aria-label="Hide interactive demos"
-            tabIndex={open ? 0 : -1}
-          >
-            <span>Hide demos</span>
-            <span className={s.closeIcon} aria-hidden>−</span>
-          </button>
+          <ToggleButton open={open} onClick={toggle} label={label} innerRef={closeBtnRef} />
         </div>
       </div>
     </div>
