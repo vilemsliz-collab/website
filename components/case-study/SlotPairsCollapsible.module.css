@@ -1,54 +1,9 @@
 .wrap {
   display: flex;
   flex-direction: column;
+  align-items: center;
   width: 100%;
 }
-
-/* ── Toggle button — full-width gray-50 card, used at top and bottom ── */
-.btn {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-4);
-  width: 100%;
-  background: var(--gray-50);
-  border: 1px solid var(--gray-100);
-  border-radius: var(--shape-md);
-  color: var(--color-on-background);
-  font-family: var(--font-brand);
-  font-size: 23px;
-  line-height: 32px;
-  letter-spacing: var(--type-body-large-ls);
-  font-weight: 500;
-  font-variation-settings: 'wght' 500;
-  text-align: left;
-  padding: var(--space-6);
-  cursor: pointer;
-  z-index: 2;
-  transition: background 0.18s ease, border-color 0.18s ease;
-}
-.btn:hover {
-  background: var(--gray-100);
-  border-color: var(--gray-200);
-}
-
-.btnLabel { flex: 1; }
-.btnIcon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 9999px;
-  background: var(--color-on-surface);
-  color: var(--color-surface);
-  font-size: 22px;
-  line-height: 1;
-  transition: transform 0.3s cubic-bezier(0.23, 1, 0.32, 1);
-  flex-shrink: 0;
-}
-.btnIcon[data-open='true'] { transform: rotate(45deg); }
 
 /* ── Collapse wrapper — grid-rows animation ── */
 .collapse {
@@ -63,29 +18,60 @@
 .inner {
   overflow: hidden;
   min-height: 0;
-  display: flex;
-  flex-direction: column;
 }
 
-/* ── Section card — white surface between the two buttons ── */
+/* ── Section card — white surface, contains the revealed content ── */
 .section {
-  position: relative;
   background: var(--color-background);
   border: 1px solid var(--gray-50);
   border-radius: var(--shape-md);
-  /* Pull section up so the open button visually overlaps its top border */
-  margin-top: calc(var(--space-3) * -1);
 }
 .content {
   padding: var(--space-6);
 }
 
-/* ── Bottom toggle — same button, pulled up to overlap section's bottom ── */
-.inner .btn {
-  margin-top: calc(var(--space-3) * -1);
+/* ── Pill — single toggle, always sits at the END of the section above
+   (AgentsGrid when collapsed, the revealed section when expanded).
+   Negative margin-top makes it overlap that section's bottom border. ── */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  background: var(--gray-50);
+  border: 1px solid var(--gray-100);
+  border-radius: 9999px;
+  color: var(--color-on-background);
+  font-family: var(--font-brand);
+  font-size: var(--type-body-medium-size);
+  line-height: var(--type-body-medium-lh);
+  letter-spacing: var(--type-body-medium-ls);
+  font-weight: 500;
+  font-variation-settings: 'wght' 500;
+  padding: 10px 16px 10px 20px;
+  cursor: pointer;
+  margin-top: -22px;
+  z-index: 2;
+  transition: background 0.18s ease, border-color 0.18s ease;
 }
+.pill:hover {
+  background: var(--gray-100);
+  border-color: var(--gray-200);
+}
+.pillIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 9999px;
+  background: var(--color-on-surface);
+  color: var(--color-surface);
+  font-size: 16px;
+  line-height: 1;
+  transition: transform 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+}
+.pillIcon[data-open='true'] { transform: rotate(45deg); }
 
 @media (max-width: 768px) {
-  .btn { padding: var(--space-4); font-size: 18px; line-height: 28px; }
   .content { padding: var(--space-4); }
 }
