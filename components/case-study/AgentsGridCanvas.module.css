@@ -1,13 +1,12 @@
 .wrapper {
   width: 100%;
-  max-width: 280px;
-  aspect-ratio: 1 / 1;
+  aspect-ratio: 1072 / 675;
   background: var(--color-background);
   border: 1px solid var(--gray-50);
   border-radius: var(--shape-md);
   overflow: hidden;
   position: relative;
-  margin: 0 auto;
+  margin-top: var(--space-2);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -94,6 +93,16 @@
   height: 76px;
   color: #00e05c;
   display: block;
+}
+
+@media (max-width: 768px) {
+  /* Smaller centered frame instead of edge-to-edge; the component's own
+     ResizeObserver scales the 372×372 grid down via transform to fit. */
+  .wrapper {
+    max-width: 280px;
+    aspect-ratio: 1 / 1;
+    margin: var(--space-2) auto 0;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
