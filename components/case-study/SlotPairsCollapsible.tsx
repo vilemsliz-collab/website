@@ -13,9 +13,11 @@ export default function SlotPairsCollapsible({ pairs }: { pairs: string[][] }) {
         className={s.toggle}
         onClick={() => setOpen(v => !v)}
         aria-expanded={open}
-        data-cursor="link"
       >
-        {open ? 'Hide interactive demos' : 'Show interactive demos'}
+        <span className={s.toggleLabel}>
+          {open ? 'Hide interactive demos' : 'Show interactive demos'}
+        </span>
+        <span className={s.toggleIcon} aria-hidden data-open={open}>+</span>
       </button>
       <div className={s.collapse} data-open={open}>
         <div className={s.inner}>
