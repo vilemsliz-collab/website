@@ -7,5 +7,6 @@
   border: 1px solid var(--gray-50);
   border-radius: var(--shape-md);
   overflow: hidden;
+  clip-path: inset(0 round var(--shape-md));
   position: relative;
 }
