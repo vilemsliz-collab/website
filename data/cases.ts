@@ -130,7 +130,7 @@ export const CASES: CaseStudy[] = [
     mediaCaption: 'Three separate product teams were shipping UI at different speeds with no shared vocabulary.',
     pairs: [],
     widget: '@agents-grid',
-    solutionVideo: 'https://res.cloudinary.com/duee5dfom/video/upload/q_auto,f_auto/v1779028599/Comp_1_2_tgjofv.mp4',
+    solutionVideo: 'https://res.cloudinary.com/duee5dfom/video/upload/q_auto,f_auto/v1779056003/Comp_1_2_tgjofv.mp4',
     resultsLabel: 'Results',
     results: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Edit me via Agentation feedback when ready.',
     resultsVideo: 'https://res.cloudinary.com/duee5dfom/video/upload/q_auto,f_auto/v1779056073/kling_20260518_%E4%BD%9C%E5%93%81_Iphone_sub_1299_0_1_2_hplfxf.mp4',
