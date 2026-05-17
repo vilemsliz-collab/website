@@ -1,6 +1,7 @@
 'use client'
 
 import { useRef, useState } from 'react'
+import { ChevronDownIcon } from '@radix-ui/react-icons'
 import SlotPairs from './SlotPairs'
 import s from './SlotPairsCollapsible.module.css'
 
@@ -21,11 +22,7 @@ export default function SlotPairsCollapsible({ pairs }: { pairs: string[][] }) {
     <div className={s.wrap}>
       <div className={s.collapse} data-open={open}>
         <div className={s.inner}>
-          <div className={s.section}>
-            <div className={s.content}>
-              <SlotPairs pairs={pairs} />
-            </div>
-          </div>
+          <SlotPairs pairs={pairs} />
         </div>
       </div>
       <button
@@ -36,7 +33,9 @@ export default function SlotPairsCollapsible({ pairs }: { pairs: string[][] }) {
         aria-expanded={open}
       >
         <span>{open ? 'Hide interactive demos' : 'Show interactive demos'}</span>
-        <span className={s.pillIcon} data-open={open} aria-hidden>+</span>
+        <span className={s.pillIcon} data-open={open} aria-hidden>
+          <ChevronDownIcon width={16} height={16} />
+        </span>
       </button>
     </div>
   )

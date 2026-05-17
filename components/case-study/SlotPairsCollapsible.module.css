@@ -20,16 +20,6 @@
   min-height: 0;
 }
 
-/* ── Section card — white surface, contains the revealed content ── */
-.section {
-  background: var(--color-background);
-  border: 1px solid var(--gray-50);
-  border-radius: var(--shape-md);
-}
-.content {
-  padding: var(--space-6);
-}
-
 /* ── Pill — single toggle, always sits at the END of the section above
    (AgentsGrid when collapsed, the revealed section when expanded).
    Negative margin-top makes it overlap that section's bottom border. ── */
@@ -70,8 +60,4 @@
   line-height: 1;
   transition: transform 0.3s cubic-bezier(0.23, 1, 0.32, 1);
 }
-.pillIcon[data-open='true'] { transform: rotate(45deg); }
-
-@media (max-width: 768px) {
-  .content { padding: var(--space-4); }
-}
+.pillIcon[data-open='true'] { transform: rotate(180deg); }
