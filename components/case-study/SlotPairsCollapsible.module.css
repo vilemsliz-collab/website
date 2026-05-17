@@ -1,18 +1,19 @@
 .wrap {
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
   width: 100%;
 }
 
-.toggle {
+/* ── Open button — full-width card, gray-50 surface ── */
+.openBtn {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-4);
   width: 100%;
-  background: var(--color-background);
-  border: 1px solid var(--gray-50);
+  background: var(--gray-50);
+  border: 1px solid var(--gray-100);
   border-radius: var(--shape-md);
   color: var(--color-on-background);
   font-family: var(--font-brand);
@@ -24,16 +25,16 @@
   text-align: left;
   padding: var(--space-6);
   cursor: pointer;
+  z-index: 2;
   transition: background 0.18s ease, border-color 0.18s ease;
 }
-.toggle:hover {
-  background: var(--gray-50);
-  border-color: var(--gray-100);
+.openBtn:hover {
+  background: var(--gray-100);
+  border-color: var(--gray-200);
 }
 
-.toggleLabel { flex: 1; }
-
-.toggleIcon {
+.openLabel { flex: 1; }
+.openIcon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -44,22 +45,84 @@
   color: var(--color-surface);
   font-size: 22px;
   line-height: 1;
-  font-weight: 400;
-  font-variation-settings: 'wght' 400;
   transition: transform 0.3s cubic-bezier(0.23, 1, 0.32, 1);
   flex-shrink: 0;
 }
-.toggleIcon[data-open='true'] { transform: rotate(45deg); }
+.openIcon[data-open='true'] { transform: rotate(45deg); }
 
-@media (max-width: 768px) {
-  .toggle { padding: var(--space-4); font-size: 18px; line-height: 28px; }
-}
-
+/* ── Collapse wrapper — grid-rows animation ── */
 .collapse {
   display: grid;
   grid-template-rows: 0fr;
   width: 100%;
   transition: grid-template-rows 0.45s cubic-bezier(0.23, 1, 0.32, 1);
 }
-.collapse[data-open='true'] { grid-template-rows: 1fr; }
-.inner { overflow: hidden; min-height: 0; }
+.collapse[data-open='true'] {
+  grid-template-rows: 1fr;
+}
+.inner {
+  overflow: hidden;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Section card — white surface, sits below the open button ── */
+.section {
+  position: relative;
+  background: var(--color-background);
+  border: 1px solid var(--gray-50);
+  border-radius: var(--shape-md);
+  /* Pull section up so the open button visually overlaps its top border */
+  margin-top: calc(var(--space-3) * -1);
+}
+.content {
+  padding: var(--space-6);
+  /* Reserve room at the bottom so the close pill doesn't cover content */
+  padding-bottom: calc(var(--space-6) + var(--space-6));
+}
+
+/* ── Close button — compact pill, centered, overlaps section's bottom border ── */
+.closeBtn {
+  align-self: center;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  background: var(--gray-50);
+  border: 1px solid var(--gray-100);
+  border-radius: 9999px;
+  color: var(--color-on-background);
+  font-family: var(--font-brand);
+  font-size: var(--type-body-medium-size);
+  line-height: var(--type-body-medium-lh);
+  letter-spacing: var(--type-body-medium-ls);
+  font-weight: 500;
+  font-variation-settings: 'wght' 500;
+  padding: 10px 16px 10px 20px;
+  cursor: pointer;
+  z-index: 2;
+  /* Pull the pill up so half of it overlaps the section's bottom border */
+  margin-top: -22px;
+  transition: background 0.18s ease, border-color 0.18s ease;
+}
+.closeBtn:hover {
+  background: var(--gray-100);
+  border-color: var(--gray-200);
+}
+.closeIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 9999px;
+  background: var(--color-on-surface);
+  color: var(--color-surface);
+  font-size: 16px;
+  line-height: 1;
+}
+
+@media (max-width: 768px) {
+  .openBtn { padding: var(--space-4); font-size: 18px; line-height: 28px; }
+  .content { padding: var(--space-4); padding-bottom: calc(var(--space-4) + var(--space-6)); }
+}
