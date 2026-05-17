@@ -25,6 +25,7 @@ export interface CaseStudy {
   mediaVideo?: string
   mediaCaption: string
   solutionImg?: string
+  solutionVideo?: string
   resultsLabel?: string
   results?: string
   resultsImg?: string
@@ -129,7 +130,7 @@ export const CASES: CaseStudy[] = [
     pairs: [],
     pairsBottom: [['@hp-animation', '@star-animation']],
     widget: '@agents-grid',
-    solutionImg: 'https://res.cloudinary.com/duee5dfom/image/upload/q_auto,f_auto/v1778664477/Slide_16_9_-_1_dtuhgg.png',
+    solutionVideo: 'https://res.cloudinary.com/duee5dfom/video/upload/q_auto,f_auto/v1779028599/Comp_1_2_tgjofv.mp4',
     resultsLabel: 'Results',
     results: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Edit me via Agentation feedback when ready.',
     resultsImg: 'https://res.cloudinary.com/duee5dfom/image/upload/q_auto,f_auto/v1778670430/10_dark_light_color_mwznxm.png',
