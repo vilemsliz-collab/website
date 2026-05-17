@@ -51,13 +51,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 22px;
-  height: 22px;
-  border-radius: 9999px;
-  background: var(--color-on-surface);
-  color: var(--color-surface);
-  font-size: 16px;
-  line-height: 1;
+  color: var(--color-on-background);
   transition: transform 0.3s cubic-bezier(0.23, 1, 0.32, 1);
 }
 .pillIcon[data-open='true'] { transform: rotate(180deg); }
