@@ -36,7 +36,6 @@ export interface CaseStudy {
   reflection?: string
   pairs: string[][]
   pairsBottom?: string[][]
-  pairsBottomCollapsible?: boolean
   widget?: string
   mobileSections?: MobileSection[]
   layout?: 'about'
@@ -129,8 +128,6 @@ export const CASES: CaseStudy[] = [
     mediaVideo: 'https://res.cloudinary.com/duee5dfom/video/upload/q_auto/f_auto/v1777116988/Final_Wrike_Copilot_Promo_Compressed_HB_1__2_gyxj2u.mp4',
     mediaCaption: 'Three separate product teams were shipping UI at different speeds with no shared vocabulary.',
     pairs: [],
-    pairsBottom: [['@hp-animation', '@star-animation']],
-    pairsBottomCollapsible: true,
     widget: '@agents-grid',
     solutionVideo: 'https://res.cloudinary.com/duee5dfom/video/upload/q_auto,f_auto/v1779028599/Comp_1_2_tgjofv.mp4',
     resultsLabel: 'Results',
