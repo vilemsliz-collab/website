@@ -7,15 +7,19 @@ import s from './SlotPairsCollapsible.module.css'
 
 export default function SlotPairsCollapsible({ pairs }: { pairs: string[][] }) {
   const [open, setOpen] = useState(false)
+  const collapseRef = useRef<HTMLDivElement>(null)
   const pillRef = useRef<HTMLButtonElement>(null)
 
   function toggle() {
-    setOpen(prev => !prev)
-    // After the collapse animation, bring the pill (always at the end of the
-    // section it controls) into view — opens scroll down, closes scroll back.
-    window.setTimeout(() => {
-      pillRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
-    }, 480)
+    const next = !open
+    setOpen(next)
+    if (!next) return
+    // On open: kick off the smooth scroll alongside the expand animation so the
+    // reposition feels like part of opening (not a delayed afterthought).
+    // Closing leaves the user where they are.
+    requestAnimationFrame(() => {
+      collapseRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    })
   }
 
   return (

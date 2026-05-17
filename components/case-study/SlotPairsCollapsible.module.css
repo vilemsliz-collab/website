@@ -3,6 +3,8 @@
   flex-direction: column;
   align-items: center;
   width: 100%;
+  /* Cancel the page gap so the pill can sit centered on the section line above */
+  margin-top: calc(var(--space-2) * -1);
 }
 
 /* ── Collapse wrapper — grid-rows animation ── */
