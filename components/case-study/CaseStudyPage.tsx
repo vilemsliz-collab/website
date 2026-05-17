@@ -176,8 +176,13 @@ export default function CaseStudyPage({ cs, isOverlay }: Props) {
                 <p className={styles.caseStudyBody}>{cs.results}</p>
               </div>
             )}
-            {cs.resultsImg && (
-              <SlotSolutionMedia src={cs.resultsImg} id="case-results-media" dataElement="Results media" />
+            {(cs.resultsImg || cs.resultsVideo) && (
+              <SlotSolutionMedia
+                src={cs.resultsImg}
+                video={cs.resultsVideo}
+                id="case-results-media"
+                dataElement="Results media"
+              />
             )}
             {cs.impact && (
               <div id="case-impact" data-element="Impact" className={`${styles.caseStudyChallenge} ${styles.caseStudyTextInset}`}>
